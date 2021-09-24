@@ -20,7 +20,7 @@ pub struct ValidationError {
     /// associated with certain entities.
     #[prost(string, repeated, tag = "3")]
     pub entries: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
-    /// The detailed error messsage.
+    /// The detailed error message.
     #[prost(string, tag = "4")]
     pub error_message: ::prost::alloc::string::String,
 }
@@ -349,7 +349,7 @@ pub mod agents_client {
             interceptor: F,
         ) -> AgentsClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -452,6 +452,14 @@ pub mod agents_client {
         }
         #[doc = " Trains the specified agent."]
         #[doc = ""]
+        #[doc = " This method is a [long-running"]
+        #[doc = " operation](https://cloud.google.com/dialogflow/es/docs/how/long-running-operations)."]
+        #[doc = " The returned `Operation` type has the following method-specific fields:"]
+        #[doc = ""]
+        #[doc = " - `metadata`: An empty [Struct"]
+        #[doc = "   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)"]
+        #[doc = " - `response`: An [Empty"]
+        #[doc = "   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#empty)"]
         #[doc = ""]
         #[doc = " Note: You should always train an agent prior to sending it queries. See the"]
         #[doc = " [training"]
@@ -476,6 +484,14 @@ pub mod agents_client {
             self.inner.unary(request.into_request(), path, codec).await
         }
         #[doc = " Exports the specified agent to a ZIP file."]
+        #[doc = ""]
+        #[doc = " This method is a [long-running"]
+        #[doc = " operation](https://cloud.google.com/dialogflow/es/docs/how/long-running-operations)."]
+        #[doc = " The returned `Operation` type has the following method-specific fields:"]
+        #[doc = ""]
+        #[doc = " - `metadata`: An empty [Struct"]
+        #[doc = "   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)"]
+        #[doc = " - `response`: [ExportAgentResponse][google.cloud.dialogflow.v2.ExportAgentResponse]"]
         pub async fn export_agent(
             &mut self,
             request: impl tonic::IntoRequest<super::ExportAgentRequest>,
@@ -505,8 +521,17 @@ pub mod agents_client {
         #[doc = " call [TrainAgent][google.cloud.dialogflow.v2.Agents.TrainAgent] and wait for the operation it returns in order to train"]
         #[doc = " explicitly."]
         #[doc = ""]
-        #[doc = " An operation which tracks when importing is complete. It only tracks"]
-        #[doc = " when the draft agent is updated not when it is done training."]
+        #[doc = " This method is a [long-running"]
+        #[doc = " operation](https://cloud.google.com/dialogflow/es/docs/how/long-running-operations)."]
+        #[doc = " The returned `Operation` type has the following method-specific fields:"]
+        #[doc = ""]
+        #[doc = " - `metadata`: An empty [Struct"]
+        #[doc = "   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)"]
+        #[doc = " - `response`: An [Empty"]
+        #[doc = "   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#empty)"]
+        #[doc = ""]
+        #[doc = " The operation only tracks when importing is complete, not when it is done"]
+        #[doc = " training."]
         #[doc = ""]
         #[doc = " Note: You should always train an agent prior to sending it queries. See the"]
         #[doc = " [training"]
@@ -539,8 +564,17 @@ pub mod agents_client {
         #[doc = " completed yet. Please call [TrainAgent][google.cloud.dialogflow.v2.Agents.TrainAgent] and wait for the operation it"]
         #[doc = " returns in order to train explicitly."]
         #[doc = ""]
-        #[doc = " An operation which tracks when restoring is complete. It only tracks"]
-        #[doc = " when the draft agent is updated not when it is done training."]
+        #[doc = " This method is a [long-running"]
+        #[doc = " operation](https://cloud.google.com/dialogflow/es/docs/how/long-running-operations)."]
+        #[doc = " The returned `Operation` type has the following method-specific fields:"]
+        #[doc = ""]
+        #[doc = " - `metadata`: An empty [Struct"]
+        #[doc = "   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)"]
+        #[doc = " - `response`: An [Empty"]
+        #[doc = "   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#empty)"]
+        #[doc = ""]
+        #[doc = " The operation only tracks when restoring is complete, not when it is done"]
+        #[doc = " training."]
         #[doc = ""]
         #[doc = " Note: You should always train an agent prior to sending it queries. See the"]
         #[doc = " [training"]
@@ -1098,7 +1132,7 @@ pub mod contexts_client {
             interceptor: F,
         ) -> ContextsClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -1328,6 +1362,7 @@ pub struct Intent {
         tag = "15"
     )]
     pub default_response_platforms: ::prost::alloc::vec::Vec<i32>,
+    /// Output only.
     /// Read-only. The unique identifier of the root intent in the chain of
     /// followup intents. It identifies the correct followup intents chain for
     /// this intent. We populate this field only in the output.
@@ -1345,7 +1380,7 @@ pub struct Intent {
     /// Format: `projects/<Project ID>/agent/intents/<Intent ID>`.
     #[prost(string, tag = "17")]
     pub parent_followup_intent_name: ::prost::alloc::string::String,
-    /// Read-only. Information about all followup intents that have this intent as
+    /// Output only. Read-only. Information about all followup intents that have this intent as
     /// a direct or indirect parent. We populate this field only in the output.
     #[prost(message, repeated, tag = "18")]
     pub followup_intent_info: ::prost::alloc::vec::Vec<intent::FollowupIntentInfo>,
@@ -2257,7 +2292,7 @@ pub mod intents_client {
             interceptor: F,
         ) -> IntentsClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -2381,6 +2416,13 @@ pub mod intents_client {
         }
         #[doc = " Updates/Creates multiple intents in the specified agent."]
         #[doc = ""]
+        #[doc = " This method is a [long-running"]
+        #[doc = " operation](https://cloud.google.com/dialogflow/es/docs/how/long-running-operations)."]
+        #[doc = " The returned `Operation` type has the following method-specific fields:"]
+        #[doc = ""]
+        #[doc = " - `metadata`: An empty [Struct"]
+        #[doc = "   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)"]
+        #[doc = " - `response`: [BatchUpdateIntentsResponse][google.cloud.dialogflow.v2.BatchUpdateIntentsResponse]"]
         #[doc = ""]
         #[doc = " Note: You should always train an agent prior to sending it queries. See the"]
         #[doc = " [training"]
@@ -2406,6 +2448,14 @@ pub mod intents_client {
         }
         #[doc = " Deletes intents in the specified agent."]
         #[doc = ""]
+        #[doc = " This method is a [long-running"]
+        #[doc = " operation](https://cloud.google.com/dialogflow/es/docs/how/long-running-operations)."]
+        #[doc = " The returned `Operation` type has the following method-specific fields:"]
+        #[doc = ""]
+        #[doc = " - `metadata`: An empty [Struct"]
+        #[doc = "   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)"]
+        #[doc = " - `response`: An [Empty"]
+        #[doc = "   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#empty)"]
         #[doc = ""]
         #[doc = " Note: You should always train an agent prior to sending it queries. See the"]
         #[doc = " [training"]
@@ -2780,7 +2830,7 @@ pub mod entity_types_client {
             interceptor: F,
         ) -> EntityTypesClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -2904,6 +2954,13 @@ pub mod entity_types_client {
         }
         #[doc = " Updates/Creates multiple entity types in the specified agent."]
         #[doc = ""]
+        #[doc = " This method is a [long-running"]
+        #[doc = " operation](https://cloud.google.com/dialogflow/es/docs/how/long-running-operations)."]
+        #[doc = " The returned `Operation` type has the following method-specific fields:"]
+        #[doc = ""]
+        #[doc = " - `metadata`: An empty [Struct"]
+        #[doc = "   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)"]
+        #[doc = " - `response`: [BatchUpdateEntityTypesResponse][google.cloud.dialogflow.v2.BatchUpdateEntityTypesResponse]"]
         #[doc = ""]
         #[doc = " Note: You should always train an agent prior to sending it queries. See the"]
         #[doc = " [training"]
@@ -2929,6 +2986,15 @@ pub mod entity_types_client {
         }
         #[doc = " Deletes entity types in the specified agent."]
         #[doc = ""]
+        #[doc = " This method is a [long-running"]
+        #[doc = " operation](https://cloud.google.com/dialogflow/es/docs/how/long-running-operations)."]
+        #[doc = " The returned `Operation` type has the following method-specific fields:"]
+        #[doc = ""]
+        #[doc = " - `metadata`: An empty [Struct"]
+        #[doc = "   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)"]
+        #[doc = " - `response`: An [Empty"]
+        #[doc = "   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#empty)"]
+        #[doc = ""]
         #[doc = " Note: You should always train an agent prior to sending it queries. See the"]
         #[doc = " [training"]
         #[doc = " documentation](https://cloud.google.com/dialogflow/es/docs/training)."]
@@ -2952,6 +3018,15 @@ pub mod entity_types_client {
             self.inner.unary(request.into_request(), path, codec).await
         }
         #[doc = " Creates multiple new entities in the specified entity type."]
+        #[doc = ""]
+        #[doc = " This method is a [long-running"]
+        #[doc = " operation](https://cloud.google.com/dialogflow/es/docs/how/long-running-operations)."]
+        #[doc = " The returned `Operation` type has the following method-specific fields:"]
+        #[doc = ""]
+        #[doc = " - `metadata`: An empty [Struct"]
+        #[doc = "   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)"]
+        #[doc = " - `response`: An [Empty"]
+        #[doc = "   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#empty)"]
         #[doc = ""]
         #[doc = " Note: You should always train an agent prior to sending it queries. See the"]
         #[doc = " [training"]
@@ -2979,9 +3054,19 @@ pub mod entity_types_client {
         #[doc = " method does not affect entities in the entity type that aren't explicitly"]
         #[doc = " specified in the request."]
         #[doc = ""]
+        #[doc = " This method is a [long-running"]
+        #[doc = " operation](https://cloud.google.com/dialogflow/es/docs/how/long-running-operations)."]
+        #[doc = " The returned `Operation` type has the following method-specific fields:"]
+        #[doc = ""]
+        #[doc = " - `metadata`: An empty [Struct"]
+        #[doc = "   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)"]
+        #[doc = " - `response`: An [Empty"]
+        #[doc = "   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#empty)"]
+        #[doc = ""]
         #[doc = " Note: You should always train an agent prior to sending it queries. See the"]
         #[doc = " [training"]
         #[doc = " documentation](https://cloud.google.com/dialogflow/es/docs/training)."]
+        #[doc = ""]
         pub async fn batch_update_entities(
             &mut self,
             request: impl tonic::IntoRequest<super::BatchUpdateEntitiesRequest>,
@@ -3002,6 +3087,15 @@ pub mod entity_types_client {
             self.inner.unary(request.into_request(), path, codec).await
         }
         #[doc = " Deletes entities in the specified entity type."]
+        #[doc = ""]
+        #[doc = " This method is a [long-running"]
+        #[doc = " operation](https://cloud.google.com/dialogflow/es/docs/how/long-running-operations)."]
+        #[doc = " The returned `Operation` type has the following method-specific fields:"]
+        #[doc = ""]
+        #[doc = " - `metadata`: An empty [Struct"]
+        #[doc = "   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct)"]
+        #[doc = " - `response`: An [Empty"]
+        #[doc = "   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#empty)"]
         #[doc = ""]
         #[doc = " Note: You should always train an agent prior to sending it queries. See the"]
         #[doc = " [training"]
@@ -3188,7 +3282,7 @@ pub mod session_entity_types_client {
             interceptor: F,
         ) -> SessionEntityTypesClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -3803,6 +3897,9 @@ pub struct StreamingRecognitionResult {
     /// beginning of the audio. Only populated for `message_type` = `TRANSCRIPT`.
     #[prost(message, optional, tag = "8")]
     pub speech_end_offset: ::core::option::Option<::prost_types::Duration>,
+    /// Detected language code for the transcript.
+    #[prost(string, tag = "10")]
+    pub language_code: ::prost::alloc::string::String,
 }
 /// Nested message and enum types in `StreamingRecognitionResult`.
 pub mod streaming_recognition_result {
@@ -3939,7 +4036,7 @@ pub mod sessions_client {
             interceptor: F,
         ) -> SessionsClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -4510,7 +4607,7 @@ pub mod participants_client {
             interceptor: F,
         ) -> ParticipantsClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -4934,7 +5031,7 @@ pub mod answer_records_client {
             interceptor: F,
         ) -> AnswerRecordsClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -5231,7 +5328,7 @@ pub mod conversations_client {
             interceptor: F,
         ) -> ConversationsClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -5928,7 +6025,7 @@ pub mod conversation_profiles_client {
             interceptor: F,
         ) -> ConversationProfilesClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -6315,7 +6412,7 @@ pub mod documents_client {
             interceptor: F,
         ) -> DocumentsClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -6376,8 +6473,12 @@ pub mod documents_client {
         }
         #[doc = " Creates a new document."]
         #[doc = ""]
-        #[doc = " Operation <response: [Document][google.cloud.dialogflow.v2.Document],"]
-        #[doc = "            metadata: [KnowledgeOperationMetadata][google.cloud.dialogflow.v2.KnowledgeOperationMetadata]>"]
+        #[doc = " This method is a [long-running"]
+        #[doc = " operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation)."]
+        #[doc = " The returned `Operation` type has the following method-specific fields:"]
+        #[doc = ""]
+        #[doc = " - `metadata`: [KnowledgeOperationMetadata][google.cloud.dialogflow.v2.KnowledgeOperationMetadata]"]
+        #[doc = " - `response`: [Document][google.cloud.dialogflow.v2.Document]"]
         pub async fn create_document(
             &mut self,
             request: impl tonic::IntoRequest<super::CreateDocumentRequest>,
@@ -6399,8 +6500,13 @@ pub mod documents_client {
         }
         #[doc = " Deletes the specified document."]
         #[doc = ""]
-        #[doc = " Operation <response: [google.protobuf.Empty][google.protobuf.Empty],"]
-        #[doc = "            metadata: [KnowledgeOperationMetadata][google.cloud.dialogflow.v2.KnowledgeOperationMetadata]>"]
+        #[doc = " This method is a [long-running"]
+        #[doc = " operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation)."]
+        #[doc = " The returned `Operation` type has the following method-specific fields:"]
+        #[doc = ""]
+        #[doc = " - `metadata`: [KnowledgeOperationMetadata][google.cloud.dialogflow.v2.KnowledgeOperationMetadata]"]
+        #[doc = " - `response`: An [Empty"]
+        #[doc = "   message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#empty)"]
         pub async fn delete_document(
             &mut self,
             request: impl tonic::IntoRequest<super::DeleteDocumentRequest>,
@@ -6422,8 +6528,12 @@ pub mod documents_client {
         }
         #[doc = " Updates the specified document."]
         #[doc = ""]
-        #[doc = " Operation <response: [Document][google.cloud.dialogflow.v2.Document],"]
-        #[doc = "            metadata: [KnowledgeOperationMetadata][google.cloud.dialogflow.v2.KnowledgeOperationMetadata]>"]
+        #[doc = " This method is a [long-running"]
+        #[doc = " operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation)."]
+        #[doc = " The returned `Operation` type has the following method-specific fields:"]
+        #[doc = ""]
+        #[doc = " - `metadata`: [KnowledgeOperationMetadata][google.cloud.dialogflow.v2.KnowledgeOperationMetadata]"]
+        #[doc = " - `response`: [Document][google.cloud.dialogflow.v2.Document]"]
         pub async fn update_document(
             &mut self,
             request: impl tonic::IntoRequest<super::UpdateDocumentRequest>,
@@ -6448,11 +6558,15 @@ pub mod documents_client {
         #[doc = " Note: Even when the content of the document has not changed, there still"]
         #[doc = " may be side effects because of internal implementation changes."]
         #[doc = ""]
+        #[doc = " This method is a [long-running"]
+        #[doc = " operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation)."]
+        #[doc = " The returned `Operation` type has the following method-specific fields:"]
+        #[doc = ""]
+        #[doc = " - `metadata`: [KnowledgeOperationMetadata][google.cloud.dialogflow.v2.KnowledgeOperationMetadata]"]
+        #[doc = " - `response`: [Document][google.cloud.dialogflow.v2.Document]"]
+        #[doc = ""]
         #[doc = " Note: The `projects.agent.knowledgeBases.documents` resource is deprecated;"]
         #[doc = " only use `projects.knowledgeBases.documents`."]
-        #[doc = ""]
-        #[doc = " Operation <response: [Document][google.cloud.dialogflow.v2.Document],"]
-        #[doc = "            metadata: [KnowledgeOperationMetadata][google.cloud.dialogflow.v2.KnowledgeOperationMetadata]>"]
         pub async fn reload_document(
             &mut self,
             request: impl tonic::IntoRequest<super::ReloadDocumentRequest>,
@@ -6617,7 +6731,7 @@ pub mod fulfillments_client {
             interceptor: F,
         ) -> FulfillmentsClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -6700,17 +6814,21 @@ pub mod fulfillments_client {
 pub struct Environment {
     /// Output only. The unique identifier of this agent environment.
     /// Supported formats:
+    ///
     /// - `projects/<Project ID>/agent/environments/<Environment ID>`
     /// - `projects/<Project ID>/locations/<Location
     ///   ID>/agent/environments/<Environment ID>`
+    ///
+    /// The environment ID for the default environment is `-`.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
     /// Optional. The developer-provided description for this environment.
     /// The maximum length is 500 characters. If exceeded, the request is rejected.
     #[prost(string, tag = "2")]
     pub description: ::prost::alloc::string::String,
-    /// Required. The agent version loaded into this environment.
+    /// Optional. The agent version loaded into this environment.
     /// Supported formats:
+    ///
     /// - `projects/<Project ID>/agent/versions/<Version ID>`
     /// - `projects/<Project ID>/locations/<Location ID>/agent/versions/<Version
     ///   ID>`
@@ -6780,6 +6898,7 @@ pub struct TextToSpeechSettings {
 pub struct ListEnvironmentsRequest {
     /// Required. The agent to list all environments from.
     /// Format:
+    ///
     /// - `projects/<Project ID>/agent`
     /// - `projects/<Project ID>/locations/<Location ID>/agent`
     #[prost(string, tag = "1")]
@@ -6809,9 +6928,12 @@ pub struct ListEnvironmentsResponse {
 pub struct GetEnvironmentRequest {
     /// Required. The name of the environment.
     /// Supported formats:
+    ///
     /// - `projects/<Project ID>/agent/environments/<Environment ID>`
     /// - `projects/<Project ID>/locations/<Location
     ///   ID>/agent/environments/<Environment ID>`
+    ///
+    /// The environment ID for the default environment is `-`.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
 }
@@ -6820,6 +6942,7 @@ pub struct GetEnvironmentRequest {
 pub struct CreateEnvironmentRequest {
     /// Required. The agent to create an environment for.
     /// Supported formats:
+    ///
     /// - `projects/<Project ID>/agent`
     /// - `projects/<Project ID>/locations/<Location ID>/agent`
     #[prost(string, tag = "1")]
@@ -6840,10 +6963,10 @@ pub struct UpdateEnvironmentRequest {
     /// Required. The mask to control which fields get updated.
     #[prost(message, optional, tag = "2")]
     pub update_mask: ::core::option::Option<::prost_types::FieldMask>,
-    /// Optional. This field is used to prevent accidental overwrite of the draft
+    /// Optional. This field is used to prevent accidental overwrite of the default
     /// environment, which is an operation that cannot be undone. To confirm that
     /// the caller desires this overwrite, this field must be explicitly set to
-    /// true when updating the draft environment (environment ID = `-`).
+    /// true when updating the default environment (environment ID = `-`).
     #[prost(bool, tag = "3")]
     pub allow_load_to_draft_and_discard_changes: bool,
 }
@@ -6852,9 +6975,12 @@ pub struct UpdateEnvironmentRequest {
 pub struct DeleteEnvironmentRequest {
     /// Required. The name of the environment to delete.
     /// / Format:
+    ///
     /// - `projects/<Project ID>/agent/environments/<Environment ID>`
     /// - `projects/<Project ID>/locations/<Location
-    /// ID>/agent/environments/<Environment ID>`
+    ///   ID>/agent/environments/<Environment ID>`
+    ///
+    /// The environment ID for the default environment is `-`.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
 }
@@ -6863,9 +6989,12 @@ pub struct DeleteEnvironmentRequest {
 pub struct GetEnvironmentHistoryRequest {
     /// Required. The name of the environment to retrieve history for.
     /// Supported formats:
+    ///
     /// - `projects/<Project ID>/agent/environments/<Environment ID>`
     /// - `projects/<Project ID>/locations/<Location
     ///   ID>/agent/environments/<Environment ID>`
+    ///
+    /// The environment ID for the default environment is `-`.
     #[prost(string, tag = "1")]
     pub parent: ::prost::alloc::string::String,
     /// Optional. The maximum number of items to return in a single page. By default 100 and
@@ -6881,9 +7010,12 @@ pub struct GetEnvironmentHistoryRequest {
 pub struct EnvironmentHistory {
     /// Output only. The name of the environment this history is for.
     /// Supported formats:
+    ///
     /// - `projects/<Project ID>/agent/environments/<Environment ID>`
     /// - `projects/<Project ID>/locations/<Location
     ///    ID>/agent/environments/<Environment ID>`
+    ///
+    /// The environment ID for the default environment is `-`.
     #[prost(string, tag = "1")]
     pub parent: ::prost::alloc::string::String,
     /// Output only. The list of agent environments. There will be a maximum number of items
@@ -6936,7 +7068,7 @@ pub mod environments_client {
             interceptor: F,
         ) -> EnvironmentsClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -6961,7 +7093,7 @@ pub mod environments_client {
             self.inner = self.inner.accept_gzip();
             self
         }
-        #[doc = " Returns the list of all non-draft environments of the specified agent."]
+        #[doc = " Returns the list of all non-default environments of the specified agent."]
         pub async fn list_environments(
             &mut self,
             request: impl tonic::IntoRequest<super::ListEnvironmentsRequest>,
@@ -7017,13 +7149,13 @@ pub mod environments_client {
         #[doc = " This method allows you to deploy new agent versions into the environment."]
         #[doc = " When an environment is pointed to a new agent version by setting"]
         #[doc = " `environment.agent_version`, the environment is temporarily set to the"]
-        #[doc = " `LOADING` state. During that time, the environment keeps on serving the"]
+        #[doc = " `LOADING` state. During that time, the environment continues serving the"]
         #[doc = " previous version of the agent. After the new agent version is done loading,"]
         #[doc = " the environment is set back to the `RUNNING` state."]
-        #[doc = " You can use \"-\" as Environment ID in environment name to update version"]
-        #[doc = " in \"draft\" environment. WARNING: this will negate all recent changes to"]
-        #[doc = " draft and can't be undone. You may want to save the draft to a version"]
-        #[doc = " before calling this function."]
+        #[doc = " You can use \"-\" as Environment ID in environment name to update an agent"]
+        #[doc = " version in the default environment. WARNING: this will negate all recent"]
+        #[doc = " changes to the draft agent and can't be undone. You may want to save the"]
+        #[doc = " draft agent to a version before calling this method."]
         pub async fn update_environment(
             &mut self,
             request: impl tonic::IntoRequest<super::UpdateEnvironmentRequest>,
@@ -7217,7 +7349,7 @@ pub mod knowledge_bases_client {
             interceptor: F,
         ) -> KnowledgeBasesClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -7351,6 +7483,7 @@ pub mod knowledge_bases_client {
 pub struct Version {
     /// Output only. The unique identifier of this agent version.
     /// Supported formats:
+    ///
     /// - `projects/<Project ID>/agent/versions/<Version ID>`
     /// - `projects/<Project ID>/locations/<Location ID>/agent/versions/<Version
     ///   ID>`
@@ -7393,6 +7526,7 @@ pub mod version {
 pub struct ListVersionsRequest {
     /// Required. The agent to list all versions from.
     /// Supported formats:
+    ///
     /// - `projects/<Project ID>/agent`
     /// - `projects/<Project ID>/locations/<Location ID>/agent`
     #[prost(string, tag = "1")]
@@ -7422,6 +7556,7 @@ pub struct ListVersionsResponse {
 pub struct GetVersionRequest {
     /// Required. The name of the version.
     /// Supported formats:
+    ///
     /// - `projects/<Project ID>/agent/versions/<Version ID>`
     /// - `projects/<Project ID>/locations/<Location ID>/agent/versions/<Version
     ///   ID>`
@@ -7433,6 +7568,7 @@ pub struct GetVersionRequest {
 pub struct CreateVersionRequest {
     /// Required. The agent to create a version for.
     /// Supported formats:
+    ///
     /// - `projects/<Project ID>/agent`
     /// - `projects/<Project ID>/locations/<Location ID>/agent`
     #[prost(string, tag = "1")]
@@ -7446,6 +7582,7 @@ pub struct CreateVersionRequest {
 pub struct UpdateVersionRequest {
     /// Required. The version to update.
     /// Supported formats:
+    ///
     /// - `projects/<Project ID>/agent/versions/<Version ID>`
     /// - `projects/<Project ID>/locations/<Location ID>/agent/versions/<Version
     ///   ID>`
@@ -7460,6 +7597,7 @@ pub struct UpdateVersionRequest {
 pub struct DeleteVersionRequest {
     /// Required. The name of the version to delete.
     /// Supported formats:
+    ///
     /// - `projects/<Project ID>/agent/versions/<Version ID>`
     /// - `projects/<Project ID>/locations/<Location ID>/agent/versions/<Version
     ///   ID>`
@@ -7491,7 +7629,7 @@ pub mod versions_client {
             interceptor: F,
         ) -> VersionsClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<

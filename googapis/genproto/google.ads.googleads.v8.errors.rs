@@ -1760,6 +1760,21 @@ pub mod conversion_adjustment_upload_error_enum {
         TooManyAdjustmentsInRequest = 11,
         /// The conversion has been adjusted too many times.
         TooManyAdjustments = 12,
+        /// The customer has not accepted the customer data terms in the conversion
+        /// settings page.
+        CustomerNotAcceptedCustomerDataTerms = 15,
+        /// The enhanced conversion settings of the conversion action supplied is
+        /// not eligible for enhancements.
+        ConversionActionNotEligibleForEnhancement = 16,
+        /// The provided user identifier is not a SHA-256 hash. It is either unhashed
+        /// or hashed using a different hash function.
+        InvalidUserIdentifier = 17,
+        /// The provided user identifier is not supported.
+        /// ConversionAdjustmentUploadService only supports hashed_email,
+        /// hashed_phone_number, and address_info.
+        UnsupportedUserIdentifier = 18,
+        /// The user_identifier_source must be FIRST_PARTY for enhancements.
+        InvalidUserIdentifierSource = 19,
     }
 }
 // Proto file describing conversion custom variable errors.
@@ -1878,6 +1893,121 @@ pub mod conversion_upload_error_enum {
         /// comply with the App Tracking Transparency (ATT) policy or the person who
         /// converted didn't consent to tracking.
         ConversionNotCompliantWithAttPolicy = 32,
+        /// No click was found for the provided user identifiers that could be
+        /// applied to the specified conversion action.
+        ClickNotFound = 33,
+        /// The provided user identifier is not a SHA-256 hash. It is either unhashed
+        /// or hashed using a different hash function.
+        InvalidUserIdentifier = 34,
+        /// Conversion actions which use an external attribution model cannot be used
+        /// with UserIdentifier.
+        ExternallyAttributedConversionActionNotPermittedWithUserIdentifier = 35,
+        /// The provided user identifier is not supported. ConversionUploadService
+        /// only supports hashed_email and hashed_phone_number.
+        UnsupportedUserIdentifier = 36,
+        /// The user_identifier_source must be FIRST_PARTY for conversion uploads.
+        InvalidUserIdentifierSource = 37,
+    }
+}
+// Proto file describing conversion value rule errors.
+
+/// Container for enum describing possible conversion value rule errors.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ConversionValueRuleErrorEnum {}
+/// Nested message and enum types in `ConversionValueRuleErrorEnum`.
+pub mod conversion_value_rule_error_enum {
+    /// Enum describing possible conversion value rule errors.
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum ConversionValueRuleError {
+        /// Enum unspecified.
+        Unspecified = 0,
+        /// The received error code is not known in this version.
+        Unknown = 1,
+        /// The value rule's geo location condition contains invalid geo target
+        /// constant(s), i.e. there's no matching geo target.
+        InvalidGeoTargetConstant = 2,
+        /// The value rule's geo location condition contains conflicting included and
+        /// excluded geo targets. Specifically, some of the excluded geo target(s)
+        /// are the same as or contain some of the included geo target(s). For
+        /// example, the geo location condition includes California but excludes U.S.
+        ConflictingIncludedAndExcludedGeoTarget = 3,
+        /// User specified conflicting conditions for two value rules in the same
+        /// value rule set.
+        ConflictingConditions = 4,
+        /// The value rule cannot be removed because it's still included in some
+        /// value rule set.
+        CannotRemoveIfIncludedInValueRuleSet = 5,
+        /// The value rule contains a condition that's not allowed by the value rule
+        /// set including this value rule.
+        ConditionNotAllowed = 6,
+        /// The value rule contains a field that should be unset.
+        FieldMustBeUnset = 7,
+        /// Pausing the value rule requires pausing the value rule set because the
+        /// value rule is (one of) the last enabled in the value rule set.
+        CannotPauseUnlessValueRuleSetIsPaused = 8,
+        /// The value rule's geo location condition contains untargetable geo target
+        /// constant(s).
+        UntargetableGeoTarget = 9,
+        /// The value rule's audience condition contains invalid user list(s). In
+        /// another word, there's no matching user list.
+        InvalidAudienceUserList = 10,
+        /// The value rule's audience condition contains inaccessible user list(s).
+        InaccessibleUserList = 11,
+        /// The value rule's audience condition contains invalid user_interest(s).
+        /// This might be because there is no matching user interest, or the user
+        /// interest is not visible.
+        InvalidAudienceUserInterest = 12,
+        /// When a value rule is created, it shouldn't have REMOVED status.
+        CannotAddRuleWithStatusRemoved = 13,
+    }
+}
+// Proto file describing conversion value rule set errors.
+
+/// Container for enum describing possible conversion value rule set errors.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ConversionValueRuleSetErrorEnum {}
+/// Nested message and enum types in `ConversionValueRuleSetErrorEnum`.
+pub mod conversion_value_rule_set_error_enum {
+    /// Enum describing possible conversion value rule set errors.
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum ConversionValueRuleSetError {
+        /// Enum unspecified.
+        Unspecified = 0,
+        /// The received error code is not known in this version.
+        Unknown = 1,
+        /// Two value rules in this value rule set contain conflicting conditions.
+        ConflictingValueRuleConditions = 2,
+        /// This value rule set includes a value rule that cannot be found, has been
+        /// permanently removed or belongs to a different customer.
+        InvalidValueRule = 3,
+        /// An error that's thrown when a mutate operation is trying to
+        /// replace/remove some existing elements in the dimensions field. In other
+        /// words, ADD op is always fine and UPDATE op is fine if it's only appending
+        /// new elements into dimensions list.
+        DimensionsUpdateOnlyAllowAppend = 4,
+        /// An error that's thrown when a mutate is adding new value rule(s) into a
+        /// value rule set and the added value rule(s) include conditions that are
+        /// not specified in the dimensions of the value rule set.
+        ConditionTypeNotAllowed = 5,
+        /// The dimensions field contains duplicate elements.
+        DuplicateDimensions = 6,
+        /// This value rule set is attached to an invalid campaign id. Either a
+        /// campaign with this campaign id doesn't exist or it belongs to a different
+        /// customer.
+        InvalidCampaignId = 7,
+        /// When a mutate request tries to pause a value rule set, the enabled
+        /// value rules in this set must be paused in the same command, or this error
+        /// will be thrown.
+        CannotPauseUnlessAllValueRulesArePaused = 8,
+        /// When a mutate request tries to pause all the value rules in a value rule
+        /// set, the value rule set must be paused, or this error will be thrown.
+        ShouldPauseWhenAllValueRulesArePaused = 9,
+        /// This value rule set is attached to a campaign that does not support value
+        /// rules. Currently, campaign level value rule sets can only be created on
+        /// Search, or Display campaigns.
+        ValueRulesNotSupportedForCampaignType = 10,
     }
 }
 // Proto file describing country code errors.
@@ -2197,6 +2327,9 @@ pub mod criterion_error_enum {
         HotelCheckInDateRangeEndDateTooLate = 133,
         /// Start date is after end date.
         HotelCheckInDateRangeReversed = 134,
+        /// Broad match modifier (BMM) keywords can no longer be created. Please see
+        /// https://ads-developers.googleblog.com/2021/06/broad-match-modifier-upcoming-changes.html.
+        BroadMatchModifierKeywordNotAllowed = 135,
     }
 }
 // Proto file describing currency code errors.
@@ -4749,7 +4882,7 @@ pub mod query_error_enum {
         InvalidValueWithBetweenOperator = 26,
         /// The value passed to the DURING operator is not a Date range literal
         InvalidValueWithDuringOperator = 22,
-        /// A non-string value was passed to the LIKE operator.
+        /// An invalid value was passed to the LIKE operator.
         InvalidValueWithLikeOperator = 56,
         /// An operator was provided that is inapplicable to the field being
         /// filtered.
@@ -5589,7 +5722,7 @@ pub struct ErrorCode {
     /// The list of error enums
     #[prost(
         oneof = "error_code::ErrorCode",
-        tags = "1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19, 21, 24, 25, 107, 26, 29, 31, 109, 32, 90, 33, 34, 35, 36, 37, 38, 39, 40, 110, 42, 116, 86, 44, 45, 46, 47, 48, 49, 58, 51, 52, 53, 54, 55, 56, 57, 117, 59, 60, 61, 62, 63, 64, 65, 115, 143, 111, 66, 67, 68, 70, 71, 72, 132, 74, 133, 76, 77, 78, 136, 79, 80, 81, 82, 83, 84, 87, 88, 91, 92, 93, 94, 96, 97, 98, 100, 101, 102, 103, 140, 141, 104, 105, 112, 114, 118, 119, 137, 121, 122, 124, 125, 126, 127, 128, 129, 130, 131, 134, 135, 138, 139"
+        tags = "1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19, 21, 24, 25, 107, 26, 29, 31, 109, 32, 90, 33, 34, 35, 36, 37, 38, 39, 40, 110, 42, 116, 86, 44, 45, 46, 47, 48, 49, 58, 51, 52, 53, 54, 55, 56, 57, 117, 59, 60, 61, 62, 63, 64, 65, 115, 143, 111, 145, 146, 66, 67, 68, 70, 71, 72, 132, 74, 133, 76, 77, 78, 136, 79, 80, 81, 82, 83, 84, 87, 88, 91, 92, 93, 94, 96, 97, 98, 100, 101, 102, 103, 140, 141, 104, 105, 112, 114, 118, 119, 137, 121, 122, 124, 125, 126, 127, 128, 129, 130, 131, 134, 135, 138, 139"
     )]
     pub error_code: ::core::option::Option<error_code::ErrorCode>,
 }
@@ -5907,6 +6040,18 @@ pub mod error_code {
             tag = "111"
         )]
         ConversionUploadError(i32),
+        /// The reasons for the conversion value rule error
+        #[prost(
+            enumeration = "super::conversion_value_rule_error_enum::ConversionValueRuleError",
+            tag = "145"
+        )]
+        ConversionValueRuleError(i32),
+        /// The reasons for the conversion value rule set error
+        #[prost(
+            enumeration = "super::conversion_value_rule_set_error_enum::ConversionValueRuleSetError",
+            tag = "146"
+        )]
+        ConversionValueRuleSetError(i32),
         /// The reasons for the header error.
         #[prost(enumeration = "super::header_error_enum::HeaderError", tag = "66")]
         HeaderError(i32),

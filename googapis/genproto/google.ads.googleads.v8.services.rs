@@ -31,7 +31,7 @@ pub mod accessible_bidding_strategy_service_client {
             interceptor: F,
         ) -> AccessibleBiddingStrategyServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -187,7 +187,7 @@ pub mod account_budget_proposal_service_client {
             interceptor: F,
         ) -> AccountBudgetProposalServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -305,7 +305,7 @@ pub mod account_budget_service_client {
             interceptor: F,
         ) -> AccountBudgetServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -471,7 +471,7 @@ pub mod account_link_service_client {
             interceptor: F,
         ) -> AccountLinkServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -615,7 +615,7 @@ pub mod ad_group_ad_asset_view_service_client {
             interceptor: F,
         ) -> AdGroupAdAssetViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -765,7 +765,7 @@ pub mod ad_group_ad_label_service_client {
             interceptor: F,
         ) -> AdGroupAdLabelServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -965,7 +965,7 @@ pub mod ad_group_ad_service_client {
             interceptor: F,
         ) -> AdGroupAdServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -1194,7 +1194,7 @@ pub mod ad_group_asset_service_client {
             interceptor: F,
         ) -> AdGroupAssetServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -1309,7 +1309,7 @@ pub mod ad_group_audience_view_service_client {
             interceptor: F,
         ) -> AdGroupAudienceViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -1475,7 +1475,7 @@ pub mod ad_group_bid_modifier_service_client {
             interceptor: F,
         ) -> AdGroupBidModifierServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -1668,7 +1668,7 @@ pub mod ad_group_criterion_label_service_client {
             interceptor: F,
         ) -> AdGroupCriterionLabelServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -1871,7 +1871,7 @@ pub mod ad_group_criterion_service_client {
             interceptor: F,
         ) -> AdGroupCriterionServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -2009,7 +2009,7 @@ pub mod ad_group_criterion_simulation_service_client {
             interceptor: F,
         ) -> AdGroupCriterionSimulationServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -2188,7 +2188,7 @@ pub mod ad_group_extension_setting_service_client {
             interceptor: F,
         ) -> AdGroupExtensionSettingServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -2400,7 +2400,7 @@ pub mod ad_group_feed_service_client {
             interceptor: F,
         ) -> AdGroupFeedServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -2590,7 +2590,7 @@ pub mod ad_group_label_service_client {
             interceptor: F,
         ) -> AdGroupLabelServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -2785,7 +2785,7 @@ pub mod ad_group_service_client {
             interceptor: F,
         ) -> AdGroupServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -2919,7 +2919,7 @@ pub mod ad_group_simulation_service_client {
             interceptor: F,
         ) -> AdGroupSimulationServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -3086,7 +3086,7 @@ pub mod ad_parameter_service_client {
             interceptor: F,
         ) -> AdParameterServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -3202,7 +3202,7 @@ pub mod ad_schedule_view_service_client {
             interceptor: F,
         ) -> AdScheduleViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -3365,7 +3365,7 @@ pub mod ad_service_client {
             interceptor: F,
         ) -> AdServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -3507,7 +3507,7 @@ pub mod age_range_view_service_client {
             interceptor: F,
         ) -> AgeRangeViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -3591,7 +3591,7 @@ pub mod asset_field_type_view_service_client {
             interceptor: F,
         ) -> AssetFieldTypeViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -3749,7 +3749,7 @@ pub mod asset_service_client {
             interceptor: F,
         ) -> AssetServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -3843,6 +3843,374 @@ pub mod asset_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/google.ads.googleads.v8.services.AssetService/MutateAssets",
             );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+    }
+}
+/// Request message for
+/// [BiddingDataExclusionService.GetBiddingDataExclusion][google.ads.googleads.v8.services.BiddingDataExclusionService.GetBiddingDataExclusion].
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetBiddingDataExclusionRequest {
+    /// Required. The resource name of the data exclusion to fetch.
+    #[prost(string, tag = "1")]
+    pub resource_name: ::prost::alloc::string::String,
+}
+/// Request message for
+/// [BiddingDataExclusionService.MutateBiddingDataExclusions][google.ads.googleads.v8.services.BiddingDataExclusionService.MutateBiddingDataExclusions].
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MutateBiddingDataExclusionsRequest {
+    /// Required. ID of the customer whose data exclusions are being modified.
+    #[prost(string, tag = "1")]
+    pub customer_id: ::prost::alloc::string::String,
+    /// Required. The list of operations to perform on individual data exclusions.
+    #[prost(message, repeated, tag = "2")]
+    pub operations: ::prost::alloc::vec::Vec<BiddingDataExclusionOperation>,
+    /// If true, successful operations will be carried out and invalid
+    /// operations will return errors. If false, all operations will be carried
+    /// out in one transaction if and only if they are all valid.
+    /// Default is false.
+    #[prost(bool, tag = "3")]
+    pub partial_failure: bool,
+    /// If true, the request is validated but not executed. Only errors are
+    /// returned, not results.
+    #[prost(bool, tag = "4")]
+    pub validate_only: bool,
+    /// The response content type setting. Determines whether the mutable resource
+    /// or just the resource name should be returned post mutation.
+    #[prost(
+        enumeration = "super::enums::response_content_type_enum::ResponseContentType",
+        tag = "5"
+    )]
+    pub response_content_type: i32,
+}
+/// A single operation (create, remove, update) on a data exclusion.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct BiddingDataExclusionOperation {
+    /// FieldMask that determines which resource fields are modified in an update.
+    #[prost(message, optional, tag = "4")]
+    pub update_mask: ::core::option::Option<::prost_types::FieldMask>,
+    /// The mutate operation.
+    #[prost(
+        oneof = "bidding_data_exclusion_operation::Operation",
+        tags = "1, 2, 3"
+    )]
+    pub operation: ::core::option::Option<bidding_data_exclusion_operation::Operation>,
+}
+/// Nested message and enum types in `BiddingDataExclusionOperation`.
+pub mod bidding_data_exclusion_operation {
+    /// The mutate operation.
+    #[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Operation {
+        /// Create operation: No resource name is expected for the new data
+        /// exclusion.
+        #[prost(message, tag = "1")]
+        Create(super::super::resources::BiddingDataExclusion),
+        /// Update operation: The data exclusion is expected to have a valid
+        /// resource name.
+        #[prost(message, tag = "2")]
+        Update(super::super::resources::BiddingDataExclusion),
+        /// Remove operation: A resource name for the removed data exclusion
+        /// is expected, in this format:
+        ///
+        /// `customers/{customer_id}/biddingDataExclusions/{data_exclusion_id}`
+        #[prost(string, tag = "3")]
+        Remove(::prost::alloc::string::String),
+    }
+}
+/// Response message for data exlusions mutate.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MutateBiddingDataExclusionsResponse {
+    /// Errors that pertain to operation failures in the partial failure mode.
+    /// Returned only when partial_failure = true and all errors occur inside the
+    /// operations. If any errors occur outside the operations (e.g. auth errors),
+    /// we return an RPC level error.
+    #[prost(message, optional, tag = "3")]
+    pub partial_failure_error: ::core::option::Option<super::super::super::super::rpc::Status>,
+    /// All results for the mutate.
+    #[prost(message, repeated, tag = "2")]
+    pub results: ::prost::alloc::vec::Vec<MutateBiddingDataExclusionsResult>,
+}
+/// The result for the data exclusion mutate.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MutateBiddingDataExclusionsResult {
+    /// Returned for successful operations.
+    #[prost(string, tag = "1")]
+    pub resource_name: ::prost::alloc::string::String,
+    /// The mutated bidding data exclusion with only mutable fields after mutate.
+    /// The field will only be returned when response_content_type is set
+    /// to "MUTABLE_RESOURCE".
+    #[prost(message, optional, tag = "2")]
+    pub bidding_data_exclusion: ::core::option::Option<super::resources::BiddingDataExclusion>,
+}
+#[doc = r" Generated client implementations."]
+pub mod bidding_data_exclusion_service_client {
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    use tonic::codegen::*;
+    #[doc = " Service to manage bidding data exclusions."]
+    #[derive(Debug, Clone)]
+    pub struct BiddingDataExclusionServiceClient<T> {
+        inner: tonic::client::Grpc<T>,
+    }
+    impl<T> BiddingDataExclusionServiceClient<T>
+    where
+        T: tonic::client::GrpcService<tonic::body::BoxBody>,
+        T::ResponseBody: Body + Send + Sync + 'static,
+        T::Error: Into<StdError>,
+        <T::ResponseBody as Body>::Error: Into<StdError> + Send,
+    {
+        pub fn new(inner: T) -> Self {
+            let inner = tonic::client::Grpc::new(inner);
+            Self { inner }
+        }
+        pub fn with_interceptor<F>(
+            inner: T,
+            interceptor: F,
+        ) -> BiddingDataExclusionServiceClient<InterceptedService<T, F>>
+        where
+            F: tonic::service::Interceptor,
+            T: tonic::codegen::Service<
+                http::Request<tonic::body::BoxBody>,
+                Response = http::Response<
+                    <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
+                >,
+            >,
+            <T as tonic::codegen::Service<http::Request<tonic::body::BoxBody>>>::Error:
+                Into<StdError> + Send + Sync,
+        {
+            BiddingDataExclusionServiceClient::new(InterceptedService::new(inner, interceptor))
+        }
+        #[doc = r" Compress requests with `gzip`."]
+        #[doc = r""]
+        #[doc = r" This requires the server to support it otherwise it might respond with an"]
+        #[doc = r" error."]
+        pub fn send_gzip(mut self) -> Self {
+            self.inner = self.inner.send_gzip();
+            self
+        }
+        #[doc = r" Enable decompressing responses with `gzip`."]
+        pub fn accept_gzip(mut self) -> Self {
+            self.inner = self.inner.accept_gzip();
+            self
+        }
+        #[doc = " Returns the requested data exclusion in full detail."]
+        pub async fn get_bidding_data_exclusion(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetBiddingDataExclusionRequest>,
+        ) -> Result<tonic::Response<super::super::resources::BiddingDataExclusion>, tonic::Status>
+        {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http :: uri :: PathAndQuery :: from_static ("/google.ads.googleads.v8.services.BiddingDataExclusionService/GetBiddingDataExclusion") ;
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        #[doc = " Creates, updates, or removes data exclusions."]
+        #[doc = " Operation statuses are returned."]
+        pub async fn mutate_bidding_data_exclusions(
+            &mut self,
+            request: impl tonic::IntoRequest<super::MutateBiddingDataExclusionsRequest>,
+        ) -> Result<tonic::Response<super::MutateBiddingDataExclusionsResponse>, tonic::Status>
+        {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http :: uri :: PathAndQuery :: from_static ("/google.ads.googleads.v8.services.BiddingDataExclusionService/MutateBiddingDataExclusions") ;
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+    }
+}
+/// Request message for
+/// [BiddingSeasonalityAdjustmentService.GetBiddingSeasonalityAdjustment][google.ads.googleads.v8.services.BiddingSeasonalityAdjustmentService.GetBiddingSeasonalityAdjustment].
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetBiddingSeasonalityAdjustmentRequest {
+    /// Required. The resource name of the seasonality adjustment to fetch.
+    #[prost(string, tag = "1")]
+    pub resource_name: ::prost::alloc::string::String,
+}
+/// Request message for
+/// [BiddingSeasonalityAdjustmentService.MutateBiddingSeasonalityAdjustments][google.ads.googleads.v8.services.BiddingSeasonalityAdjustmentService.MutateBiddingSeasonalityAdjustments].
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MutateBiddingSeasonalityAdjustmentsRequest {
+    /// Required. ID of the customer whose seasonality adjustments are being modified.
+    #[prost(string, tag = "1")]
+    pub customer_id: ::prost::alloc::string::String,
+    /// Required. The list of operations to perform on individual seasonality adjustments.
+    #[prost(message, repeated, tag = "2")]
+    pub operations: ::prost::alloc::vec::Vec<BiddingSeasonalityAdjustmentOperation>,
+    /// If true, successful operations will be carried out and invalid
+    /// operations will return errors. If false, all operations will be carried
+    /// out in one transaction if and only if they are all valid.
+    /// Default is false.
+    #[prost(bool, tag = "3")]
+    pub partial_failure: bool,
+    /// If true, the request is validated but not executed. Only errors are
+    /// returned, not results.
+    #[prost(bool, tag = "4")]
+    pub validate_only: bool,
+    /// The response content type setting. Determines whether the mutable resource
+    /// or just the resource name should be returned post mutation.
+    #[prost(
+        enumeration = "super::enums::response_content_type_enum::ResponseContentType",
+        tag = "5"
+    )]
+    pub response_content_type: i32,
+}
+/// A single operation (create, remove, update) on a seasonality adjustment.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct BiddingSeasonalityAdjustmentOperation {
+    /// FieldMask that determines which resource fields are modified in an update.
+    #[prost(message, optional, tag = "4")]
+    pub update_mask: ::core::option::Option<::prost_types::FieldMask>,
+    /// The mutate operation.
+    #[prost(
+        oneof = "bidding_seasonality_adjustment_operation::Operation",
+        tags = "1, 2, 3"
+    )]
+    pub operation: ::core::option::Option<bidding_seasonality_adjustment_operation::Operation>,
+}
+/// Nested message and enum types in `BiddingSeasonalityAdjustmentOperation`.
+pub mod bidding_seasonality_adjustment_operation {
+    /// The mutate operation.
+    #[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Operation {
+        /// Create operation: No resource name is expected for the new seasonality
+        /// adjustment.
+        #[prost(message, tag = "1")]
+        Create(super::super::resources::BiddingSeasonalityAdjustment),
+        /// Update operation: The seasonality adjustment is expected to have a valid
+        /// resource name.
+        #[prost(message, tag = "2")]
+        Update(super::super::resources::BiddingSeasonalityAdjustment),
+        /// Remove operation: A resource name for the removed seasonality adjustment
+        /// is expected, in this format:
+        ///
+        /// `customers/{customer_id}/biddingSeasonalityAdjustments/{seasonality_adjustment_id}`
+        #[prost(string, tag = "3")]
+        Remove(::prost::alloc::string::String),
+    }
+}
+/// Response message for seasonality adjustments mutate.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MutateBiddingSeasonalityAdjustmentsResponse {
+    /// Errors that pertain to operation failures in the partial failure mode.
+    /// Returned only when partial_failure = true and all errors occur inside the
+    /// operations. If any errors occur outside the operations (e.g. auth errors),
+    /// we return an RPC level error.
+    #[prost(message, optional, tag = "3")]
+    pub partial_failure_error: ::core::option::Option<super::super::super::super::rpc::Status>,
+    /// All results for the mutate.
+    #[prost(message, repeated, tag = "2")]
+    pub results: ::prost::alloc::vec::Vec<MutateBiddingSeasonalityAdjustmentsResult>,
+}
+/// The result for the seasonality adjustment mutate.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MutateBiddingSeasonalityAdjustmentsResult {
+    /// Returned for successful operations.
+    #[prost(string, tag = "1")]
+    pub resource_name: ::prost::alloc::string::String,
+    /// The mutated bidding seasonality adjustment with only mutable fields after
+    /// mutate. The field will only be returned when response_content_type is set
+    /// to "MUTABLE_RESOURCE".
+    #[prost(message, optional, tag = "2")]
+    pub bidding_seasonality_adjustment:
+        ::core::option::Option<super::resources::BiddingSeasonalityAdjustment>,
+}
+#[doc = r" Generated client implementations."]
+pub mod bidding_seasonality_adjustment_service_client {
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    use tonic::codegen::*;
+    #[doc = " Service to manage bidding seasonality adjustments."]
+    #[derive(Debug, Clone)]
+    pub struct BiddingSeasonalityAdjustmentServiceClient<T> {
+        inner: tonic::client::Grpc<T>,
+    }
+    impl<T> BiddingSeasonalityAdjustmentServiceClient<T>
+    where
+        T: tonic::client::GrpcService<tonic::body::BoxBody>,
+        T::ResponseBody: Body + Send + Sync + 'static,
+        T::Error: Into<StdError>,
+        <T::ResponseBody as Body>::Error: Into<StdError> + Send,
+    {
+        pub fn new(inner: T) -> Self {
+            let inner = tonic::client::Grpc::new(inner);
+            Self { inner }
+        }
+        pub fn with_interceptor<F>(
+            inner: T,
+            interceptor: F,
+        ) -> BiddingSeasonalityAdjustmentServiceClient<InterceptedService<T, F>>
+        where
+            F: tonic::service::Interceptor,
+            T: tonic::codegen::Service<
+                http::Request<tonic::body::BoxBody>,
+                Response = http::Response<
+                    <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
+                >,
+            >,
+            <T as tonic::codegen::Service<http::Request<tonic::body::BoxBody>>>::Error:
+                Into<StdError> + Send + Sync,
+        {
+            BiddingSeasonalityAdjustmentServiceClient::new(InterceptedService::new(
+                inner,
+                interceptor,
+            ))
+        }
+        #[doc = r" Compress requests with `gzip`."]
+        #[doc = r""]
+        #[doc = r" This requires the server to support it otherwise it might respond with an"]
+        #[doc = r" error."]
+        pub fn send_gzip(mut self) -> Self {
+            self.inner = self.inner.send_gzip();
+            self
+        }
+        #[doc = r" Enable decompressing responses with `gzip`."]
+        pub fn accept_gzip(mut self) -> Self {
+            self.inner = self.inner.accept_gzip();
+            self
+        }
+        #[doc = " Returns the requested seasonality adjustment in full detail."]
+        pub async fn get_bidding_seasonality_adjustment(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetBiddingSeasonalityAdjustmentRequest>,
+        ) -> Result<
+            tonic::Response<super::super::resources::BiddingSeasonalityAdjustment>,
+            tonic::Status,
+        > {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http :: uri :: PathAndQuery :: from_static ("/google.ads.googleads.v8.services.BiddingSeasonalityAdjustmentService/GetBiddingSeasonalityAdjustment") ;
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        #[doc = " Creates, updates, or removes seasonality adjustments."]
+        #[doc = " Operation statuses are returned."]
+        pub async fn mutate_bidding_seasonality_adjustments(
+            &mut self,
+            request: impl tonic::IntoRequest<super::MutateBiddingSeasonalityAdjustmentsRequest>,
+        ) -> Result<
+            tonic::Response<super::MutateBiddingSeasonalityAdjustmentsResponse>,
+            tonic::Status,
+        > {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http :: uri :: PathAndQuery :: from_static ("/google.ads.googleads.v8.services.BiddingSeasonalityAdjustmentService/MutateBiddingSeasonalityAdjustments") ;
             self.inner.unary(request.into_request(), path, codec).await
         }
     }
@@ -3962,7 +4330,7 @@ pub mod bidding_strategy_service_client {
             interceptor: F,
         ) -> BiddingStrategyServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -4177,7 +4545,7 @@ pub mod campaign_asset_service_client {
             interceptor: F,
         ) -> CampaignAssetServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -4378,7 +4746,7 @@ pub mod campaign_bid_modifier_service_client {
             interceptor: F,
         ) -> CampaignBidModifierServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -4584,7 +4952,7 @@ pub mod campaign_budget_service_client {
             interceptor: F,
         ) -> CampaignBudgetServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -4788,7 +5156,7 @@ pub mod campaign_criterion_service_client {
             interceptor: F,
         ) -> CampaignCriterionServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -5046,7 +5414,7 @@ pub mod campaign_draft_service_client {
             interceptor: F,
         ) -> CampaignDraftServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -5413,7 +5781,7 @@ pub mod campaign_experiment_service_client {
             interceptor: F,
         ) -> CampaignExperimentServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -5767,7 +6135,7 @@ pub mod campaign_extension_setting_service_client {
             interceptor: F,
         ) -> CampaignExtensionSettingServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -5978,7 +6346,7 @@ pub mod campaign_feed_service_client {
             interceptor: F,
         ) -> CampaignFeedServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -6169,7 +6537,7 @@ pub mod campaign_label_service_client {
             interceptor: F,
         ) -> CampaignLabelServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -6366,7 +6734,7 @@ pub mod campaign_service_client {
             interceptor: F,
         ) -> CampaignServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -6580,7 +6948,7 @@ pub mod campaign_shared_set_service_client {
             interceptor: F,
         ) -> CampaignSharedSetServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -6788,7 +7156,7 @@ pub mod conversion_action_service_client {
             interceptor: F,
         ) -> ConversionActionServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -6996,7 +7364,7 @@ pub mod conversion_custom_variable_service_client {
             interceptor: F,
         ) -> ConversionCustomVariableServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -7070,6 +7438,365 @@ pub mod conversion_custom_variable_service_client {
             })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http :: uri :: PathAndQuery :: from_static ("/google.ads.googleads.v8.services.ConversionCustomVariableService/MutateConversionCustomVariables") ;
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+    }
+}
+/// Request message for
+/// [ConversionValueRuleService.GetConversionValueRule][google.ads.googleads.v8.services.ConversionValueRuleService.GetConversionValueRule].
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetConversionValueRuleRequest {
+    /// Required. The resource name of the conversion value rule to fetch.
+    #[prost(string, tag = "1")]
+    pub resource_name: ::prost::alloc::string::String,
+}
+/// Request message for
+/// [ConversionValueRuleService.MutateConversionValueRules][google.ads.googleads.v8.services.ConversionValueRuleService.MutateConversionValueRules].
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MutateConversionValueRulesRequest {
+    /// Required. The ID of the customer whose conversion value rules are being modified.
+    #[prost(string, tag = "1")]
+    pub customer_id: ::prost::alloc::string::String,
+    /// Required. The list of operations to perform on individual conversion value rules.
+    #[prost(message, repeated, tag = "2")]
+    pub operations: ::prost::alloc::vec::Vec<ConversionValueRuleOperation>,
+    /// If true, successful operations will be carried out and invalid
+    /// operations will return errors. If false, all operations will be carried
+    /// out in one transaction if and only if they are all valid.
+    /// Default is false.
+    #[prost(bool, tag = "5")]
+    pub partial_failure: bool,
+    /// If true, the request is validated but not executed. Only errors are
+    /// returned, not results.
+    #[prost(bool, tag = "3")]
+    pub validate_only: bool,
+    /// The response content type setting. Determines whether the mutable resource
+    /// or just the resource name should be returned post mutation.
+    #[prost(
+        enumeration = "super::enums::response_content_type_enum::ResponseContentType",
+        tag = "4"
+    )]
+    pub response_content_type: i32,
+}
+/// A single operation (create, update, remove) on a conversion value rule.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ConversionValueRuleOperation {
+    /// FieldMask that determines which resource fields are modified in an update.
+    #[prost(message, optional, tag = "4")]
+    pub update_mask: ::core::option::Option<::prost_types::FieldMask>,
+    /// The mutate operation.
+    #[prost(oneof = "conversion_value_rule_operation::Operation", tags = "1, 2, 3")]
+    pub operation: ::core::option::Option<conversion_value_rule_operation::Operation>,
+}
+/// Nested message and enum types in `ConversionValueRuleOperation`.
+pub mod conversion_value_rule_operation {
+    /// The mutate operation.
+    #[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Operation {
+        /// Create operation: No resource name is expected for the new conversion
+        /// value rule.
+        #[prost(message, tag = "1")]
+        Create(super::super::resources::ConversionValueRule),
+        /// Update operation: The conversion action is expected to have a valid
+        /// resource name.
+        #[prost(message, tag = "2")]
+        Update(super::super::resources::ConversionValueRule),
+        /// Remove operation: A resource name for the removed conversion action is
+        /// expected, in this format:
+        ///
+        /// `customers/{customer_id}/conversionValueRules/{conversion_value_rule_id}`
+        #[prost(string, tag = "3")]
+        Remove(::prost::alloc::string::String),
+    }
+}
+/// Response message for
+/// [ConversionValueRuleService.MutateConversionValueRules][google.ads.googleads.v8.services.ConversionValueRuleService.MutateConversionValueRules].
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MutateConversionValueRulesResponse {
+    /// All results for the mutate.
+    #[prost(message, repeated, tag = "2")]
+    pub results: ::prost::alloc::vec::Vec<MutateConversionValueRuleResult>,
+    /// Errors that pertain to operation failures in the partial failure mode.
+    /// Returned only when partial_failure = true and all errors occur inside the
+    /// operations. If any errors occur outside the operations (e.g. auth errors),
+    /// we return an RPC level error.
+    #[prost(message, optional, tag = "3")]
+    pub partial_failure_error: ::core::option::Option<super::super::super::super::rpc::Status>,
+}
+/// The result for the conversion value rule mutate.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MutateConversionValueRuleResult {
+    /// Returned for successful operations.
+    #[prost(string, tag = "1")]
+    pub resource_name: ::prost::alloc::string::String,
+    /// The mutated conversion value rule with only mutable fields after
+    /// mutate. The field will only be returned when response_content_type is set
+    /// to "MUTABLE_RESOURCE".
+    #[prost(message, optional, tag = "2")]
+    pub conversion_value_rule: ::core::option::Option<super::resources::ConversionValueRule>,
+}
+#[doc = r" Generated client implementations."]
+pub mod conversion_value_rule_service_client {
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    use tonic::codegen::*;
+    #[doc = " Service to manage conversion value rules."]
+    #[derive(Debug, Clone)]
+    pub struct ConversionValueRuleServiceClient<T> {
+        inner: tonic::client::Grpc<T>,
+    }
+    impl<T> ConversionValueRuleServiceClient<T>
+    where
+        T: tonic::client::GrpcService<tonic::body::BoxBody>,
+        T::ResponseBody: Body + Send + Sync + 'static,
+        T::Error: Into<StdError>,
+        <T::ResponseBody as Body>::Error: Into<StdError> + Send,
+    {
+        pub fn new(inner: T) -> Self {
+            let inner = tonic::client::Grpc::new(inner);
+            Self { inner }
+        }
+        pub fn with_interceptor<F>(
+            inner: T,
+            interceptor: F,
+        ) -> ConversionValueRuleServiceClient<InterceptedService<T, F>>
+        where
+            F: tonic::service::Interceptor,
+            T: tonic::codegen::Service<
+                http::Request<tonic::body::BoxBody>,
+                Response = http::Response<
+                    <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
+                >,
+            >,
+            <T as tonic::codegen::Service<http::Request<tonic::body::BoxBody>>>::Error:
+                Into<StdError> + Send + Sync,
+        {
+            ConversionValueRuleServiceClient::new(InterceptedService::new(inner, interceptor))
+        }
+        #[doc = r" Compress requests with `gzip`."]
+        #[doc = r""]
+        #[doc = r" This requires the server to support it otherwise it might respond with an"]
+        #[doc = r" error."]
+        pub fn send_gzip(mut self) -> Self {
+            self.inner = self.inner.send_gzip();
+            self
+        }
+        #[doc = r" Enable decompressing responses with `gzip`."]
+        pub fn accept_gzip(mut self) -> Self {
+            self.inner = self.inner.accept_gzip();
+            self
+        }
+        #[doc = " Returns the requested conversion value rule."]
+        pub async fn get_conversion_value_rule(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetConversionValueRuleRequest>,
+        ) -> Result<tonic::Response<super::super::resources::ConversionValueRule>, tonic::Status>
+        {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http :: uri :: PathAndQuery :: from_static ("/google.ads.googleads.v8.services.ConversionValueRuleService/GetConversionValueRule") ;
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        #[doc = " Creates, updates, or removes conversion value rules. Operation statuses are"]
+        #[doc = " returned."]
+        pub async fn mutate_conversion_value_rules(
+            &mut self,
+            request: impl tonic::IntoRequest<super::MutateConversionValueRulesRequest>,
+        ) -> Result<tonic::Response<super::MutateConversionValueRulesResponse>, tonic::Status>
+        {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http :: uri :: PathAndQuery :: from_static ("/google.ads.googleads.v8.services.ConversionValueRuleService/MutateConversionValueRules") ;
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+    }
+}
+/// Request message for
+/// [ConversionValueRuleSetService.GetConversionValueRuleSet][google.ads.googleads.v8.services.ConversionValueRuleSetService.GetConversionValueRuleSet].
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetConversionValueRuleSetRequest {
+    /// Required. The resource name of the conversion value rule set to fetch.
+    #[prost(string, tag = "1")]
+    pub resource_name: ::prost::alloc::string::String,
+}
+/// Request message for
+/// [ConversionValueRuleSetService.MutateConversionValueRuleSets][google.ads.googleads.v8.services.ConversionValueRuleSetService.MutateConversionValueRuleSets].
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MutateConversionValueRuleSetsRequest {
+    /// Required. The ID of the customer whose conversion value rule sets are being modified.
+    #[prost(string, tag = "1")]
+    pub customer_id: ::prost::alloc::string::String,
+    /// Required. The list of operations to perform on individual conversion value rule sets.
+    #[prost(message, repeated, tag = "2")]
+    pub operations: ::prost::alloc::vec::Vec<ConversionValueRuleSetOperation>,
+    /// If true, successful operations will be carried out and invalid
+    /// operations will return errors. If false, all operations will be carried
+    /// out in one transaction if and only if they are all valid.
+    /// Default is false.
+    #[prost(bool, tag = "5")]
+    pub partial_failure: bool,
+    /// If true, the request is validated but not executed. Only errors are
+    /// returned, not results.
+    #[prost(bool, tag = "3")]
+    pub validate_only: bool,
+    /// The response content type setting. Determines whether the mutable resource
+    /// or just the resource name should be returned post mutation.
+    #[prost(
+        enumeration = "super::enums::response_content_type_enum::ResponseContentType",
+        tag = "4"
+    )]
+    pub response_content_type: i32,
+}
+/// A single operation (create, update, remove) on a conversion value rule set.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ConversionValueRuleSetOperation {
+    /// FieldMask that determines which resource fields are modified in an update.
+    #[prost(message, optional, tag = "4")]
+    pub update_mask: ::core::option::Option<::prost_types::FieldMask>,
+    /// The mutate operation.
+    #[prost(
+        oneof = "conversion_value_rule_set_operation::Operation",
+        tags = "1, 2, 3"
+    )]
+    pub operation: ::core::option::Option<conversion_value_rule_set_operation::Operation>,
+}
+/// Nested message and enum types in `ConversionValueRuleSetOperation`.
+pub mod conversion_value_rule_set_operation {
+    /// The mutate operation.
+    #[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Operation {
+        /// Create operation: No resource name is expected for the new conversion
+        /// value rule set.
+        #[prost(message, tag = "1")]
+        Create(super::super::resources::ConversionValueRuleSet),
+        /// Update operation: The conversion action is expected to have a valid
+        /// resource name.
+        #[prost(message, tag = "2")]
+        Update(super::super::resources::ConversionValueRuleSet),
+        /// Remove operation: A resource name for the removed conversion action is
+        /// expected, in this format:
+        ///
+        /// `customers/{customer_id}/conversionValueRuleSets/{conversion_value_rule_set_id}`
+        #[prost(string, tag = "3")]
+        Remove(::prost::alloc::string::String),
+    }
+}
+/// Response message for
+/// [ConversionValueRuleSetService.MutateConversionValueRuleSets][google.ads.googleads.v8.services.ConversionValueRuleSetService.MutateConversionValueRuleSets].
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MutateConversionValueRuleSetsResponse {
+    /// All results for the mutate.
+    #[prost(message, repeated, tag = "1")]
+    pub results: ::prost::alloc::vec::Vec<MutateConversionValueRuleSetResult>,
+    /// Errors that pertain to operation failures in the partial failure mode.
+    /// Returned only when partial_failure = true and all errors occur inside the
+    /// operations. If any errors occur outside the operations (e.g. auth errors),
+    /// we return an RPC level error.
+    #[prost(message, optional, tag = "2")]
+    pub partial_failure_error: ::core::option::Option<super::super::super::super::rpc::Status>,
+}
+/// The result for the conversion value rule set mutate.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MutateConversionValueRuleSetResult {
+    /// Returned for successful operations.
+    #[prost(string, tag = "1")]
+    pub resource_name: ::prost::alloc::string::String,
+    /// The mutated conversion value rule set with only mutable fields after
+    /// mutate. The field will only be returned when response_content_type is set
+    /// to "MUTABLE_RESOURCE".
+    #[prost(message, optional, tag = "2")]
+    pub conversion_value_rule_set: ::core::option::Option<super::resources::ConversionValueRuleSet>,
+}
+#[doc = r" Generated client implementations."]
+pub mod conversion_value_rule_set_service_client {
+    #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
+    use tonic::codegen::*;
+    #[doc = " Service to manage conversion value rule sets."]
+    #[derive(Debug, Clone)]
+    pub struct ConversionValueRuleSetServiceClient<T> {
+        inner: tonic::client::Grpc<T>,
+    }
+    impl<T> ConversionValueRuleSetServiceClient<T>
+    where
+        T: tonic::client::GrpcService<tonic::body::BoxBody>,
+        T::ResponseBody: Body + Send + Sync + 'static,
+        T::Error: Into<StdError>,
+        <T::ResponseBody as Body>::Error: Into<StdError> + Send,
+    {
+        pub fn new(inner: T) -> Self {
+            let inner = tonic::client::Grpc::new(inner);
+            Self { inner }
+        }
+        pub fn with_interceptor<F>(
+            inner: T,
+            interceptor: F,
+        ) -> ConversionValueRuleSetServiceClient<InterceptedService<T, F>>
+        where
+            F: tonic::service::Interceptor,
+            T: tonic::codegen::Service<
+                http::Request<tonic::body::BoxBody>,
+                Response = http::Response<
+                    <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
+                >,
+            >,
+            <T as tonic::codegen::Service<http::Request<tonic::body::BoxBody>>>::Error:
+                Into<StdError> + Send + Sync,
+        {
+            ConversionValueRuleSetServiceClient::new(InterceptedService::new(inner, interceptor))
+        }
+        #[doc = r" Compress requests with `gzip`."]
+        #[doc = r""]
+        #[doc = r" This requires the server to support it otherwise it might respond with an"]
+        #[doc = r" error."]
+        pub fn send_gzip(mut self) -> Self {
+            self.inner = self.inner.send_gzip();
+            self
+        }
+        #[doc = r" Enable decompressing responses with `gzip`."]
+        pub fn accept_gzip(mut self) -> Self {
+            self.inner = self.inner.accept_gzip();
+            self
+        }
+        #[doc = " Returns the requested conversion value rule set."]
+        pub async fn get_conversion_value_rule_set(
+            &mut self,
+            request: impl tonic::IntoRequest<super::GetConversionValueRuleSetRequest>,
+        ) -> Result<tonic::Response<super::super::resources::ConversionValueRuleSet>, tonic::Status>
+        {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http :: uri :: PathAndQuery :: from_static ("/google.ads.googleads.v8.services.ConversionValueRuleSetService/GetConversionValueRuleSet") ;
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        #[doc = " Creates, updates or removes conversion value rule sets. Operation statuses"]
+        #[doc = " are returned."]
+        pub async fn mutate_conversion_value_rule_sets(
+            &mut self,
+            request: impl tonic::IntoRequest<super::MutateConversionValueRuleSetsRequest>,
+        ) -> Result<tonic::Response<super::MutateConversionValueRuleSetsResponse>, tonic::Status>
+        {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http :: uri :: PathAndQuery :: from_static ("/google.ads.googleads.v8.services.ConversionValueRuleSetService/MutateConversionValueRuleSets") ;
             self.inner.unary(request.into_request(), path, codec).await
         }
     }
@@ -7189,7 +7916,7 @@ pub mod customer_asset_service_client {
             interceptor: F,
         ) -> CustomerAssetServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -7394,7 +8121,7 @@ pub mod customer_extension_setting_service_client {
             interceptor: F,
         ) -> CustomerExtensionSettingServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -7603,7 +8330,7 @@ pub mod customer_feed_service_client {
             interceptor: F,
         ) -> CustomerFeedServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -7793,7 +8520,7 @@ pub mod customer_label_service_client {
             interceptor: F,
         ) -> CustomerLabelServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -7987,7 +8714,7 @@ pub mod customer_negative_criterion_service_client {
             interceptor: F,
         ) -> CustomerNegativeCriterionServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -8194,7 +8921,7 @@ pub mod customer_service_client {
             interceptor: F,
         ) -> CustomerServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -8447,7 +9174,7 @@ pub mod extension_feed_item_service_client {
             interceptor: F,
         ) -> ExtensionFeedItemServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -8655,7 +9382,7 @@ pub mod feed_item_service_client {
             interceptor: F,
         ) -> FeedItemServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -8842,7 +9569,7 @@ pub mod feed_item_set_link_service_client {
             interceptor: F,
         ) -> FeedItemSetLinkServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -9015,7 +9742,7 @@ pub mod feed_item_set_service_client {
             interceptor: F,
         ) -> FeedItemSetServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -9202,7 +9929,7 @@ pub mod feed_item_target_service_client {
             interceptor: F,
         ) -> FeedItemTargetServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -9400,7 +10127,7 @@ pub mod feed_mapping_service_client {
             interceptor: F,
         ) -> FeedMappingServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -9604,7 +10331,7 @@ pub mod feed_service_client {
             interceptor: F,
         ) -> FeedServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -9816,7 +10543,7 @@ pub mod keyword_plan_ad_group_keyword_service_client {
             interceptor: F,
         ) -> KeywordPlanAdGroupKeywordServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -10005,7 +10732,7 @@ pub mod keyword_plan_ad_group_service_client {
             interceptor: F,
         ) -> KeywordPlanAdGroupServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -10205,7 +10932,7 @@ pub mod keyword_plan_campaign_keyword_service_client {
             interceptor: F,
         ) -> KeywordPlanCampaignKeywordServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -10396,7 +11123,7 @@ pub mod keyword_plan_campaign_service_client {
             interceptor: F,
         ) -> KeywordPlanCampaignServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -10789,7 +11516,7 @@ pub mod keyword_plan_service_client {
             interceptor: F,
         ) -> KeywordPlanServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -11104,7 +11831,7 @@ pub mod label_service_client {
             interceptor: F,
         ) -> LabelServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -11299,7 +12026,7 @@ pub mod media_file_service_client {
             interceptor: F,
         ) -> MediaFileServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -11488,7 +12215,7 @@ pub mod remarketing_action_service_client {
             interceptor: F,
         ) -> RemarketingActionServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -11674,7 +12401,7 @@ pub mod shared_criterion_service_client {
             interceptor: F,
         ) -> SharedCriterionServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -11880,7 +12607,7 @@ pub mod shared_set_service_client {
             interceptor: F,
         ) -> SharedSetServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -12070,7 +12797,7 @@ pub mod smart_campaign_setting_service_client {
             interceptor: F,
         ) -> SmartCampaignSettingServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -12231,7 +12958,7 @@ pub mod user_list_service_client {
             interceptor: F,
         ) -> UserListServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -12497,6 +13224,13 @@ pub struct GoogleAdsRow {
     /// The batch job referenced in the query.
     #[prost(message, optional, tag = "139")]
     pub batch_job: ::core::option::Option<super::resources::BatchJob>,
+    /// The bidding data exclusion referenced in the query.
+    #[prost(message, optional, tag = "159")]
+    pub bidding_data_exclusion: ::core::option::Option<super::resources::BiddingDataExclusion>,
+    /// The bidding seasonality adjustment referenced in the query.
+    #[prost(message, optional, tag = "160")]
+    pub bidding_seasonality_adjustment:
+        ::core::option::Option<super::resources::BiddingSeasonalityAdjustment>,
     /// The bidding strategy referenced in the query.
     #[prost(message, optional, tag = "18")]
     pub bidding_strategy: ::core::option::Option<super::resources::BiddingStrategy>,
@@ -12573,6 +13307,12 @@ pub struct GoogleAdsRow {
     #[prost(message, optional, tag = "153")]
     pub conversion_custom_variable:
         ::core::option::Option<super::resources::ConversionCustomVariable>,
+    /// The conversion value rule referenced in the query.
+    #[prost(message, optional, tag = "164")]
+    pub conversion_value_rule: ::core::option::Option<super::resources::ConversionValueRule>,
+    /// The conversion value rule set referenced in the query.
+    #[prost(message, optional, tag = "165")]
+    pub conversion_value_rule_set: ::core::option::Option<super::resources::ConversionValueRuleSet>,
     /// The ClickView referenced in the query.
     #[prost(message, optional, tag = "122")]
     pub click_view: ::core::option::Option<super::resources::ClickView>,
@@ -12868,7 +13608,7 @@ pub struct MutateOperation {
     /// The mutate operation.
     #[prost(
         oneof = "mutate_operation::Operation",
-        tags = "17, 1, 56, 2, 18, 3, 19, 20, 21, 5, 49, 22, 23, 6, 52, 7, 8, 13, 24, 25, 26, 27, 28, 10, 11, 12, 55, 57, 30, 31, 32, 34, 35, 36, 37, 53, 54, 38, 39, 40, 44, 50, 51, 45, 48, 41, 42, 43, 14, 15, 61, 16"
+        tags = "17, 1, 56, 2, 18, 3, 19, 20, 21, 5, 49, 22, 23, 58, 59, 6, 52, 7, 8, 13, 24, 25, 26, 27, 28, 10, 11, 12, 55, 63, 64, 57, 30, 31, 32, 34, 35, 36, 37, 53, 54, 38, 39, 40, 44, 50, 51, 45, 48, 41, 42, 43, 14, 15, 61, 16"
     )]
     pub operation: ::core::option::Option<mutate_operation::Operation>,
 }
@@ -12916,6 +13656,12 @@ pub mod mutate_operation {
         /// An asset mutate operation.
         #[prost(message, tag = "23")]
         AssetOperation(super::AssetOperation),
+        /// A bidding data exclusion mutate operation.
+        #[prost(message, tag = "58")]
+        BiddingDataExclusionOperation(super::BiddingDataExclusionOperation),
+        /// A bidding seasonality adjustment mutate operation.
+        #[prost(message, tag = "59")]
+        BiddingSeasonalityAdjustmentOperation(super::BiddingSeasonalityAdjustmentOperation),
         /// A bidding strategy mutate operation.
         #[prost(message, tag = "6")]
         BiddingStrategyOperation(super::BiddingStrategyOperation),
@@ -12958,6 +13704,12 @@ pub mod mutate_operation {
         /// A conversion custom variable mutate operation.
         #[prost(message, tag = "55")]
         ConversionCustomVariableOperation(super::ConversionCustomVariableOperation),
+        /// A conversion value rule mutate operation.
+        #[prost(message, tag = "63")]
+        ConversionValueRuleOperation(super::ConversionValueRuleOperation),
+        /// A conversion value rule set mutate operation.
+        #[prost(message, tag = "64")]
+        ConversionValueRuleSetOperation(super::ConversionValueRuleSetOperation),
         /// A customer asset mutate operation.
         #[prost(message, tag = "57")]
         CustomerAssetOperation(super::CustomerAssetOperation),
@@ -13041,7 +13793,7 @@ pub struct MutateOperationResponse {
     /// The mutate response.
     #[prost(
         oneof = "mutate_operation_response::Response",
-        tags = "17, 1, 56, 2, 18, 3, 19, 20, 21, 5, 22, 49, 23, 6, 52, 7, 8, 13, 24, 25, 26, 27, 28, 10, 11, 12, 55, 57, 30, 31, 32, 34, 35, 36, 37, 53, 54, 38, 39, 40, 44, 45, 50, 51, 48, 41, 42, 43, 14, 15, 61, 16"
+        tags = "17, 1, 56, 2, 18, 3, 19, 20, 21, 5, 22, 49, 23, 58, 59, 6, 52, 7, 8, 13, 24, 25, 26, 27, 28, 10, 11, 12, 55, 63, 64, 57, 30, 31, 32, 34, 35, 36, 37, 53, 54, 38, 39, 40, 44, 45, 50, 51, 48, 41, 42, 43, 14, 15, 61, 16"
     )]
     pub response: ::core::option::Option<mutate_operation_response::Response>,
 }
@@ -13089,6 +13841,12 @@ pub mod mutate_operation_response {
         /// The result for the asset mutate.
         #[prost(message, tag = "23")]
         AssetResult(super::MutateAssetResult),
+        /// The result for the bidding data exclusion mutate.
+        #[prost(message, tag = "58")]
+        BiddingDataExclusionResult(super::MutateBiddingDataExclusionsResult),
+        /// The result for the bidding seasonality adjustment mutate.
+        #[prost(message, tag = "59")]
+        BiddingSeasonalityAdjustmentResult(super::MutateBiddingSeasonalityAdjustmentsResult),
         /// The result for the bidding strategy mutate.
         #[prost(message, tag = "6")]
         BiddingStrategyResult(super::MutateBiddingStrategyResult),
@@ -13131,6 +13889,12 @@ pub mod mutate_operation_response {
         /// The result for the conversion custom variable mutate.
         #[prost(message, tag = "55")]
         ConversionCustomVariableResult(super::MutateConversionCustomVariableResult),
+        /// The result for the conversion value rule mutate.
+        #[prost(message, tag = "63")]
+        ConversionValueRuleResult(super::MutateConversionValueRuleResult),
+        /// The result for the conversion value rule set mutate.
+        #[prost(message, tag = "64")]
+        ConversionValueRuleSetResult(super::MutateConversionValueRuleSetResult),
         /// The result for the customer asset mutate.
         #[prost(message, tag = "57")]
         CustomerAssetResult(super::MutateCustomerAssetResult),
@@ -13233,7 +13997,7 @@ pub mod google_ads_service_client {
             interceptor: F,
         ) -> GoogleAdsServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -13621,7 +14385,7 @@ pub mod batch_job_service_client {
             interceptor: F,
         ) -> BatchJobServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -13819,7 +14583,7 @@ pub mod bidding_strategy_simulation_service_client {
             interceptor: F,
         ) -> BiddingStrategySimulationServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -13956,7 +14720,7 @@ pub mod billing_setup_service_client {
             interceptor: F,
         ) -> BillingSetupServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -14069,7 +14833,7 @@ pub mod campaign_audience_view_service_client {
             interceptor: F,
         ) -> CampaignAudienceViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -14153,7 +14917,7 @@ pub mod campaign_criterion_simulation_service_client {
             interceptor: F,
         ) -> CampaignCriterionSimulationServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -14242,7 +15006,7 @@ pub mod campaign_simulation_service_client {
             interceptor: F,
         ) -> CampaignSimulationServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -14319,7 +15083,7 @@ pub mod carrier_constant_service_client {
             interceptor: F,
         ) -> CarrierConstantServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -14404,7 +15168,7 @@ pub mod change_status_service_client {
             interceptor: F,
         ) -> ChangeStatusServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -14488,7 +15252,7 @@ pub mod click_view_service_client {
             interceptor: F,
         ) -> ClickViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -14574,7 +15338,7 @@ pub mod combined_audience_service_client {
             interceptor: F,
         ) -> CombinedAudienceServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -14699,6 +15463,18 @@ pub struct ConversionAdjustment {
     /// and ignored.
     #[prost(message, optional, tag = "6")]
     pub restatement_value: ::core::option::Option<RestatementValue>,
+    /// The user identifiers to enhance the original conversion.
+    /// ConversionAdjustmentUploadService only accepts user identifiers in
+    /// enhancements. The maximum number of user identifiers for each
+    /// enhancement is 5.
+    #[prost(message, repeated, tag = "10")]
+    pub user_identifiers: ::prost::alloc::vec::Vec<super::common::UserIdentifier>,
+    /// The user agent to enhance the original conversion. This can be found in
+    /// your user's HTTP request header when they convert on your web page.
+    /// Example, "Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X)". User
+    /// agent can only be specified in enhancements with user identifiers.
+    #[prost(string, optional, tag = "11")]
+    pub user_agent: ::core::option::Option<::prost::alloc::string::String>,
     /// Identifies the conversion to be adjusted.
     #[prost(oneof = "conversion_adjustment::ConversionIdentifier", tags = "1, 7")]
     pub conversion_identifier: ::core::option::Option<conversion_adjustment::ConversionIdentifier>,
@@ -14714,7 +15490,7 @@ pub mod conversion_adjustment {
         GclidDateTimePair(super::GclidDateTimePair),
         /// The order ID of the conversion to be adjusted. If the conversion was
         /// reported with an order ID specified, that order ID must be used as the
-        /// identifier here.
+        /// identifier here. The order ID is required for enhancements.
         #[prost(string, tag = "7")]
         OrderId(::prost::alloc::string::String),
     }
@@ -14816,7 +15592,7 @@ pub mod conversion_adjustment_upload_service_client {
             interceptor: F,
         ) -> ConversionAdjustmentUploadServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -14990,6 +15766,11 @@ pub struct ClickConversion {
     /// The cart data associated with this conversion.
     #[prost(message, optional, tag = "16")]
     pub cart_data: ::core::option::Option<CartData>,
+    /// The user identifiers associated with this conversion. Only hashed_email and
+    /// hashed_phone_number are supported for conversion uploads. The maximum
+    /// number of user identifiers for each conversion is 5.
+    #[prost(message, repeated, tag = "17")]
+    pub user_identifiers: ::prost::alloc::vec::Vec<super::common::UserIdentifier>,
 }
 /// A call conversion.
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -15049,6 +15830,11 @@ pub struct ClickConversionResult {
     /// "yyyy-mm-dd hh:mm:ss+|-hh:mm", e.g. “2019-01-01 12:32:45-08:00”.
     #[prost(string, optional, tag = "6")]
     pub conversion_date_time: ::core::option::Option<::prost::alloc::string::String>,
+    /// The user identifiers associated with this conversion. Only hashed_email and
+    /// hashed_phone_number are supported for conversion uploads. The maximum
+    /// number of user identifiers for each conversion is 5.
+    #[prost(message, repeated, tag = "7")]
+    pub user_identifiers: ::prost::alloc::vec::Vec<super::common::UserIdentifier>,
 }
 /// Identifying information for a successfully processed CallConversionUpload.
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -15150,7 +15936,7 @@ pub mod conversion_upload_service_client {
             interceptor: F,
         ) -> ConversionUploadServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -15262,7 +16048,7 @@ pub mod currency_constant_service_client {
             interceptor: F,
         ) -> CurrencyConstantServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -15406,7 +16192,7 @@ pub mod custom_audience_service_client {
             interceptor: F,
         ) -> CustomAudienceServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -15576,7 +16362,7 @@ pub mod custom_interest_service_client {
             interceptor: F,
         ) -> CustomInterestServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -15742,7 +16528,7 @@ pub mod customer_client_link_service_client {
             interceptor: F,
         ) -> CustomerClientLinkServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -15857,7 +16643,7 @@ pub mod customer_client_service_client {
             interceptor: F,
         ) -> CustomerClientServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -16023,7 +16809,7 @@ pub mod customer_manager_link_service_client {
             interceptor: F,
         ) -> CustomerManagerLinkServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -16221,7 +17007,7 @@ pub mod customer_user_access_invitation_service_client {
             interceptor: F,
         ) -> CustomerUserAccessInvitationServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -16387,7 +17173,7 @@ pub mod customer_user_access_service_client {
             interceptor: F,
         ) -> CustomerUserAccessServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -16500,7 +17286,7 @@ pub mod detail_placement_view_service_client {
             interceptor: F,
         ) -> DetailPlacementViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -16583,7 +17369,7 @@ pub mod detailed_demographic_service_client {
             interceptor: F,
         ) -> DetailedDemographicServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -16658,7 +17444,7 @@ pub mod display_keyword_view_service_client {
             interceptor: F,
         ) -> DisplayKeywordViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -16743,7 +17529,7 @@ pub mod distance_view_service_client {
             interceptor: F,
         ) -> DistanceViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -16828,7 +17614,7 @@ pub mod domain_category_service_client {
             interceptor: F,
         ) -> DomainCategoryServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -16914,7 +17700,7 @@ pub mod dynamic_search_ads_search_term_view_service_client {
             interceptor: F,
         ) -> DynamicSearchAdsSearchTermViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -17003,7 +17789,7 @@ pub mod expanded_landing_page_view_service_client {
             interceptor: F,
         ) -> ExpandedLandingPageViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -17086,7 +17872,7 @@ pub mod feed_placeholder_view_service_client {
             interceptor: F,
         ) -> FeedPlaceholderViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -17169,7 +17955,7 @@ pub mod gender_view_service_client {
             interceptor: F,
         ) -> GenderViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -17327,7 +18113,7 @@ pub mod geo_target_constant_service_client {
             interceptor: F,
         ) -> GeoTargetConstantServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -17437,7 +18223,7 @@ pub mod geographic_view_service_client {
             interceptor: F,
         ) -> GeographicViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -17554,7 +18340,7 @@ pub mod google_ads_field_service_client {
             interceptor: F,
         ) -> GoogleAdsFieldServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -17665,7 +18451,7 @@ pub mod group_placement_view_service_client {
             interceptor: F,
         ) -> GroupPlacementViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -17750,7 +18536,7 @@ pub mod hotel_group_view_service_client {
             interceptor: F,
         ) -> HotelGroupViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -17835,7 +18621,7 @@ pub mod hotel_performance_view_service_client {
             interceptor: F,
         ) -> HotelPerformanceViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -17918,7 +18704,7 @@ pub mod income_range_view_service_client {
             interceptor: F,
         ) -> IncomeRangeViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -18026,7 +18812,7 @@ pub mod invoice_service_client {
             interceptor: F,
         ) -> InvoiceServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -18250,7 +19036,7 @@ pub mod keyword_plan_idea_service_client {
             interceptor: F,
         ) -> KeywordPlanIdeaServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -18361,7 +19147,7 @@ pub mod keyword_theme_constant_service_client {
             interceptor: F,
         ) -> KeywordThemeConstantServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -18460,7 +19246,7 @@ pub mod keyword_view_service_client {
             interceptor: F,
         ) -> KeywordViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -18544,7 +19330,7 @@ pub mod landing_page_view_service_client {
             interceptor: F,
         ) -> LandingPageViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -18629,7 +19415,7 @@ pub mod language_constant_service_client {
             interceptor: F,
         ) -> LanguageConstantServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -18714,7 +19500,7 @@ pub mod life_event_service_client {
             interceptor: F,
         ) -> LifeEventServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -18790,7 +19576,7 @@ pub mod location_view_service_client {
             interceptor: F,
         ) -> LocationViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -18874,7 +19660,7 @@ pub mod managed_placement_view_service_client {
             interceptor: F,
         ) -> ManagedPlacementViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -19028,7 +19814,7 @@ pub mod merchant_center_link_service_client {
             interceptor: F,
         ) -> MerchantCenterLinkServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -19163,7 +19949,7 @@ pub mod mobile_app_category_constant_service_client {
             interceptor: F,
         ) -> MobileAppCategoryConstantServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -19248,7 +20034,7 @@ pub mod mobile_device_constant_service_client {
             interceptor: F,
         ) -> MobileDeviceConstantServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -19420,7 +20206,7 @@ pub mod offline_user_data_job_service_client {
             interceptor: F,
         ) -> OfflineUserDataJobServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -19595,7 +20381,7 @@ pub mod operating_system_version_constant_service_client {
             interceptor: F,
         ) -> OperatingSystemVersionConstantServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -19684,7 +20470,7 @@ pub mod paid_organic_search_term_view_service_client {
             interceptor: F,
         ) -> PaidOrganicSearchTermViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -19769,7 +20555,7 @@ pub mod parental_status_view_service_client {
             interceptor: F,
         ) -> ParentalStatusViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -19862,7 +20648,7 @@ pub mod payments_account_service_client {
             interceptor: F,
         ) -> PaymentsAccountServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -19950,7 +20736,7 @@ pub mod product_bidding_category_constant_service_client {
             interceptor: F,
         ) -> ProductBiddingCategoryConstantServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -20038,7 +20824,7 @@ pub mod product_group_view_service_client {
             interceptor: F,
         ) -> ProductGroupViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -20285,8 +21071,22 @@ pub struct GenerateReachForecastRequest {
     /// exposed to the ad) for the reported reach metrics [1-10].
     /// This won't affect the targeting, but just the reporting.
     /// If not specified, a default of 1 is applied.
+    ///
+    /// This field cannot be combined with the effective_frequency_limit field.
     #[prost(int32, optional, tag = "11")]
     pub min_effective_frequency: ::core::option::Option<i32>,
+    /// The highest minimum effective frequency (the number of times a person was
+    /// exposed to the ad) value [1-10] to include in
+    /// Forecast.effective_frequency_breakdowns.
+    /// If not specified, Forecast.effective_frequency_breakdowns will not be
+    /// provided.
+    ///
+    /// The effective frequency value provided here will also be used as the
+    /// minimum effective frequency for the reported reach metrics.
+    ///
+    /// This field cannot be combined with the min_effective_frequency field.
+    #[prost(message, optional, tag = "12")]
+    pub effective_frequency_limit: ::core::option::Option<EffectiveFrequencyLimit>,
     /// The targeting to be applied to all products selected in the product mix.
     ///
     /// This is planned targeting: execution details might vary based on the
@@ -20299,6 +21099,15 @@ pub struct GenerateReachForecastRequest {
     /// The max number of allowed planned products is 15.
     #[prost(message, repeated, tag = "7")]
     pub planned_products: ::prost::alloc::vec::Vec<PlannedProduct>,
+}
+/// Effective frequency limit.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct EffectiveFrequencyLimit {
+    /// The highest effective frequency value to include in
+    /// Forecast.effective_frequency_breakdowns.
+    /// This field supports frequencies 1-10, inclusive.
+    #[prost(int32, tag = "1")]
+    pub effective_frequency_breakdown_limit: i32,
 }
 /// A rule specifying the maximum number of times an ad can be shown to a user
 /// over a particular time period.
@@ -20402,13 +21211,23 @@ pub struct ReachForecast {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Forecast {
     /// Number of unique people reached at least
-    /// GenerateReachForecastRequest.min_effective_frequency times that exactly
+    /// GenerateReachForecastRequest.min_effective_frequency or
+    /// GenerateReachForecastRequest.effective_frequency_limit times that exactly
     /// matches the Targeting.
+    ///
+    /// Note that a minimum number of unique people must be reached in order for
+    /// data to be reported. If the minimum number is not met, the on_target_reach
+    /// value will be rounded to 0.
     #[prost(int64, optional, tag = "5")]
     pub on_target_reach: ::core::option::Option<i64>,
     /// Total number of unique people reached at least
-    /// GenerateReachForecastRequest.min_effective_frequency times. This includes
+    /// GenerateReachForecastRequest.min_effective_frequency or
+    /// GenerateReachForecastRequest.effective_frequency_limit times. This includes
     /// people that may fall outside the specified Targeting.
+    ///
+    /// Note that a minimum number of unique people must be reached in order for
+    /// data to be reported. If the minimum number is not met, the total_reach
+    /// value will be rounded to 0.
     #[prost(int64, optional, tag = "6")]
     pub total_reach: ::core::option::Option<i64>,
     /// Number of ad impressions that exactly matches the Targeting.
@@ -20425,6 +21244,12 @@ pub struct Forecast {
     /// viewability is measured.
     #[prost(int64, optional, tag = "9")]
     pub viewable_impressions: ::core::option::Option<i64>,
+    /// A list of effective frequency forecasts. The list is ordered starting with
+    /// 1+ and ending with the value set in
+    /// GenerateReachForecastRequest.effective_frequency_limit. If no
+    /// effective_frequency_limit was set, this list will be empty.
+    #[prost(message, repeated, tag = "10")]
+    pub effective_frequency_breakdowns: ::prost::alloc::vec::Vec<EffectiveFrequencyBreakdown>,
 }
 /// The forecasted allocation and traffic metrics for a specific product
 /// at a point on the reach curve.
@@ -20448,10 +21273,18 @@ pub struct PlannedProductReachForecast {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PlannedProductForecast {
     /// Number of unique people reached that exactly matches the Targeting.
+    ///
+    /// Note that a minimum number of unique people must be reached in order for
+    /// data to be reported. If the minimum number is not met, the on_target_reach
+    /// value will be rounded to 0.
     #[prost(int64, tag = "1")]
     pub on_target_reach: i64,
     /// Number of unique people reached. This includes people that may fall
     /// outside the specified Targeting.
+    ///
+    /// Note that a minimum number of unique people must be reached in order for
+    /// data to be reported. If the minimum number is not met, the total_reach
+    /// value will be rounded to 0.
     #[prost(int64, tag = "2")]
     pub total_reach: i64,
     /// Number of ad impressions that exactly matches the Targeting.
@@ -20484,6 +21317,30 @@ pub struct OnTargetAudienceMetrics {
     #[prost(int64, optional, tag = "4")]
     pub census_audience_size: ::core::option::Option<i64>,
 }
+/// A breakdown of the number of unique people reached at a given effective
+/// frequency.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct EffectiveFrequencyBreakdown {
+    /// The effective frequency [1-10].
+    #[prost(int32, tag = "1")]
+    pub effective_frequency: i32,
+    /// The number of unique people reached at least effective_frequency times that
+    /// exactly matches the Targeting.
+    ///
+    /// Note that a minimum number of unique people must be reached in order for
+    /// data to be reported. If the minimum number is not met, the on_target_reach
+    /// value will be rounded to 0.
+    #[prost(int64, tag = "2")]
+    pub on_target_reach: i64,
+    /// Total number of unique people reached at least effective_frequency times.
+    /// This includes people that may fall outside the specified Targeting.
+    ///
+    /// Note that a minimum number of unique people must be reached in order for
+    /// data to be reported. If the minimum number is not met, the total_reach
+    /// value will be rounded to 0.
+    #[prost(int64, tag = "3")]
+    pub total_reach: i64,
+}
 #[doc = r" Generated client implementations."]
 pub mod reach_plan_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
@@ -20513,7 +21370,7 @@ pub mod reach_plan_service_client {
             interceptor: F,
         ) -> ReachPlanServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -20738,7 +21595,7 @@ pub mod apply_recommendation_operation {
     pub struct TargetRoasOptInParameters {
         /// Average ROAS (revenue per unit of spend) to use for Target ROAS bidding
         /// strategy. The value is between 0.01 and 1000.0, inclusive. This is a
-        /// required field.
+        /// required field, unless new_campaign_budget_amount_micros is set.
         #[prost(double, optional, tag = "1")]
         pub target_roas: ::core::option::Option<f64>,
         /// Optional, budget amount to set for the campaign.
@@ -20917,7 +21774,7 @@ pub mod recommendation_service_client {
             interceptor: F,
         ) -> RecommendationServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -21058,7 +21915,7 @@ pub mod search_term_view_service_client {
             interceptor: F,
         ) -> SearchTermViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -21144,7 +22001,7 @@ pub mod shopping_performance_view_service_client {
             interceptor: F,
         ) -> ShoppingPerformanceViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -21228,7 +22085,7 @@ pub mod smart_campaign_search_term_view_service_client {
             interceptor: F,
         ) -> SmartCampaignSearchTermViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -21285,7 +22142,7 @@ pub mod smart_campaign_search_term_view_service_client {
     }
 }
 /// Request message for
-/// [SmartCampaignBudgetSuggestService.SuggestSmartCampaignBudgets][].
+/// [SmartCampaignSuggestService.SuggestSmartCampaignBudgets][].
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SuggestSmartCampaignBudgetOptionsRequest {
     /// Required. The ID of the customer whose budget options are to be suggested.
@@ -21323,14 +22180,6 @@ pub struct SmartCampaignSuggestionInfo {
     /// Optional. Landing page URL of the campaign.
     #[prost(string, tag = "1")]
     pub final_url: ::prost::alloc::string::String,
-    /// Optional. The ID of the Google My Business (GMB) Location.
-    /// The location ID can be fetched by GMB API with its form:
-    /// accounts/{accountId}/locations/{locationId}. The last {locationId}
-    /// component from the GMB API represents the business_location_id.
-    /// See the [Google My Business API]
-    /// (https://developers.google.com/my-business/reference/rest/v4/accounts.locations)
-    #[prost(int64, tag = "2")]
-    pub business_location_id: i64,
     /// Optional. The two letter advertising language for the Smart campaign to be
     /// constructed, default to 'en' if not set.
     #[prost(string, tag = "3")]
@@ -21342,6 +22191,14 @@ pub struct SmartCampaignSuggestionInfo {
     /// accuracy and we recommend always setting it if possible.
     #[prost(message, repeated, tag = "7")]
     pub keyword_themes: ::prost::alloc::vec::Vec<super::common::KeywordThemeInfo>,
+    /// The business settings to consider when generating suggestions.
+    /// Settings are automatically extracted from the GMB location when provided.
+    /// Otherwise, these settings must be specified explicitly.
+    #[prost(
+        oneof = "smart_campaign_suggestion_info::BusinessSetting",
+        tags = "8, 2"
+    )]
+    pub business_setting: ::core::option::Option<smart_campaign_suggestion_info::BusinessSetting>,
     /// The geo target of the campaign, either a list of locations or
     /// a single proximity shall be specified.
     #[prost(oneof = "smart_campaign_suggestion_info::GeoTarget", tags = "4, 5")]
@@ -21356,6 +22213,30 @@ pub mod smart_campaign_suggestion_info {
         #[prost(message, repeated, tag = "1")]
         pub locations: ::prost::alloc::vec::Vec<super::super::common::LocationInfo>,
     }
+    /// A context that describes a business.
+    #[derive(Clone, PartialEq, ::prost::Message)]
+    pub struct BusinessContext {
+        /// Optional. The name of the business.
+        #[prost(string, tag = "1")]
+        pub business_name: ::prost::alloc::string::String,
+    }
+    /// The business settings to consider when generating suggestions.
+    /// Settings are automatically extracted from the GMB location when provided.
+    /// Otherwise, these settings must be specified explicitly.
+    #[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum BusinessSetting {
+        /// Optional. Context describing the business to advertise.
+        #[prost(message, tag = "8")]
+        BusinessContext(BusinessContext),
+        /// Optional. The ID of the Google My Business (GMB) Location.
+        /// The location ID can be fetched by GMB API with its form:
+        /// accounts/{accountId}/locations/{locationId}. The last {locationId}
+        /// component from the GMB API represents the business_location_id.
+        /// See the [Google My Business API]
+        /// (https://developers.google.com/my-business/reference/rest/v4/accounts.locations)
+        #[prost(int64, tag = "2")]
+        BusinessLocationId(i64),
+    }
     /// The geo target of the campaign, either a list of locations or
     /// a single proximity shall be specified.
     #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -21369,8 +22250,8 @@ pub mod smart_campaign_suggestion_info {
     }
 }
 /// Response message for
-/// [SmartCampaignBudgetSuggestService.SuggestSmartCampaignBudgets][]. Depending
-/// on whether the system could suggest the options, either all of the options or
+/// [SmartCampaignSuggestService.SuggestSmartCampaignBudgets][]. Depending on
+/// whether the system could suggest the options, either all of the options or
 /// none of them might be returned.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SuggestSmartCampaignBudgetOptionsResponse {
@@ -21411,6 +22292,28 @@ pub mod suggest_smart_campaign_budget_options_response {
         pub metrics: ::core::option::Option<Metrics>,
     }
 }
+/// Request message for
+/// [SmartCampaignSuggestService.SuggestSmartCampaignAd][google.ads.googleads.v8.services.SmartCampaignSuggestService.SuggestSmartCampaignAd].
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SuggestSmartCampaignAdRequest {
+    /// Required. The ID of the customer.
+    #[prost(string, tag = "1")]
+    pub customer_id: ::prost::alloc::string::String,
+    /// Required. Inputs used to suggest a Smart campaign ad.
+    /// Required fields: final_url, language_code, keyword_themes.
+    /// Optional but recommended fields to improve the quality of the suggestion:
+    /// business_setting and geo_target.
+    #[prost(message, optional, tag = "2")]
+    pub suggestion_info: ::core::option::Option<SmartCampaignSuggestionInfo>,
+}
+/// Response message for
+/// [SmartCampaignSuggestService.SuggestSmartCampaignAd][google.ads.googleads.v8.services.SmartCampaignSuggestService.SuggestSmartCampaignAd].
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SuggestSmartCampaignAdResponse {
+    /// Optional. Ad info includes 3 creative headlines and 2 creative descriptions.
+    #[prost(message, optional, tag = "1")]
+    pub ad_info: ::core::option::Option<super::common::SmartCampaignAdInfo>,
+}
 #[doc = r" Generated client implementations."]
 pub mod smart_campaign_suggest_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
@@ -21436,7 +22339,7 @@ pub mod smart_campaign_suggest_service_client {
             interceptor: F,
         ) -> SmartCampaignSuggestServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -21475,6 +22378,22 @@ pub mod smart_campaign_suggest_service_client {
             })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http :: uri :: PathAndQuery :: from_static ("/google.ads.googleads.v8.services.SmartCampaignSuggestService/SuggestSmartCampaignBudgetOptions") ;
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        #[doc = " Suggests a Smart campaign ad compatible with the Ad family of resources,"]
+        #[doc = " based on data points such as targeting and the business to advertise."]
+        pub async fn suggest_smart_campaign_ad(
+            &mut self,
+            request: impl tonic::IntoRequest<super::SuggestSmartCampaignAdRequest>,
+        ) -> Result<tonic::Response<super::SuggestSmartCampaignAdResponse>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http :: uri :: PathAndQuery :: from_static ("/google.ads.googleads.v8.services.SmartCampaignSuggestService/SuggestSmartCampaignAd") ;
             self.inner.unary(request.into_request(), path, codec).await
         }
     }
@@ -21525,7 +22444,7 @@ pub mod third_party_app_analytics_link_service_client {
             interceptor: F,
         ) -> ThirdPartyAppAnalyticsLinkServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -21638,7 +22557,7 @@ pub mod topic_constant_service_client {
             interceptor: F,
         ) -> TopicConstantServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -21723,7 +22642,7 @@ pub mod topic_view_service_client {
             interceptor: F,
         ) -> TopicViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -21855,7 +22774,7 @@ pub mod user_data_service_client {
             interceptor: F,
         ) -> UserDataServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -21944,7 +22863,7 @@ pub mod user_interest_service_client {
             interceptor: F,
         ) -> UserInterestServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -22028,7 +22947,7 @@ pub mod user_location_view_service_client {
             interceptor: F,
         ) -> UserLocationViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -22113,7 +23032,7 @@ pub mod video_service_client {
             interceptor: F,
         ) -> VideoServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -22197,7 +23116,7 @@ pub mod webpage_view_service_client {
             interceptor: F,
         ) -> WebpageViewServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<

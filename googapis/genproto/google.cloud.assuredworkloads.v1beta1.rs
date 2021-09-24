@@ -113,7 +113,7 @@ pub struct Workload {
     /// Output only. Immutable. The Workload creation timestamp.
     #[prost(message, optional, tag = "5")]
     pub create_time: ::core::option::Option<::prost_types::Timestamp>,
-    /// Required. Input only. The billing account used for the resources which are
+    /// Input only. The billing account used for the resources which are
     /// direct children of workload. This billing account is initially associated
     /// with the resources created as part of Workload creation.
     /// After the initial creation of these resources, the customer can change
@@ -132,12 +132,11 @@ pub struct Workload {
     pub labels:
         ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
     /// Input only. The parent resource for the resources managed by this Assured Workload. May
-    /// be either an organization or a folder. Must be the same or a child of the
+    /// be either empty or a folder resource which is a child of the
     /// Workload parent. If not specified all resources are created under the
-    /// Workload parent.
-    /// Formats:
+    /// parent organization.
+    /// Format:
     /// folders/{folder_id}
-    /// organizations/{organization_id}
     #[prost(string, tag = "13")]
     pub provisioned_resources_parent: ::prost::alloc::string::String,
     /// Input only. Settings used to create a CMEK crypto key. When set a project with a KMS
@@ -177,10 +176,15 @@ pub mod workload {
         pub enum ResourceType {
             /// Unknown resource type.
             Unspecified = 0,
-            /// Consumer project.
+            /// Deprecated. Existing workloads will continue to support this, but new
+            /// CreateWorkloadRequests should not specify this as an input value.
             ConsumerProject = 1,
+            /// Consumer Folder.
+            ConsumerFolder = 4,
             /// Consumer project containing encryption keys.
             EncryptionKeysProject = 2,
+            /// Keyring resource that hosts encryption keys.
+            Keyring = 3,
         }
     }
     /// Settings specific to the Key Management Service.
@@ -237,6 +241,11 @@ pub mod workload {
         /// ENCRYPTION_KEYS_PROJECT)
         #[prost(enumeration = "resource_info::ResourceType", tag = "2")]
         pub resource_type: i32,
+        /// User-assigned resource display name.
+        /// If not empty it will be used to create a resource with the specified
+        /// name.
+        #[prost(string, tag = "3")]
+        pub display_name: ::prost::alloc::string::String,
     }
     /// Supported Compliance Regimes.
     #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
@@ -258,6 +267,10 @@ pub mod workload {
         Hipaa = 6,
         /// Health Information Trust Alliance controls
         Hitrust = 7,
+        /// Assured Workloads For EU Regions and Support controls
+        EuRegionsAndSupport = 8,
+        /// Assured Workloads For Canada Regions and Support controls
+        CaRegionsAndSupport = 9,
     }
     /// Settings specific to the selected [compliance_regime]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -292,6 +305,10 @@ pub struct CreateWorkloadOperationMetadata {
     /// the workload.
     #[prost(enumeration = "workload::ComplianceRegime", tag = "4")]
     pub compliance_regime: i32,
+    /// Optional. Resource properties in the input that are used for creating/customizing
+    /// workload resources.
+    #[prost(message, repeated, tag = "5")]
+    pub resource_settings: ::prost::alloc::vec::Vec<workload::ResourceSettings>,
 }
 #[doc = r" Generated client implementations."]
 pub mod assured_workloads_service_client {
@@ -318,7 +335,7 @@ pub mod assured_workloads_service_client {
             interceptor: F,
         ) -> AssuredWorkloadsServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<

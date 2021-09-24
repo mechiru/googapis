@@ -18,7 +18,7 @@ pub struct Membership {
     #[prost(map = "string, string", tag = "2")]
     pub labels:
         ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
-    /// Required. Description of this membership, limited to 63 characters.
+    /// Optional. Description of this membership, limited to 63 characters.
     /// Must match the regex: `[a-zA-Z0-9][a-zA-Z0-9_\-\.\ ]*`
     #[prost(string, tag = "3")]
     pub description: ::prost::alloc::string::String,
@@ -99,9 +99,6 @@ pub mod membership {
 /// endpoint and any additional Kubernetes metadata.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MembershipEndpoint {
-    /// Optional. GKE-specific information. Only present if this Membership is a GKE cluster.
-    #[prost(message, optional, tag = "4")]
-    pub gke_cluster: ::core::option::Option<GkeCluster>,
     /// Output only. Useful Kubernetes-specific metadata.
     #[prost(message, optional, tag = "5")]
     pub kubernetes_metadata: ::core::option::Option<KubernetesMetadata>,
@@ -115,6 +112,25 @@ pub struct MembershipEndpoint {
     ///   * Ensure proper initial configuration of default Hub Features.
     #[prost(message, optional, tag = "6")]
     pub kubernetes_resource: ::core::option::Option<KubernetesResource>,
+    /// Cluster information of the registered cluster.
+    #[prost(oneof = "membership_endpoint::Type", tags = "4, 7, 8")]
+    pub r#type: ::core::option::Option<membership_endpoint::Type>,
+}
+/// Nested message and enum types in `MembershipEndpoint`.
+pub mod membership_endpoint {
+    /// Cluster information of the registered cluster.
+    #[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Type {
+        /// Optional. Specific information for a GKE-on-GCP cluster.
+        #[prost(message, tag = "4")]
+        GkeCluster(super::GkeCluster),
+        /// Optional. Specific information for a GKE On-Prem cluster.
+        #[prost(message, tag = "7")]
+        OnPremCluster(super::OnPremCluster),
+        /// Optional. Specific information for a GKE Multi-Cloud cluster.
+        #[prost(message, tag = "8")]
+        MultiCloudCluster(super::MultiCloudCluster),
+    }
 }
 /// KubernetesResource contains the YAML manifests and configuration for
 /// Membership Kubernetes resources in the cluster. After CreateMembership or
@@ -188,11 +204,49 @@ pub struct ResourceManifest {
 pub struct GkeCluster {
     /// Immutable. Self-link of the GCP resource for the GKE cluster. For example:
     ///
-    /// > container.googleapis.com/projects/my-project/locations/us-west1-a/clusters/my-cluster
+    ///     //container.googleapis.com/projects/my-project/locations/us-west1-a/clusters/my-cluster
     ///
     /// Zonal clusters are also supported.
     #[prost(string, tag = "1")]
     pub resource_link: ::prost::alloc::string::String,
+    /// Output only. If cluster_missing is set then it denotes that the GKE cluster no longer
+    /// exists in the GKE Control Plane.
+    #[prost(bool, tag = "3")]
+    pub cluster_missing: bool,
+}
+/// OnPremCluster contains information specific to GKE On-Prem clusters.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct OnPremCluster {
+    /// Immutable. Self-link of the GCP resource for the GKE On-Prem cluster. For example:
+    ///
+    ///  //gkeonprem.googleapis.com/projects/my-project/locations/us-west1-a/vmwareClusters/my-cluster
+    ///  //gkeonprem.googleapis.com/projects/my-project/locations/us-west1-a/bareMetalClusters/my-cluster
+    #[prost(string, tag = "1")]
+    pub resource_link: ::prost::alloc::string::String,
+    /// Output only. If cluster_missing is set then it denotes that
+    /// API(gkeonprem.googleapis.com) resource for this GKE On-Prem cluster no
+    /// longer exists.
+    #[prost(bool, tag = "2")]
+    pub cluster_missing: bool,
+    /// Immutable. Whether the cluster is an admin cluster.
+    #[prost(bool, tag = "3")]
+    pub admin_cluster: bool,
+}
+/// MultiCloudCluster contains information specific to GKE Multi-Cloud clusters.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MultiCloudCluster {
+    /// Immutable. Self-link of the GCP resource for the GKE Multi-Cloud cluster. For
+    /// example:
+    ///
+    ///  //gkemulticloud.googleapis.com/projects/my-project/locations/us-west1-a/awsClusters/my-cluster
+    ///  //gkemulticloud.googleapis.com/projects/my-project/locations/us-west1-a/azureClusters/my-cluster
+    #[prost(string, tag = "1")]
+    pub resource_link: ::prost::alloc::string::String,
+    /// Output only. If cluster_missing is set then it denotes that
+    /// API(gkemulticloud.googleapis.com) resource for this GKE Multi-Cloud cluster
+    /// no longer exists.
+    #[prost(bool, tag = "2")]
+    pub cluster_missing: bool,
 }
 /// KubernetesMetadata provides informational metadata for Memberships
 /// representing Kubernetes clusters.
@@ -383,6 +437,21 @@ pub struct CreateMembershipRequest {
     /// Required. The membership to create.
     #[prost(message, optional, tag = "3")]
     pub resource: ::core::option::Option<Membership>,
+    /// Optional. A request ID to identify requests. Specify a unique request ID
+    /// so that if you must retry your request, the server will know to ignore
+    /// the request if it has already been completed. The server will guarantee
+    /// that for at least 60 minutes after the first request.
+    ///
+    /// For example, consider a situation where you make an initial request and
+    /// the request times out. If you make the request again with the same request
+    /// ID, the server can check if original operation with the same request ID
+    /// was received, and if so, will ignore the second request. This prevents
+    /// clients from accidentally creating duplicate commitments.
+    ///
+    /// The request ID must be a valid UUID with the exception that zero UUID is
+    /// not supported (00000000-0000-0000-0000-000000000000).
+    #[prost(string, tag = "4")]
+    pub request_id: ::prost::alloc::string::String,
 }
 /// Request message for `GkeHubMembershipService.DeleteMembership` method.
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -391,6 +460,21 @@ pub struct DeleteMembershipRequest {
     /// `projects/*/locations/*/memberships/*`.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
+    /// Optional. A request ID to identify requests. Specify a unique request ID
+    /// so that if you must retry your request, the server will know to ignore
+    /// the request if it has already been completed. The server will guarantee
+    /// that for at least 60 minutes after the first request.
+    ///
+    /// For example, consider a situation where you make an initial request and
+    /// the request times out. If you make the request again with the same request
+    /// ID, the server can check if original operation with the same request ID
+    /// was received, and if so, will ignore the second request. This prevents
+    /// clients from accidentally creating duplicate commitments.
+    ///
+    /// The request ID must be a valid UUID with the exception that zero UUID is
+    /// not supported (00000000-0000-0000-0000-000000000000).
+    #[prost(string, tag = "4")]
+    pub request_id: ::prost::alloc::string::String,
 }
 /// Request message for `GkeHubMembershipService.UpdateMembership` method.
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -409,8 +493,25 @@ pub struct UpdateMembershipRequest {
     /// If you are updating a map field, set the value of a key to null or empty
     /// string to delete the key from the map. It's not possible to update a key's
     /// value to the empty string.
+    /// If you specify the update_mask to be a special path "*", fully replaces all
+    /// user-modifiable fields to match `resource`.
     #[prost(message, optional, tag = "3")]
     pub resource: ::core::option::Option<Membership>,
+    /// Optional. A request ID to identify requests. Specify a unique request ID
+    /// so that if you must retry your request, the server will know to ignore
+    /// the request if it has already been completed. The server will guarantee
+    /// that for at least 60 minutes after the first request.
+    ///
+    /// For example, consider a situation where you make an initial request and
+    /// the request times out. If you make the request again with the same request
+    /// ID, the server can check if original operation with the same request ID
+    /// was received, and if so, will ignore the second request. This prevents
+    /// clients from accidentally creating duplicate commitments.
+    ///
+    /// The request ID must be a valid UUID with the exception that zero UUID is
+    /// not supported (00000000-0000-0000-0000-000000000000).
+    #[prost(string, tag = "4")]
+    pub request_id: ::prost::alloc::string::String,
 }
 /// Request message for `GkeHubMembershipService.GenerateConnectManifest`
 /// method.
@@ -583,8 +684,14 @@ pub struct OperationMetadata {
 pub mod gke_hub_membership_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    #[doc = " GKE Hub CRUD API for the Membership resource."]
-    #[doc = " The Membership service is currently only available in the global location."]
+    #[doc = " The GKE Hub MembershipService handles the registration of many Kubernetes"]
+    #[doc = " clusters to Google Cloud, represented with the [Membership][google.cloud.gkehub.v1beta1.Membership] resource."]
+    #[doc = ""]
+    #[doc = " GKE Hub is currently only available in the global region."]
+    #[doc = ""]
+    #[doc = " **Membership management may be non-trivial:** it is recommended to use one"]
+    #[doc = " of the Google-provided client libraries or tools where possible when working"]
+    #[doc = " with Membership resources."]
     #[derive(Debug, Clone)]
     pub struct GkeHubMembershipServiceClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -605,7 +712,7 @@ pub mod gke_hub_membership_service_client {
             interceptor: F,
         ) -> GkeHubMembershipServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -664,7 +771,11 @@ pub mod gke_hub_membership_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        #[doc = " Adds a new Membership."]
+        #[doc = " Creates a new Membership."]
+        #[doc = ""]
+        #[doc = " **This is currently only supported for GKE clusters on Google Cloud**."]
+        #[doc = " To register other clusters, follow the instructions at"]
+        #[doc = " https://cloud.google.com/anthos/multicluster-management/connect/registering-a-cluster."]
         pub async fn create_membership(
             &mut self,
             request: impl tonic::IntoRequest<super::CreateMembershipRequest>,
@@ -685,6 +796,10 @@ pub mod gke_hub_membership_service_client {
             self.inner.unary(request.into_request(), path, codec).await
         }
         #[doc = " Removes a Membership."]
+        #[doc = ""]
+        #[doc = " **This is currently only supported for GKE clusters on Google Cloud**."]
+        #[doc = " To unregister other clusters, follow the instructions at"]
+        #[doc = " https://cloud.google.com/anthos/multicluster-management/connect/unregistering-a-cluster."]
         pub async fn delete_membership(
             &mut self,
             request: impl tonic::IntoRequest<super::DeleteMembershipRequest>,
@@ -725,6 +840,9 @@ pub mod gke_hub_membership_service_client {
             self.inner.unary(request.into_request(), path, codec).await
         }
         #[doc = " Generates the manifest for deployment of the GKE connect agent."]
+        #[doc = ""]
+        #[doc = " **This method is used internally by Google-provided libraries.**"]
+        #[doc = " Most clients should not need to call this method directly."]
         pub async fn generate_connect_manifest(
             &mut self,
             request: impl tonic::IntoRequest<super::GenerateConnectManifestRequest>,

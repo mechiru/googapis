@@ -64,6 +64,16 @@ pub struct CryptoKey {
     #[prost(map = "string, string", tag = "10")]
     pub labels:
         ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
+    /// Immutable. Whether this key may contain imported versions only.
+    #[prost(bool, tag = "13")]
+    pub import_only: bool,
+    /// Immutable. The period of time that versions of this key spend in the
+    /// [DESTROY_SCHEDULED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.DESTROY_SCHEDULED]
+    /// state before transitioning to
+    /// [DESTROYED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.DESTROYED]. If not
+    /// specified at creation time, the default duration is 24 hours.
+    #[prost(message, optional, tag = "14")]
+    pub destroy_scheduled_duration: ::core::option::Option<::prost_types::Duration>,
     /// Controls the rate of automatic rotation.
     #[prost(oneof = "crypto_key::RotationSchedule", tags = "8")]
     pub rotation_schedule: ::core::option::Option<crypto_key::RotationSchedule>,
@@ -91,6 +101,9 @@ pub mod crypto_key {
         /// [AsymmetricDecrypt][google.cloud.kms.v1.KeyManagementService.AsymmetricDecrypt] and
         /// [GetPublicKey][google.cloud.kms.v1.KeyManagementService.GetPublicKey].
         AsymmetricDecrypt = 6,
+        /// [CryptoKeys][google.cloud.kms.v1.CryptoKey] with this purpose may be used with
+        /// [MacSign][google.cloud.kms.v1.KeyManagementService.MacSign].
+        Mac = 9,
     }
     /// Controls the rate of automatic rotation.
     #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -215,16 +228,16 @@ pub struct CryptoKeyVersion {
     /// [DESTROYED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.DESTROYED].
     #[prost(message, optional, tag = "6")]
     pub destroy_event_time: ::core::option::Option<::prost_types::Timestamp>,
-    /// Output only. The name of the [ImportJob][google.cloud.kms.v1.ImportJob] used to import this
+    /// Output only. The name of the [ImportJob][google.cloud.kms.v1.ImportJob] used in the most recent import of this
     /// [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion]. Only present if the underlying key material was
     /// imported.
     #[prost(string, tag = "14")]
     pub import_job: ::prost::alloc::string::String,
     /// Output only. The time at which this [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion]'s key material
-    /// was imported.
+    /// was most recently imported.
     #[prost(message, optional, tag = "15")]
     pub import_time: ::core::option::Option<::prost_types::Timestamp>,
-    /// Output only. The root cause of an import failure. Only present if
+    /// Output only. The root cause of the most recent import failure. Only present if
     /// [state][google.cloud.kms.v1.CryptoKeyVersion.state] is
     /// [IMPORT_FAILED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.IMPORT_FAILED].
     #[prost(string, tag = "16")]
@@ -234,6 +247,11 @@ pub struct CryptoKeyVersion {
     /// [EXTERNAL][google.cloud.kms.v1.ProtectionLevel.EXTERNAL] protection level.
     #[prost(message, optional, tag = "17")]
     pub external_protection_level_options: ::core::option::Option<ExternalProtectionLevelOptions>,
+    /// Output only. Whether or not this key version is eligible for reimport, by being
+    /// specified as a target in
+    /// [ImportCryptoKeyVersionRequest.crypto_key_version][google.cloud.kms.v1.ImportCryptoKeyVersionRequest.crypto_key_version].
+    #[prost(bool, tag = "18")]
+    pub reimport_eligible: bool,
 }
 /// Nested message and enum types in `CryptoKeyVersion`.
 pub mod crypto_key_version {
@@ -268,6 +286,12 @@ pub mod crypto_key_version {
     ///
     /// The fields in the name after "EC_SIGN_" correspond to the following
     /// parameters: elliptic curve, digest algorithm.
+    ///
+    /// Algorithms beginning with "HMAC_" are usable with [CryptoKey.purpose][google.cloud.kms.v1.CryptoKey.purpose]
+    /// [MAC][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose.MAC].
+    ///
+    /// The suffix following "HMAC_" corresponds to the hash algorithm being used
+    /// (eg. SHA256).
     ///
     /// For more information, see [Key purposes and algorithms]
     /// (https://cloud.google.com/kms/docs/algorithms).
@@ -309,6 +333,8 @@ pub mod crypto_key_version {
         /// ECDSA on the non-NIST secp256k1 curve. This curve is only supported for
         /// HSM protection level.
         EcSignSecp256k1Sha256 = 31,
+        /// HMAC-SHA256 signing with a 256 bit key.
+        HmacSha256 = 32,
         /// Algorithm representing symmetric encryption by an external key manager.
         ExternalSymmetricEncryption = 18,
     }
@@ -328,7 +354,10 @@ pub mod crypto_key_version {
         /// and the version can be placed back into the [ENABLED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.ENABLED] state.
         Disabled = 2,
         /// This version is destroyed, and the key material is no longer stored.
-        /// A version may not leave this state once entered.
+        /// This version may only become [ENABLED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.ENABLED] again if this version is
+        /// [reimport_eligible][google.cloud.kms.v1.CryptoKeyVersion.reimport_eligible] and the original
+        /// key material is reimported with a call to
+        /// [KeyManagementService.ImportCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.ImportCryptoKeyVersion].
         Destroyed = 3,
         /// This version is scheduled for destruction, and will be destroyed soon.
         /// Call
@@ -399,6 +428,9 @@ pub struct PublicKey {
     /// NOTE: This field is in Beta.
     #[prost(string, tag = "4")]
     pub name: ::prost::alloc::string::String,
+    /// The [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of the [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] public key.
+    #[prost(enumeration = "ProtectionLevel", tag = "5")]
+    pub protection_level: i32,
 }
 /// An [ImportJob][google.cloud.kms.v1.ImportJob] can be used to create [CryptoKeys][google.cloud.kms.v1.CryptoKey] and
 /// [CryptoKeyVersions][google.cloud.kms.v1.CryptoKeyVersion] using pre-existing key material,
@@ -824,10 +856,29 @@ pub struct CreateCryptoKeyVersionRequest {
 /// Request message for [KeyManagementService.ImportCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.ImportCryptoKeyVersion].
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ImportCryptoKeyVersionRequest {
-    /// Required. The [name][google.cloud.kms.v1.CryptoKey.name] of the [CryptoKey][google.cloud.kms.v1.CryptoKey] to
-    /// be imported into.
+    /// Required. The [name][google.cloud.kms.v1.CryptoKey.name] of the [CryptoKey][google.cloud.kms.v1.CryptoKey] to be imported into.
+    ///
+    /// The create permission is only required on this key when creating a new
+    /// [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion].
     #[prost(string, tag = "1")]
     pub parent: ::prost::alloc::string::String,
+    /// Optional. The optional [name][google.cloud.kms.v1.CryptoKeyVersion.name] of an existing
+    /// [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to target for an import operation.
+    /// If this field is not present, a new [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] containing the
+    /// supplied key material is created.
+    ///
+    /// If this field is present, the supplied key material is imported into
+    /// the existing [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion]. To import into an existing
+    /// [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion], the [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] must be a child of
+    /// [ImportCryptoKeyVersionRequest.parent][google.cloud.kms.v1.ImportCryptoKeyVersionRequest.parent], have been previously created via
+    /// [ImportCryptoKeyVersion][], and be in
+    /// [DESTROYED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.DESTROYED] or
+    /// [IMPORT_FAILED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.IMPORT_FAILED]
+    /// state. The key material and algorithm must match the previous
+    /// [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] exactly if the [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] has ever contained
+    /// key material.
+    #[prost(string, tag = "6")]
+    pub crypto_key_version: ::prost::alloc::string::String,
     /// Required. The [algorithm][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionAlgorithm] of
     /// the key being imported. This does not need to match the
     /// [version_template][google.cloud.kms.v1.CryptoKey.version_template] of the [CryptoKey][google.cloud.kms.v1.CryptoKey] this
@@ -916,6 +967,30 @@ pub struct UpdateCryptoKeyVersionRequest {
     #[prost(message, optional, tag = "2")]
     pub update_mask: ::core::option::Option<::prost_types::FieldMask>,
 }
+/// Request message for [KeyManagementService.UpdateCryptoKeyPrimaryVersion][google.cloud.kms.v1.KeyManagementService.UpdateCryptoKeyPrimaryVersion].
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UpdateCryptoKeyPrimaryVersionRequest {
+    /// Required. The resource name of the [CryptoKey][google.cloud.kms.v1.CryptoKey] to update.
+    #[prost(string, tag = "1")]
+    pub name: ::prost::alloc::string::String,
+    /// Required. The id of the child [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to use as primary.
+    #[prost(string, tag = "2")]
+    pub crypto_key_version_id: ::prost::alloc::string::String,
+}
+/// Request message for [KeyManagementService.DestroyCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.DestroyCryptoKeyVersion].
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DestroyCryptoKeyVersionRequest {
+    /// Required. The resource name of the [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to destroy.
+    #[prost(string, tag = "1")]
+    pub name: ::prost::alloc::string::String,
+}
+/// Request message for [KeyManagementService.RestoreCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.RestoreCryptoKeyVersion].
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct RestoreCryptoKeyVersionRequest {
+    /// Required. The resource name of the [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to restore.
+    #[prost(string, tag = "1")]
+    pub name: ::prost::alloc::string::String,
+}
 /// Request message for [KeyManagementService.Encrypt][google.cloud.kms.v1.KeyManagementService.Encrypt].
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct EncryptRequest {
@@ -960,8 +1035,6 @@ pub struct EncryptRequest {
     /// different languages. However, it is a non-negative integer, which will
     /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
     /// that support this type.
-    ///
-    /// NOTE: This field is in Beta.
     #[prost(message, optional, tag = "7")]
     pub plaintext_crc32c: ::core::option::Option<i64>,
     /// Optional. An optional CRC32C checksum of the
@@ -978,8 +1051,6 @@ pub struct EncryptRequest {
     /// different languages. However, it is a non-negative integer, which will
     /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
     /// that support this type.
-    ///
-    /// NOTE: This field is in Beta.
     #[prost(message, optional, tag = "8")]
     pub additional_authenticated_data_crc32c: ::core::option::Option<i64>,
 }
@@ -1011,8 +1082,6 @@ pub struct DecryptRequest {
     /// different languages. However, it is a non-negative integer, which will
     /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
     /// that support this type.
-    ///
-    /// NOTE: This field is in Beta.
     #[prost(message, optional, tag = "5")]
     pub ciphertext_crc32c: ::core::option::Option<i64>,
     /// Optional. An optional CRC32C checksum of the
@@ -1029,8 +1098,6 @@ pub struct DecryptRequest {
     /// different languages. However, it is a non-negative integer, which will
     /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
     /// that support this type.
-    ///
-    /// NOTE: This field is in Beta.
     #[prost(message, optional, tag = "6")]
     pub additional_authenticated_data_crc32c: ::core::option::Option<i64>,
 }
@@ -1058,8 +1125,6 @@ pub struct AsymmetricSignRequest {
     /// different languages. However, it is a non-negative integer, which will
     /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
     /// that support this type.
-    ///
-    /// NOTE: This field is in Beta.
     #[prost(message, optional, tag = "4")]
     pub digest_crc32c: ::core::option::Option<i64>,
 }
@@ -1087,34 +1152,94 @@ pub struct AsymmetricDecryptRequest {
     /// different languages. However, it is a non-negative integer, which will
     /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
     /// that support this type.
-    ///
-    /// NOTE: This field is in Beta.
     #[prost(message, optional, tag = "4")]
     pub ciphertext_crc32c: ::core::option::Option<i64>,
 }
-/// Response message for [KeyManagementService.Decrypt][google.cloud.kms.v1.KeyManagementService.Decrypt].
+/// Request message for [KeyManagementService.MacSign][google.cloud.kms.v1.KeyManagementService.MacSign].
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct DecryptResponse {
-    /// The decrypted data originally supplied in [EncryptRequest.plaintext][google.cloud.kms.v1.EncryptRequest.plaintext].
-    #[prost(bytes = "vec", tag = "1")]
-    pub plaintext: ::prost::alloc::vec::Vec<u8>,
-    /// Integrity verification field. A CRC32C checksum of the returned
-    /// [DecryptResponse.plaintext][google.cloud.kms.v1.DecryptResponse.plaintext]. An integrity check of
-    /// [DecryptResponse.plaintext][google.cloud.kms.v1.DecryptResponse.plaintext] can be performed by computing the CRC32C
-    /// checksum of [DecryptResponse.plaintext][google.cloud.kms.v1.DecryptResponse.plaintext] and comparing your results to
-    /// this field. Discard the response in case of non-matching checksum values,
-    /// and perform a limited number of retries. A persistent mismatch may indicate
-    /// an issue in your computation of the CRC32C checksum. Note: receiving this
-    /// response message indicates that [KeyManagementService][google.cloud.kms.v1.KeyManagementService] is able to
-    /// successfully decrypt the [ciphertext][google.cloud.kms.v1.DecryptRequest.ciphertext].
+pub struct MacSignRequest {
+    /// Required. The resource name of the [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to use for signing.
+    #[prost(string, tag = "1")]
+    pub name: ::prost::alloc::string::String,
+    /// Required. The data to sign. The MAC tag is computed over this data field based on
+    /// the specific algorithm.
+    #[prost(bytes = "vec", tag = "2")]
+    pub data: ::prost::alloc::vec::Vec<u8>,
+    /// Optional. An optional CRC32C checksum of the [MacSignRequest.data][google.cloud.kms.v1.MacSignRequest.data]. If
+    /// specified, [KeyManagementService][google.cloud.kms.v1.KeyManagementService] will verify the integrity of the
+    /// received [MacSignRequest.data][google.cloud.kms.v1.MacSignRequest.data] using this checksum.
+    /// [KeyManagementService][google.cloud.kms.v1.KeyManagementService] will report an error if the checksum verification
+    /// fails. If you receive a checksum error, your client should verify that
+    /// CRC32C([MacSignRequest.data][google.cloud.kms.v1.MacSignRequest.data]) is equal to
+    /// [MacSignRequest.data_crc32c][google.cloud.kms.v1.MacSignRequest.data_crc32c], and if so, perform a limited
+    /// number of retries. A persistent mismatch may indicate an issue in your
+    /// computation of the CRC32C checksum.
     /// Note: This field is defined as int64 for reasons of compatibility across
     /// different languages. However, it is a non-negative integer, which will
     /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
     /// that support this type.
-    ///
-    /// NOTE: This field is in Beta.
-    #[prost(message, optional, tag = "2")]
-    pub plaintext_crc32c: ::core::option::Option<i64>,
+    #[prost(message, optional, tag = "3")]
+    pub data_crc32c: ::core::option::Option<i64>,
+}
+/// Request message for [KeyManagementService.MacVerify][google.cloud.kms.v1.KeyManagementService.MacVerify].
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MacVerifyRequest {
+    /// Required. The resource name of the [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to use for verification.
+    #[prost(string, tag = "1")]
+    pub name: ::prost::alloc::string::String,
+    /// Required. The data used previously as a [MacSignRequest.data][google.cloud.kms.v1.MacSignRequest.data] to generate the MAC
+    /// tag.
+    #[prost(bytes = "vec", tag = "2")]
+    pub data: ::prost::alloc::vec::Vec<u8>,
+    /// Optional. An optional CRC32C checksum of the [MacVerifyRequest.data][google.cloud.kms.v1.MacVerifyRequest.data]. If
+    /// specified, [KeyManagementService][google.cloud.kms.v1.KeyManagementService] will verify the integrity of the
+    /// received [MacVerifyRequest.data][google.cloud.kms.v1.MacVerifyRequest.data] using this checksum.
+    /// [KeyManagementService][google.cloud.kms.v1.KeyManagementService] will report an error if the checksum verification
+    /// fails. If you receive a checksum error, your client should verify that
+    /// CRC32C([MacVerifyRequest.data][google.cloud.kms.v1.MacVerifyRequest.data]) is equal to
+    /// [MacVerifyRequest.data_crc32c][google.cloud.kms.v1.MacVerifyRequest.data_crc32c], and if so, perform a limited
+    /// number of retries. A persistent mismatch may indicate an issue in your
+    /// computation of the CRC32C checksum.
+    /// Note: This field is defined as int64 for reasons of compatibility across
+    /// different languages. However, it is a non-negative integer, which will
+    /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+    /// that support this type.
+    #[prost(message, optional, tag = "3")]
+    pub data_crc32c: ::core::option::Option<i64>,
+    /// Required. The signature to verify.
+    #[prost(bytes = "vec", tag = "4")]
+    pub mac: ::prost::alloc::vec::Vec<u8>,
+    /// Optional. An optional CRC32C checksum of the [MacVerifyRequest.mac][google.cloud.kms.v1.MacVerifyRequest.mac]. If
+    /// specified, [KeyManagementService][google.cloud.kms.v1.KeyManagementService] will verify the integrity of the
+    /// received [MacVerifyRequest.mac][google.cloud.kms.v1.MacVerifyRequest.mac] using this checksum.
+    /// [KeyManagementService][google.cloud.kms.v1.KeyManagementService] will report an error if the checksum verification
+    /// fails. If you receive a checksum error, your client should verify that
+    /// CRC32C([MacVerifyRequest.tag][]) is equal to
+    /// [MacVerifyRequest.mac_crc32c][google.cloud.kms.v1.MacVerifyRequest.mac_crc32c], and if so, perform a limited
+    /// number of retries. A persistent mismatch may indicate an issue in your
+    /// computation of the CRC32C checksum.
+    /// Note: This field is defined as int64 for reasons of compatibility across
+    /// different languages. However, it is a non-negative integer, which will
+    /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+    /// that support this type.
+    #[prost(message, optional, tag = "5")]
+    pub mac_crc32c: ::core::option::Option<i64>,
+}
+/// Request message for [KeyManagementService.GenerateRandomBytes][google.cloud.kms.v1.KeyManagementService.GenerateRandomBytes].
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GenerateRandomBytesRequest {
+    /// The project-specific location in which to generate random bytes.
+    /// For example, "projects/my-project/locations/us-central1".
+    #[prost(string, tag = "1")]
+    pub location: ::prost::alloc::string::String,
+    /// The length in bytes of the amount of randomness to retrieve.  Minimum 8
+    /// bytes, maximum 1024 bytes.
+    #[prost(int32, tag = "2")]
+    pub length_bytes: i32,
+    /// The [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] to use when generating the random data. Defaults to
+    /// [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE].
+    #[prost(enumeration = "ProtectionLevel", tag = "3")]
+    pub protection_level: i32,
 }
 /// Response message for [KeyManagementService.Encrypt][google.cloud.kms.v1.KeyManagementService.Encrypt].
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1137,8 +1262,6 @@ pub struct EncryptResponse {
     /// different languages. However, it is a non-negative integer, which will
     /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
     /// that support this type.
-    ///
-    /// NOTE: This field is in Beta.
     #[prost(message, optional, tag = "4")]
     pub ciphertext_crc32c: ::core::option::Option<i64>,
     /// Integrity verification field. A flag indicating whether
@@ -1149,8 +1272,6 @@ pub struct EncryptResponse {
     /// that it was not delivered to [KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've set
     /// [EncryptRequest.plaintext_crc32c][google.cloud.kms.v1.EncryptRequest.plaintext_crc32c] but this field is still false, discard
     /// the response and perform a limited number of retries.
-    ///
-    /// NOTE: This field is in Beta.
     #[prost(bool, tag = "5")]
     pub verified_plaintext_crc32c: bool,
     /// Integrity verification field. A flag indicating whether
@@ -1162,10 +1283,39 @@ pub struct EncryptResponse {
     /// that it was not delivered to [KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've set
     /// [EncryptRequest.additional_authenticated_data_crc32c][google.cloud.kms.v1.EncryptRequest.additional_authenticated_data_crc32c] but this field is
     /// still false, discard the response and perform a limited number of retries.
-    ///
-    /// NOTE: This field is in Beta.
     #[prost(bool, tag = "6")]
     pub verified_additional_authenticated_data_crc32c: bool,
+    /// The [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of the [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used in encryption.
+    #[prost(enumeration = "ProtectionLevel", tag = "7")]
+    pub protection_level: i32,
+}
+/// Response message for [KeyManagementService.Decrypt][google.cloud.kms.v1.KeyManagementService.Decrypt].
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DecryptResponse {
+    /// The decrypted data originally supplied in [EncryptRequest.plaintext][google.cloud.kms.v1.EncryptRequest.plaintext].
+    #[prost(bytes = "vec", tag = "1")]
+    pub plaintext: ::prost::alloc::vec::Vec<u8>,
+    /// Integrity verification field. A CRC32C checksum of the returned
+    /// [DecryptResponse.plaintext][google.cloud.kms.v1.DecryptResponse.plaintext]. An integrity check of
+    /// [DecryptResponse.plaintext][google.cloud.kms.v1.DecryptResponse.plaintext] can be performed by computing the CRC32C
+    /// checksum of [DecryptResponse.plaintext][google.cloud.kms.v1.DecryptResponse.plaintext] and comparing your results to
+    /// this field. Discard the response in case of non-matching checksum values,
+    /// and perform a limited number of retries. A persistent mismatch may indicate
+    /// an issue in your computation of the CRC32C checksum. Note: receiving this
+    /// response message indicates that [KeyManagementService][google.cloud.kms.v1.KeyManagementService] is able to
+    /// successfully decrypt the [ciphertext][google.cloud.kms.v1.DecryptRequest.ciphertext].
+    /// Note: This field is defined as int64 for reasons of compatibility across
+    /// different languages. However, it is a non-negative integer, which will
+    /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+    /// that support this type.
+    #[prost(message, optional, tag = "2")]
+    pub plaintext_crc32c: ::core::option::Option<i64>,
+    /// Whether the Decryption was performed using the primary key version.
+    #[prost(bool, tag = "3")]
+    pub used_primary: bool,
+    /// The [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of the [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used in decryption.
+    #[prost(enumeration = "ProtectionLevel", tag = "4")]
+    pub protection_level: i32,
 }
 /// Response message for [KeyManagementService.AsymmetricSign][google.cloud.kms.v1.KeyManagementService.AsymmetricSign].
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1184,8 +1334,6 @@ pub struct AsymmetricSignResponse {
     /// different languages. However, it is a non-negative integer, which will
     /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
     /// that support this type.
-    ///
-    /// NOTE: This field is in Beta.
     #[prost(message, optional, tag = "2")]
     pub signature_crc32c: ::core::option::Option<i64>,
     /// Integrity verification field. A flag indicating whether
@@ -1196,16 +1344,15 @@ pub struct AsymmetricSignResponse {
     /// unset or that it was not delivered to [KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've
     /// set [AsymmetricSignRequest.digest_crc32c][google.cloud.kms.v1.AsymmetricSignRequest.digest_crc32c] but this field is still false,
     /// discard the response and perform a limited number of retries.
-    ///
-    /// NOTE: This field is in Beta.
     #[prost(bool, tag = "3")]
     pub verified_digest_crc32c: bool,
     /// The resource name of the [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used for signing. Check
     /// this field to verify that the intended resource was used for signing.
-    ///
-    /// NOTE: This field is in Beta.
     #[prost(string, tag = "4")]
     pub name: ::prost::alloc::string::String,
+    /// The [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of the [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used for signing.
+    #[prost(enumeration = "ProtectionLevel", tag = "6")]
+    pub protection_level: i32,
 }
 /// Response message for [KeyManagementService.AsymmetricDecrypt][google.cloud.kms.v1.KeyManagementService.AsymmetricDecrypt].
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1224,8 +1371,6 @@ pub struct AsymmetricDecryptResponse {
     /// different languages. However, it is a non-negative integer, which will
     /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
     /// that support this type.
-    ///
-    /// NOTE: This field is in Beta.
     #[prost(message, optional, tag = "2")]
     pub plaintext_crc32c: ::core::option::Option<i64>,
     /// Integrity verification field. A flag indicating whether
@@ -1236,34 +1381,110 @@ pub struct AsymmetricDecryptResponse {
     /// was left unset or that it was not delivered to [KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If
     /// you've set [AsymmetricDecryptRequest.ciphertext_crc32c][google.cloud.kms.v1.AsymmetricDecryptRequest.ciphertext_crc32c] but this field is
     /// still false, discard the response and perform a limited number of retries.
-    ///
-    /// NOTE: This field is in Beta.
     #[prost(bool, tag = "3")]
     pub verified_ciphertext_crc32c: bool,
+    /// The [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of the [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used in decryption.
+    #[prost(enumeration = "ProtectionLevel", tag = "4")]
+    pub protection_level: i32,
 }
-/// Request message for [KeyManagementService.UpdateCryptoKeyPrimaryVersion][google.cloud.kms.v1.KeyManagementService.UpdateCryptoKeyPrimaryVersion].
+/// Response message for [KeyManagementService.MacSign][google.cloud.kms.v1.KeyManagementService.MacSign].
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct UpdateCryptoKeyPrimaryVersionRequest {
-    /// Required. The resource name of the [CryptoKey][google.cloud.kms.v1.CryptoKey] to update.
+pub struct MacSignResponse {
+    /// The resource name of the [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used for signing. Check
+    /// this field to verify that the intended resource was used for signing.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
-    /// Required. The id of the child [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to use as primary.
-    #[prost(string, tag = "2")]
-    pub crypto_key_version_id: ::prost::alloc::string::String,
+    /// The created signature.
+    #[prost(bytes = "vec", tag = "2")]
+    pub mac: ::prost::alloc::vec::Vec<u8>,
+    /// Integrity verification field. A CRC32C checksum of the returned
+    /// [MacSignResponse.mac][google.cloud.kms.v1.MacSignResponse.mac]. An integrity check of
+    /// [MacSignResponse.mac][google.cloud.kms.v1.MacSignResponse.mac] can be performed by computing the
+    /// CRC32C checksum of [MacSignResponse.mac][google.cloud.kms.v1.MacSignResponse.mac] and comparing your
+    /// results to this field. Discard the response in case of non-matching
+    /// checksum values, and perform a limited number of retries. A persistent
+    /// mismatch may indicate an issue in your computation of the CRC32C checksum.
+    /// Note: This field is defined as int64 for reasons of compatibility across
+    /// different languages. However, it is a non-negative integer, which will
+    /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+    /// that support this type.
+    #[prost(message, optional, tag = "3")]
+    pub mac_crc32c: ::core::option::Option<i64>,
+    /// Integrity verification field. A flag indicating whether
+    /// [MacSignRequest.data_crc32c][google.cloud.kms.v1.MacSignRequest.data_crc32c] was received by
+    /// [KeyManagementService][google.cloud.kms.v1.KeyManagementService] and used for the integrity verification of the
+    /// [data][google.cloud.kms.v1.MacSignRequest.data]. A false value of this field
+    /// indicates either that [MacSignRequest.data_crc32c][google.cloud.kms.v1.MacSignRequest.data_crc32c] was left
+    /// unset or that it was not delivered to [KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've
+    /// set [MacSignRequest.data_crc32c][google.cloud.kms.v1.MacSignRequest.data_crc32c] but this field is still false,
+    /// discard the response and perform a limited number of retries.
+    #[prost(bool, tag = "4")]
+    pub verified_data_crc32c: bool,
+    /// The [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of the [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used for signing.
+    #[prost(enumeration = "ProtectionLevel", tag = "5")]
+    pub protection_level: i32,
 }
-/// Request message for [KeyManagementService.DestroyCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.DestroyCryptoKeyVersion].
+/// Response message for [KeyManagementService.MacVerify][google.cloud.kms.v1.KeyManagementService.MacVerify].
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct DestroyCryptoKeyVersionRequest {
-    /// Required. The resource name of the [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to destroy.
+pub struct MacVerifyResponse {
+    /// The resource name of the [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used for verification.
+    /// Check this field to verify that the intended resource was used for
+    /// verification.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
+    /// This field indicates whether or not the verification operation for
+    /// [MacVerifyRequest.mac][google.cloud.kms.v1.MacVerifyRequest.mac] over [MacVerifyRequest.data][google.cloud.kms.v1.MacVerifyRequest.data] was successful.
+    #[prost(bool, tag = "2")]
+    pub success: bool,
+    /// Integrity verification field. A flag indicating whether
+    /// [MacVerifyRequest.data_crc32c][google.cloud.kms.v1.MacVerifyRequest.data_crc32c] was received by
+    /// [KeyManagementService][google.cloud.kms.v1.KeyManagementService] and used for the integrity verification of the
+    /// [data][google.cloud.kms.v1.MacVerifyRequest.data]. A false value of this field
+    /// indicates either that [MacVerifyRequest.data_crc32c][google.cloud.kms.v1.MacVerifyRequest.data_crc32c] was left
+    /// unset or that it was not delivered to [KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've
+    /// set [MacVerifyRequest.data_crc32c][google.cloud.kms.v1.MacVerifyRequest.data_crc32c] but this field is still false,
+    /// discard the response and perform a limited number of retries.
+    #[prost(bool, tag = "3")]
+    pub verified_data_crc32c: bool,
+    /// Integrity verification field. A flag indicating whether
+    /// [MacVerifyRequest.mac_crc32c][google.cloud.kms.v1.MacVerifyRequest.mac_crc32c] was received by
+    /// [KeyManagementService][google.cloud.kms.v1.KeyManagementService] and used for the integrity verification of the
+    /// [data][google.cloud.kms.v1.MacVerifyRequest.mac]. A false value of this field
+    /// indicates either that [MacVerifyRequest.mac_crc32c][google.cloud.kms.v1.MacVerifyRequest.mac_crc32c] was left
+    /// unset or that it was not delivered to [KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've
+    /// set [MacVerifyRequest.mac_crc32c][google.cloud.kms.v1.MacVerifyRequest.mac_crc32c] but this field is still false,
+    /// discard the response and perform a limited number of retries.
+    #[prost(bool, tag = "4")]
+    pub verified_mac_crc32c: bool,
+    /// Integrity verification field. This value is used for the integrity
+    /// verification of [MacVerifyResponse.success]. If the value of this field
+    /// contradicts the value of [MacVerifyResponse.success], discard the response
+    /// and perform a limited number of retries.
+    #[prost(bool, tag = "5")]
+    pub verified_success_integrity: bool,
+    /// The [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of the [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used for verification.
+    #[prost(enumeration = "ProtectionLevel", tag = "6")]
+    pub protection_level: i32,
 }
-/// Request message for [KeyManagementService.RestoreCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.RestoreCryptoKeyVersion].
+/// Response message for [KeyManagementService.GenerateRandomBytes][google.cloud.kms.v1.KeyManagementService.GenerateRandomBytes].
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct RestoreCryptoKeyVersionRequest {
-    /// Required. The resource name of the [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to restore.
-    #[prost(string, tag = "1")]
-    pub name: ::prost::alloc::string::String,
+pub struct GenerateRandomBytesResponse {
+    /// The generated data.
+    #[prost(bytes = "vec", tag = "1")]
+    pub data: ::prost::alloc::vec::Vec<u8>,
+    /// Integrity verification field. A CRC32C checksum of the returned
+    /// [GenerateRandomBytesResponse.data][google.cloud.kms.v1.GenerateRandomBytesResponse.data]. An integrity check of
+    /// [GenerateRandomBytesResponse.data][google.cloud.kms.v1.GenerateRandomBytesResponse.data] can be performed by computing the
+    /// CRC32C checksum of [GenerateRandomBytesResponse.data][google.cloud.kms.v1.GenerateRandomBytesResponse.data] and comparing your
+    /// results to this field. Discard the response in case of non-matching
+    /// checksum values, and perform a limited number of retries. A persistent
+    /// mismatch may indicate an issue in your computation of the CRC32C checksum.
+    /// Note: This field is defined as int64 for reasons of compatibility across
+    /// different languages. However, it is a non-negative integer, which will
+    /// never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+    /// that support this type.
+    #[prost(message, optional, tag = "3")]
+    pub data_crc32c: ::core::option::Option<i64>,
 }
 /// A [Digest][google.cloud.kms.v1.Digest] holds a cryptographic message digest.
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1338,7 +1559,7 @@ pub mod key_management_service_client {
             interceptor: F,
         ) -> KeyManagementServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -1579,11 +1800,12 @@ pub mod key_management_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        #[doc = " Imports a new [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] into an existing [CryptoKey][google.cloud.kms.v1.CryptoKey] using the"]
-        #[doc = " wrapped key material provided in the request."]
+        #[doc = " Import wrapped key material into a [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion]."]
         #[doc = ""]
-        #[doc = " The version ID will be assigned the next sequential id within the"]
-        #[doc = " [CryptoKey][google.cloud.kms.v1.CryptoKey]."]
+        #[doc = " All requests must specify a [CryptoKey][google.cloud.kms.v1.CryptoKey]. If a [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] is"]
+        #[doc = " additionally specified in the request, key material will be reimported into"]
+        #[doc = " that version. Otherwise, a new version will be created, and will be"]
+        #[doc = " assigned the next sequential id within the [CryptoKey][google.cloud.kms.v1.CryptoKey]."]
         pub async fn import_crypto_key_version(
             &mut self,
             request: impl tonic::IntoRequest<super::ImportCryptoKeyVersionRequest>,
@@ -1656,6 +1878,78 @@ pub mod key_management_service_client {
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
                 "/google.cloud.kms.v1.KeyManagementService/UpdateCryptoKeyVersion",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        #[doc = " Update the version of a [CryptoKey][google.cloud.kms.v1.CryptoKey] that will be used in [Encrypt][google.cloud.kms.v1.KeyManagementService.Encrypt]."]
+        #[doc = ""]
+        #[doc = " Returns an error if called on a key whose purpose is not"]
+        #[doc = " [ENCRYPT_DECRYPT][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose.ENCRYPT_DECRYPT]."]
+        pub async fn update_crypto_key_primary_version(
+            &mut self,
+            request: impl tonic::IntoRequest<super::UpdateCryptoKeyPrimaryVersionRequest>,
+        ) -> Result<tonic::Response<super::CryptoKey>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/google.cloud.kms.v1.KeyManagementService/UpdateCryptoKeyPrimaryVersion",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        #[doc = " Schedule a [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] for destruction."]
+        #[doc = ""]
+        #[doc = " Upon calling this method, [CryptoKeyVersion.state][google.cloud.kms.v1.CryptoKeyVersion.state] will be set to"]
+        #[doc = " [DESTROY_SCHEDULED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.DESTROY_SCHEDULED],"]
+        #[doc = " and [destroy_time][google.cloud.kms.v1.CryptoKeyVersion.destroy_time] will be set to the time"]
+        #[doc = " [destroy_scheduled_duration][google.cloud.kms.v1.CryptoKey.destroy_scheduled_duration] in the"]
+        #[doc = " future. At that time, the [state][google.cloud.kms.v1.CryptoKeyVersion.state] will"]
+        #[doc = " automatically change to"]
+        #[doc = " [DESTROYED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.DESTROYED], and the key"]
+        #[doc = " material will be irrevocably destroyed."]
+        #[doc = ""]
+        #[doc = " Before the [destroy_time][google.cloud.kms.v1.CryptoKeyVersion.destroy_time] is reached,"]
+        #[doc = " [RestoreCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.RestoreCryptoKeyVersion] may be called to reverse the process."]
+        pub async fn destroy_crypto_key_version(
+            &mut self,
+            request: impl tonic::IntoRequest<super::DestroyCryptoKeyVersionRequest>,
+        ) -> Result<tonic::Response<super::CryptoKeyVersion>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/google.cloud.kms.v1.KeyManagementService/DestroyCryptoKeyVersion",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        #[doc = " Restore a [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] in the"]
+        #[doc = " [DESTROY_SCHEDULED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.DESTROY_SCHEDULED]"]
+        #[doc = " state."]
+        #[doc = ""]
+        #[doc = " Upon restoration of the CryptoKeyVersion, [state][google.cloud.kms.v1.CryptoKeyVersion.state]"]
+        #[doc = " will be set to [DISABLED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.DISABLED],"]
+        #[doc = " and [destroy_time][google.cloud.kms.v1.CryptoKeyVersion.destroy_time] will be cleared."]
+        pub async fn restore_crypto_key_version(
+            &mut self,
+            request: impl tonic::IntoRequest<super::RestoreCryptoKeyVersionRequest>,
+        ) -> Result<tonic::Response<super::CryptoKeyVersion>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/google.cloud.kms.v1.KeyManagementService/RestoreCryptoKeyVersion",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -1734,14 +2028,13 @@ pub mod key_management_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        #[doc = " Update the version of a [CryptoKey][google.cloud.kms.v1.CryptoKey] that will be used in [Encrypt][google.cloud.kms.v1.KeyManagementService.Encrypt]."]
-        #[doc = ""]
-        #[doc = " Returns an error if called on a key whose purpose is not"]
-        #[doc = " [ENCRYPT_DECRYPT][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose.ENCRYPT_DECRYPT]."]
-        pub async fn update_crypto_key_primary_version(
+        #[doc = " Signs data using a [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] with [CryptoKey.purpose][google.cloud.kms.v1.CryptoKey.purpose]"]
+        #[doc = " MAC, producing a tag that can be verified by another source with the"]
+        #[doc = " same key."]
+        pub async fn mac_sign(
             &mut self,
-            request: impl tonic::IntoRequest<super::UpdateCryptoKeyPrimaryVersionRequest>,
-        ) -> Result<tonic::Response<super::CryptoKey>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::MacSignRequest>,
+        ) -> Result<tonic::Response<super::MacSignResponse>, tonic::Status> {
             self.inner.ready().await.map_err(|e| {
                 tonic::Status::new(
                     tonic::Code::Unknown,
@@ -1750,26 +2043,17 @@ pub mod key_management_service_client {
             })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/google.cloud.kms.v1.KeyManagementService/UpdateCryptoKeyPrimaryVersion",
+                "/google.cloud.kms.v1.KeyManagementService/MacSign",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        #[doc = " Schedule a [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] for destruction."]
-        #[doc = ""]
-        #[doc = " Upon calling this method, [CryptoKeyVersion.state][google.cloud.kms.v1.CryptoKeyVersion.state] will be set to"]
-        #[doc = " [DESTROY_SCHEDULED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.DESTROY_SCHEDULED]"]
-        #[doc = " and [destroy_time][google.cloud.kms.v1.CryptoKeyVersion.destroy_time] will be set to a time 24"]
-        #[doc = " hours in the future, at which point the [state][google.cloud.kms.v1.CryptoKeyVersion.state]"]
-        #[doc = " will be changed to"]
-        #[doc = " [DESTROYED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.DESTROYED], and the key"]
-        #[doc = " material will be irrevocably destroyed."]
-        #[doc = ""]
-        #[doc = " Before the [destroy_time][google.cloud.kms.v1.CryptoKeyVersion.destroy_time] is reached,"]
-        #[doc = " [RestoreCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.RestoreCryptoKeyVersion] may be called to reverse the process."]
-        pub async fn destroy_crypto_key_version(
+        #[doc = " Verifies MAC tag using a [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] with [CryptoKey.purpose][google.cloud.kms.v1.CryptoKey.purpose]"]
+        #[doc = " MAC, and returns a response that indicates whether or not the verification"]
+        #[doc = " was successful."]
+        pub async fn mac_verify(
             &mut self,
-            request: impl tonic::IntoRequest<super::DestroyCryptoKeyVersionRequest>,
-        ) -> Result<tonic::Response<super::CryptoKeyVersion>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::MacVerifyRequest>,
+        ) -> Result<tonic::Response<super::MacVerifyResponse>, tonic::Status> {
             self.inner.ready().await.map_err(|e| {
                 tonic::Status::new(
                     tonic::Code::Unknown,
@@ -1778,21 +2062,16 @@ pub mod key_management_service_client {
             })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/google.cloud.kms.v1.KeyManagementService/DestroyCryptoKeyVersion",
+                "/google.cloud.kms.v1.KeyManagementService/MacVerify",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        #[doc = " Restore a [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] in the"]
-        #[doc = " [DESTROY_SCHEDULED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.DESTROY_SCHEDULED]"]
-        #[doc = " state."]
-        #[doc = ""]
-        #[doc = " Upon restoration of the CryptoKeyVersion, [state][google.cloud.kms.v1.CryptoKeyVersion.state]"]
-        #[doc = " will be set to [DISABLED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.DISABLED],"]
-        #[doc = " and [destroy_time][google.cloud.kms.v1.CryptoKeyVersion.destroy_time] will be cleared."]
-        pub async fn restore_crypto_key_version(
+        #[doc = " Generate random bytes using the Cloud KMS randomness source in the provided"]
+        #[doc = " location."]
+        pub async fn generate_random_bytes(
             &mut self,
-            request: impl tonic::IntoRequest<super::RestoreCryptoKeyVersionRequest>,
-        ) -> Result<tonic::Response<super::CryptoKeyVersion>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::GenerateRandomBytesRequest>,
+        ) -> Result<tonic::Response<super::GenerateRandomBytesResponse>, tonic::Status> {
             self.inner.ready().await.map_err(|e| {
                 tonic::Status::new(
                     tonic::Code::Unknown,
@@ -1801,7 +2080,7 @@ pub mod key_management_service_client {
             })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/google.cloud.kms.v1.KeyManagementService/RestoreCryptoKeyVersion",
+                "/google.cloud.kms.v1.KeyManagementService/GenerateRandomBytes",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }

@@ -1487,7 +1487,7 @@ pub mod certificate_authority_service_client {
             interceptor: F,
         ) -> CertificateAuthorityServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<

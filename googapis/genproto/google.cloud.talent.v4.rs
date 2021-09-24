@@ -742,7 +742,8 @@ pub enum HtmlSanitization {
     /// unordered list markup tags.
     SimpleFormattingOnly = 2,
 }
-/// Method for commute.
+/// Method for commute. Walking, biking and wheelchair accessible transit is
+/// still in the Preview stage.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
 pub enum CommuteMethod {
@@ -753,6 +754,13 @@ pub enum CommuteMethod {
     /// Commute time is calculated based on public transit including bus, metro,
     /// subway, and so on.
     Transit = 2,
+    /// Commute time is calculated based on walking time.
+    Walking = 3,
+    /// Commute time is calculated based on biking time.
+    Cycling = 4,
+    /// Commute time is calculated based on public transit that is wheelchair
+    /// accessible.
+    TransitAccessible = 5,
 }
 /// A Company resource represents a company in the service. A company is the
 /// entity that owns job postings, that is, the hiring entity responsible for
@@ -957,7 +965,7 @@ pub mod company_service_client {
             interceptor: F,
         ) -> CompanyServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -1206,7 +1214,7 @@ pub mod completion_client {
             interceptor: F,
         ) -> CompletionClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -1434,7 +1442,7 @@ pub mod event_service_client {
             interceptor: F,
         ) -> EventServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -1587,7 +1595,7 @@ pub struct JobQuery {
     /// Boolean expressions (AND/OR/NOT) are supported up to 3 levels of
     /// nesting (for example, "((A AND B AND C) OR NOT D) AND E"), a maximum of 100
     /// comparisons or functions are allowed in the expression. The expression
-    /// must be < 6000 bytes in length.
+    /// must be < 10000 bytes in length.
     ///
     /// Sample Query:
     /// `(LOWER(driving_license)="class \"a\"" OR EMPTY(driving_license)) AND
@@ -1641,16 +1649,20 @@ pub struct LocationFilter {
     /// The address name, such as "Mountain View" or "Bay Area".
     #[prost(string, tag = "1")]
     pub address: ::prost::alloc::string::String,
-    /// CLDR region code of the country/region of the address. This is used
-    /// to address ambiguity of the user-input location, for example, "Liverpool"
-    /// against "Liverpool, NY, US" or "Liverpool, UK".
+    /// CLDR region code of the country/region. This field may be used in two ways:
     ///
-    /// Set this field to bias location resolution toward a specific country
-    /// or territory. If this field is not set, application behavior is biased
-    /// toward the United States by default.
+    /// 1) If telecommute preference is not set, this field is used address
+    /// ambiguity of the user-input address. For example, "Liverpool" may refer to
+    /// "Liverpool, NY, US" or "Liverpool, UK". This region code biases the
+    /// address resolution toward a specific country or territory. If this field is
+    /// not set, address resolution is biased toward the United States by default.
+    ///
+    /// 2) If telecommute preference is set to TELECOMMUTE_ALLOWED, the
+    /// telecommute location filter will be limited to the region specified in this
+    /// field. If this field is not set, the telecommute job locations will not be
     ///
     /// See
-    /// https://www.unicode.org/cldr/charts/30/supplemental/territory_information.html
+    /// https://unicode-org.github.io/cldr-staging/charts/latest/supplemental/territory_information.html
     /// for details. Example: "CH" for Switzerland.
     #[prost(string, tag = "2")]
     pub region_code: ::prost::alloc::string::String,
@@ -1904,6 +1916,15 @@ pub struct Job {
     /// be preserved, a custom field should be used for storage. It is also
     /// suggested to group the locations that close to each other in the same job
     /// for better search experience.
+    ///
+    /// Jobs with multiple addresses must have their addresses with the same
+    /// [LocationType][] to allow location filtering to work properly. (For
+    /// example, a Job with addresses "1600 Amphitheatre Parkway, Mountain View,
+    /// CA, USA" and "London, UK" may not have location filters applied correctly
+    /// at search time since the first is a [LocationType.STREET_ADDRESS][] and the
+    /// second is a [LocationType.LOCALITY][].) If a job needs to have multiple
+    /// addresses, it is suggested to split it into multiple jobs with same
+    /// LocationTypes.
     ///
     /// The maximum number of allowed characters is 500.
     #[prost(string, repeated, tag = "6")]
@@ -2216,10 +2237,13 @@ pub struct ListJobsRequest {
     ///
     /// The fields eligible for filtering are:
     ///
-    /// * `companyName` (Required)
+    /// * `companyName`
     /// * `requisitionId`
     /// * `status` Available values: OPEN, EXPIRED, ALL. Defaults to
     /// OPEN if no value is specified.
+    ///
+    /// At least one of `companyName` and `requisitionId` must present or an
+    /// INVALID_ARGUMENT error is thrown.
     ///
     /// Sample Query:
     ///
@@ -2228,6 +2252,8 @@ pub struct ListJobsRequest {
     /// requisitionId = "req-1"
     /// * companyName = "projects/foo/tenants/bar/companies/baz" AND
     /// status = "EXPIRED"
+    /// * requisitionId = "req-1"
+    /// * requisitionId = "req-1" AND status = "EXPIRED"
     #[prost(string, tag = "2")]
     pub filter: ::prost::alloc::string::String,
     /// The starting point of a query result.
@@ -2330,6 +2356,9 @@ pub struct SearchJobsRequest {
     ///   "FULL_TIME", "PART_TIME".
     /// * company_size: histogram by [CompanySize][google.cloud.talent.v4.CompanySize], for example, "SMALL",
     /// "MEDIUM", "BIG".
+    /// * publish_time_in_day: histogram by the [Job.posting_publish_time][google.cloud.talent.v4.Job.posting_publish_time]
+    ///   in days.
+    ///   Must specify list of numeric buckets in spec.
     /// * publish_time_in_month: histogram by the [Job.posting_publish_time][google.cloud.talent.v4.Job.posting_publish_time]
     ///   in months.
     ///   Must specify list of numeric buckets in spec.
@@ -2383,7 +2412,7 @@ pub struct SearchJobsRequest {
     /// bucket(100000, MAX)])`
     /// * `count(string_custom_attribute["some-string-custom-attribute"])`
     /// * `count(numeric_custom_attribute["some-numeric-custom-attribute"],
-    ///   [bucket(MIN, 0, "negative"), bucket(0, MAX, "non-negative"])`
+    ///   [bucket(MIN, 0, "negative"), bucket(0, MAX, "non-negative")])`
     #[prost(message, repeated, tag = "7")]
     pub histogram_queries: ::prost::alloc::vec::Vec<HistogramQuery>,
     /// The desired job attributes returned for jobs in the search response.
@@ -2479,6 +2508,14 @@ pub struct SearchJobsRequest {
     /// score (determined by API algorithm).
     #[prost(message, optional, tag = "14")]
     pub custom_ranking_info: ::core::option::Option<search_jobs_request::CustomRankingInfo>,
+    /// This field is deprecated. Please use
+    /// [SearchJobsRequest.keyword_match_mode][google.cloud.talent.v4.SearchJobsRequest.keyword_match_mode] going forward.
+    ///
+    /// To migrate, disable_keyword_match set to false maps to
+    /// [KeywordMatchMode.KEYWORD_MATCH_ALL][google.cloud.talent.v4.SearchJobsRequest.KeywordMatchMode.KEYWORD_MATCH_ALL], and disable_keyword_match set to
+    /// true maps to [KeywordMatchMode.KEYWORD_MATCH_DISABLED][google.cloud.talent.v4.SearchJobsRequest.KeywordMatchMode.KEYWORD_MATCH_DISABLED]. If
+    /// [SearchJobsRequest.keyword_match_mode][google.cloud.talent.v4.SearchJobsRequest.keyword_match_mode] is set, this field is ignored.
+    ///
     /// Controls whether to disable exact keyword match on [Job.title][google.cloud.talent.v4.Job.title],
     /// [Job.description][google.cloud.talent.v4.Job.description], [Job.company_display_name][google.cloud.talent.v4.Job.company_display_name], [Job.addresses][google.cloud.talent.v4.Job.addresses],
     /// [Job.qualifications][google.cloud.talent.v4.Job.qualifications]. When disable keyword match is turned off, a
@@ -2498,8 +2535,16 @@ pub struct SearchJobsRequest {
     /// requests.
     ///
     /// Defaults to false.
+    #[deprecated]
     #[prost(bool, tag = "16")]
     pub disable_keyword_match: bool,
+    /// Controls what keyword match options to use. If both keyword_match_mode and
+    /// disable_keyword_match are set, keyword_match_mode will take precedence.
+    ///
+    /// Defaults to [KeywordMatchMode.KEYWORD_MATCH_ALL][google.cloud.talent.v4.SearchJobsRequest.KeywordMatchMode.KEYWORD_MATCH_ALL] if no value
+    /// is specified.
+    #[prost(enumeration = "search_jobs_request::KeywordMatchMode", tag = "18")]
+    pub keyword_match_mode: i32,
 }
 /// Nested message and enum types in `SearchJobsRequest`.
 pub mod search_jobs_request {
@@ -2525,7 +2570,7 @@ pub mod search_jobs_request {
         /// integer/double value or an expression that can be evaluated to a number.
         ///
         /// Parenthesis are supported to adjust calculation precedence. The
-        /// expression must be < 100 characters in length.
+        /// expression must be < 200 characters in length.
         ///
         /// The expression is considered invalid for a job if the expression
         /// references custom attributes that are not populated on the job or if the
@@ -2597,6 +2642,11 @@ pub mod search_jobs_request {
     /// clustered so that only one representative job of the cluster is
     /// displayed to the job seeker higher up in the results, with the other jobs
     /// being displayed lower down in the results.
+    ///
+    /// If you are using pageToken to page through the result set,
+    /// latency might be lower but we can't guarantee that all results are
+    /// returned. If you are using page offset, latency might be higher but all
+    /// results are returned.
     #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
     #[repr(i32)]
     pub enum DiversificationLevel {
@@ -2608,11 +2658,52 @@ pub mod search_jobs_request {
         Disabled = 1,
         /// Default diversifying behavior. The result list is ordered so that
         /// highly similar results are pushed to the end of the last page of search
-        /// results. If you are using pageToken to page through the result set,
-        /// latency might be lower but we can't guarantee that all results are
-        /// returned. If you are using page offset, latency might be higher but all
-        /// results are returned.
+        /// results.
         Simple = 2,
+        /// Only one job from the same company will be shown at once, other jobs
+        /// under same company are pushed to the end of the last page of search
+        /// result.
+        OnePerCompany = 3,
+        /// Similar to ONE_PER_COMPANY, but it allows at most two jobs in the
+        /// same company to be shown at once, the other jobs under same company are
+        /// pushed to the end of the last page of search result.
+        TwoPerCompany = 4,
+        /// The result list is ordered such that somewhat similar results are pushed
+        /// to the end of the last page of the search results. This option is
+        /// recommended if SIMPLE diversification does not diversify enough.
+        DiversifyByLooserSimilarity = 5,
+    }
+    /// Controls what keyword matching behavior the search has. When keyword
+    /// matching is enabled, a keyword match returns jobs that may not match given
+    /// category filters when there are matching keywords. For example, for the
+    /// query "program manager" with KeywordMatchMode set to KEYWORD_MATCH_ALL, a
+    /// job posting with the title "software developer," which doesn't fall into
+    /// "program manager" ontology, and "program manager" appearing in its
+    /// description will be surfaced.
+    ///
+    /// For queries like "cloud" that don't contain title or
+    /// location specific ontology, jobs with "cloud" keyword matches are returned
+    /// regardless of this enum's value.
+    ///
+    /// Use [Company.keyword_searchable_job_custom_attributes][google.cloud.talent.v4.Company.keyword_searchable_job_custom_attributes] if
+    /// company-specific globally matched custom field/attribute string values are
+    /// needed. Enabling keyword match improves recall of subsequent search
+    /// requests.
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum KeywordMatchMode {
+        /// The keyword match option isn't specified. Defaults to
+        /// [KeywordMatchMode.KEYWORD_MATCH_ALL][google.cloud.talent.v4.SearchJobsRequest.KeywordMatchMode.KEYWORD_MATCH_ALL] behavior.
+        Unspecified = 0,
+        /// Disables keyword matching.
+        KeywordMatchDisabled = 1,
+        /// Enable keyword matching over [Job.title][google.cloud.talent.v4.Job.title],
+        /// [Job.description][google.cloud.talent.v4.Job.description], [Job.company_display_name][google.cloud.talent.v4.Job.company_display_name], [Job.addresses][google.cloud.talent.v4.Job.addresses],
+        /// [Job.qualifications][google.cloud.talent.v4.Job.qualifications], and keyword searchable [Job.custom_attributes][google.cloud.talent.v4.Job.custom_attributes]
+        /// fields.
+        KeywordMatchAll = 2,
+        /// Only enable keyword matching over [Job.title][google.cloud.talent.v4.Job.title].
+        KeywordMatchTitleOnly = 3,
     }
 }
 /// Response for SearchJob method.
@@ -2851,7 +2942,7 @@ pub mod job_service_client {
             interceptor: F,
         ) -> JobServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -3204,7 +3295,7 @@ pub mod tenant_service_client {
             interceptor: F,
         ) -> TenantServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<

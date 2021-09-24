@@ -24,7 +24,7 @@ pub struct CloudFunction {
     /// function, optional when updating an existing function. For a complete
     /// list of possible choices, see the
     /// [`gcloud` command
-    /// reference](/sdk/gcloud/reference/functions/deploy#--runtime).
+    /// reference](https://cloud.google.com/sdk/gcloud/reference/functions/deploy#--runtime).
     #[prost(string, tag = "19")]
     pub runtime: ::prost::alloc::string::String,
     /// The function execution timeout. Execution is considered failed and
@@ -61,8 +61,8 @@ pub struct CloudFunction {
     /// project. Otherwise, it must belong to a project within the same
     /// organization. The format of this field is either
     /// `projects/{project}/global/networks/{network}` or `{network}`, where
-    /// {project} is a project id where the network is defined, and {network} is
-    /// the short name of the network.
+    /// `{project}` is a project id where the network is defined, and `{network}`
+    /// is the short name of the network.
     ///
     /// This field is mutually exclusive with `vpc_connector` and will be replaced
     /// by it.
@@ -143,7 +143,7 @@ pub mod cloud_function {
     /// The location of the function source code.
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum SourceCode {
-        /// The Google Cloud Storage URL, starting with gs://, pointing to the zip
+        /// The Google Cloud Storage URL, starting with `gs://`, pointing to the zip
         /// archive which contains the function.
         #[prost(string, tag = "3")]
         SourceArchiveUrl(::prost::alloc::string::String),
@@ -153,7 +153,11 @@ pub mod cloud_function {
         #[prost(message, tag = "4")]
         SourceRepository(super::SourceRepository),
         /// The Google Cloud Storage signed URL used for source uploading, generated
-        /// by [google.cloud.functions.v1.GenerateUploadUrl][]
+        /// by calling [google.cloud.functions.v1.GenerateUploadUrl].
+        ///
+        /// The signature is validated on write methods (Create, Update)
+        /// The signature is stripped from the Function object on read methods (Get,
+        /// List)
         #[prost(string, tag = "16")]
         SourceUploadUrl(::prost::alloc::string::String),
     }
@@ -199,6 +203,31 @@ pub struct HttpsTrigger {
     /// Output only. The deployed url for the function.
     #[prost(string, tag = "1")]
     pub url: ::prost::alloc::string::String,
+    /// The security level for the function.
+    #[prost(enumeration = "https_trigger::SecurityLevel", tag = "2")]
+    pub security_level: i32,
+}
+/// Nested message and enum types in `HttpsTrigger`.
+pub mod https_trigger {
+    /// Available security level settings.
+    ///
+    /// This controls the methods to enforce security (HTTPS) on a URL.
+    ///
+    /// If unspecified, SECURE_OPTIONAL will be used.
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum SecurityLevel {
+        /// Unspecified.
+        Unspecified = 0,
+        /// Requests for a URL that match this handler that do not use HTTPS are
+        /// automatically redirected to the HTTPS URL with the same path. Query
+        /// parameters are reserved for the redirect.
+        SecureAlways = 1,
+        /// Both HTTP and HTTPS requests with URLs that match the handler succeed
+        /// without redirects. The application can examine the request to determine
+        /// which protocol was used and respond accordingly.
+        SecureOptional = 2,
+    }
 }
 /// Describes EventTrigger, used to request events be sent from another
 /// service.
@@ -455,7 +484,7 @@ pub mod cloud_functions_service_client {
             interceptor: F,
         ) -> CloudFunctionsServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -730,7 +759,7 @@ pub mod cloud_functions_service_client {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct OperationMetadataV1 {
     /// Target of the operation - for example
-    /// projects/project-1/locations/region-1/functions/function-1
+    /// `projects/project-1/locations/region-1/functions/function-1`
     #[prost(string, tag = "1")]
     pub target: ::prost::alloc::string::String,
     /// Type of operation.

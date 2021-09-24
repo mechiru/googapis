@@ -104,6 +104,35 @@ pub struct SpeechAdaptation {
     #[prost(message, repeated, tag = "3")]
     pub custom_classes: ::prost::alloc::vec::Vec<CustomClass>,
 }
+/// Transcription normalization configuration. Use transcription normalization
+/// to automatically replace parts of the transcript with phrases of your
+/// choosing. For StreamingRecognize, this normalization only applies to stable
+/// partial transcripts (stability > 0.8) and final transcripts.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TranscriptNormalization {
+    /// A list of replacement entries. We will perform replacement with one entry
+    /// at a time. For example, the second entry in ["cat" => "dog", "mountain cat"
+    /// => "mountain dog"] will never be applied because we will always process the
+    /// first entry before it. At most 100 entries.
+    #[prost(message, repeated, tag = "1")]
+    pub entries: ::prost::alloc::vec::Vec<transcript_normalization::Entry>,
+}
+/// Nested message and enum types in `TranscriptNormalization`.
+pub mod transcript_normalization {
+    /// A single replacement configuration.
+    #[derive(Clone, PartialEq, ::prost::Message)]
+    pub struct Entry {
+        /// What to replace. Max length is 100 characters.
+        #[prost(string, tag = "1")]
+        pub search: ::prost::alloc::string::String,
+        /// What to replace with. Max length is 100 characters.
+        #[prost(string, tag = "2")]
+        pub replace: ::prost::alloc::string::String,
+        /// Whether the search is case sensitive.
+        #[prost(bool, tag = "3")]
+        pub case_sensitive: bool,
+    }
+}
 /// The top-level message sent by the client for the `Recognize` method.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RecognizeRequest {
@@ -298,6 +327,12 @@ pub struct RecognitionConfig {
     /// documentation.
     #[prost(message, optional, tag = "20")]
     pub adaptation: ::core::option::Option<SpeechAdaptation>,
+    /// Use transcription normalization to automatically replace parts of the
+    /// transcript with phrases of your choosing. For StreamingRecognize, this
+    /// normalization only applies to stable partial transcripts (stability > 0.8)
+    /// and final transcripts.
+    #[prost(message, optional, tag = "24")]
+    pub transcript_normalization: ::core::option::Option<TranscriptNormalization>,
     /// Array of [SpeechContext][google.cloud.speech.v1p1beta1.SpeechContext].
     /// A means to provide context to assist the speech recognition. For more
     /// information, see
@@ -980,7 +1015,7 @@ pub mod speech_client {
             interceptor: F,
         ) -> SpeechClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -1266,7 +1301,7 @@ pub mod adaptation_client {
             interceptor: F,
         ) -> AdaptationClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<

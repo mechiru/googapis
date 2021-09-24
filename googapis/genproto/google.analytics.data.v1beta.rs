@@ -807,6 +807,10 @@ pub struct DimensionMetadata {
     /// True if the dimension is a custom dimension for this property.
     #[prost(bool, tag = "5")]
     pub custom_definition: bool,
+    /// The display name of the category that this dimension belongs to. Similar
+    /// dimensions and metrics are categorized together.
+    #[prost(string, tag = "7")]
+    pub category: ::prost::alloc::string::String,
 }
 /// Explains a metric.
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -839,6 +843,36 @@ pub struct MetricMetadata {
     /// True if the metric is a custom metric for this property.
     #[prost(bool, tag = "7")]
     pub custom_definition: bool,
+    /// The display name of the category that this metrics belongs to. Similar
+    /// dimensions and metrics are categorized together.
+    #[prost(string, tag = "10")]
+    pub category: ::prost::alloc::string::String,
+}
+/// The compatibility for a single dimension.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DimensionCompatibility {
+    /// The dimension metadata contains the API name for this compatibility
+    /// information. The dimension metadata also contains other helpful information
+    /// like the UI name and description.
+    #[prost(message, optional, tag = "1")]
+    pub dimension_metadata: ::core::option::Option<DimensionMetadata>,
+    /// The compatibility of this dimension. If the compatibility is COMPATIBLE,
+    /// this dimension can be successfully added to the report.
+    #[prost(enumeration = "Compatibility", optional, tag = "2")]
+    pub compatibility: ::core::option::Option<i32>,
+}
+/// The compatibility for a single metric.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MetricCompatibility {
+    /// The metric metadata contains the API name for this compatibility
+    /// information. The metric metadata also contains other helpful information
+    /// like the UI name and description.
+    #[prost(message, optional, tag = "1")]
+    pub metric_metadata: ::core::option::Option<MetricMetadata>,
+    /// The compatibility of this metric. If the compatibility is COMPATIBLE,
+    /// this metric can be successfully added to the report.
+    #[prost(enumeration = "Compatibility", optional, tag = "2")]
+    pub compatibility: ::core::option::Option<i32>,
 }
 /// Represents aggregation of metrics.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
@@ -886,6 +920,69 @@ pub enum MetricType {
     /// A length in kilometers; a special floating point type.
     TypeKilometers = 13,
 }
+/// The compatibility types for a single dimension or metric.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum Compatibility {
+    /// Unspecified compatibility.
+    Unspecified = 0,
+    /// The dimension or metric is compatible. This dimension or metric can be
+    /// successfully added to a report.
+    Compatible = 1,
+    /// The dimension or metric is incompatible. This dimension or metric cannot be
+    /// successfully added to a report.
+    Incompatible = 2,
+}
+/// The request for compatibility information for a report's dimensions and
+/// metrics. Check compatibility provides a preview of the compatibility of a
+/// report; fields shared with the `runReport` request should be the same values
+/// as in your `runReport` request.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CheckCompatibilityRequest {
+    /// A Google Analytics GA4 property identifier whose events are tracked. To
+    /// learn more, see [where to find your Property
+    /// ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id).
+    /// `property` should be the same value as in your `runReport` request.
+    ///
+    /// Example: properties/1234
+    ///
+    /// Set the Property ID to 0 for compatibility checking on dimensions and
+    /// metrics common to all properties. In this special mode, this method will
+    /// not return custom dimensions and metrics.
+    #[prost(string, tag = "1")]
+    pub property: ::prost::alloc::string::String,
+    /// The dimensions in this report. `dimensions` should be the same value as in
+    /// your `runReport` request.
+    #[prost(message, repeated, tag = "2")]
+    pub dimensions: ::prost::alloc::vec::Vec<Dimension>,
+    /// The metrics in this report. `metrics` should be the same value as in your
+    /// `runReport` request.
+    #[prost(message, repeated, tag = "3")]
+    pub metrics: ::prost::alloc::vec::Vec<Metric>,
+    /// The filter clause of dimensions. `dimensionFilter` should be the same value
+    /// as in your `runReport` request.
+    #[prost(message, optional, tag = "4")]
+    pub dimension_filter: ::core::option::Option<FilterExpression>,
+    /// The filter clause of metrics. `metricFilter` should be the same value as in
+    /// your `runReport` request
+    #[prost(message, optional, tag = "5")]
+    pub metric_filter: ::core::option::Option<FilterExpression>,
+    /// Filters the dimensions and metrics in the response to just this
+    /// compatibility. Commonly used as `”compatibilityFilter”: “COMPATIBLE”`
+    /// to only return compatible dimensions & metrics.
+    #[prost(enumeration = "Compatibility", tag = "6")]
+    pub compatibility_filter: i32,
+}
+/// The compatibility response with the compatibility of each dimension & metric.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CheckCompatibilityResponse {
+    /// The compatibility of each dimension.
+    #[prost(message, repeated, tag = "1")]
+    pub dimension_compatibilities: ::prost::alloc::vec::Vec<DimensionCompatibility>,
+    /// The compatibility of each metric.
+    #[prost(message, repeated, tag = "2")]
+    pub metric_compatibilities: ::prost::alloc::vec::Vec<MetricCompatibility>,
+}
 /// The dimensions and metrics currently accepted in reporting methods.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Metadata {
@@ -925,13 +1022,14 @@ pub struct RunReportRequest {
     /// must be unspecified.
     #[prost(message, repeated, tag = "4")]
     pub date_ranges: ::prost::alloc::vec::Vec<DateRange>,
-    /// The filter clause of dimensions. Dimensions must be requested to be used in
-    /// this filter. Metrics cannot be used in this filter.
+    /// Dimension filters allow you to ask for only specific dimension values in
+    /// the report. To learn more, see [Fundamentals of Dimension
+    /// Filters](https://developers.google.com/analytics/devguides/reporting/data/v1/basics#dimension_filters)
+    /// for examples. Metrics cannot be used in this filter.
     #[prost(message, optional, tag = "5")]
     pub dimension_filter: ::core::option::Option<FilterExpression>,
     /// The filter clause of metrics. Applied at post aggregation phase, similar to
-    /// SQL having-clause. Metrics must be requested to be used in this filter.
-    /// Dimensions cannot be used in this filter.
+    /// SQL having-clause. Dimensions cannot be used in this filter.
     #[prost(message, optional, tag = "6")]
     pub metric_filter: ::core::option::Option<FilterExpression>,
     /// The row count of the start row. The first row is counted as row 0.
@@ -1360,7 +1458,7 @@ pub mod beta_analytics_data_client {
             interceptor: F,
         ) -> BetaAnalyticsDataClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -1507,6 +1605,32 @@ pub mod beta_analytics_data_client {
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
                 "/google.analytics.data.v1beta.BetaAnalyticsData/RunRealtimeReport",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        #[doc = " This compatibility method lists dimensions and metrics that can be added to"]
+        #[doc = " a report request and maintain compatibility. This method fails if the"]
+        #[doc = " request's dimensions and metrics are incompatible."]
+        #[doc = ""]
+        #[doc = " In Google Analytics, reports fail if they request incompatible dimensions"]
+        #[doc = " and/or metrics; in that case, you will need to remove dimensions and/or"]
+        #[doc = " metrics from the incompatible report until the report is compatible."]
+        #[doc = ""]
+        #[doc = " The Realtime and Core reports have different compatibility rules. This"]
+        #[doc = " method checks compatibility for Core reports."]
+        pub async fn check_compatibility(
+            &mut self,
+            request: impl tonic::IntoRequest<super::CheckCompatibilityRequest>,
+        ) -> Result<tonic::Response<super::CheckCompatibilityResponse>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/google.analytics.data.v1beta.BetaAnalyticsData/CheckCompatibility",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }

@@ -1,0 +1,7 @@
+google-cloud-asset-v1p5beta1
+google-cloud-binaryauthorization-v1
+google-devtools-containeranalysis-v1
+google-firestore-bundle
+grafeas-v1beta1-attestation
+grafeas-v1beta1-discovery
+grafeas-v1beta1-vulnerability

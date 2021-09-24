@@ -502,6 +502,9 @@ pub struct Product {
     /// This field must be a UTF-8 encoded string with a length limit of 128
     /// characters. Otherwise, an INVALID_ARGUMENT error is returned.
     ///
+    /// This field must be a Unigram. Otherwise, an INVALID_ARGUMENT error is
+    /// returned.
+    ///
     /// Google Merchant Center property
     /// [gtin](https://support.google.com/merchants/answer/6324461).
     /// Schema.org property
@@ -614,13 +617,9 @@ pub struct Product {
     /// This field needs to pass all below criteria, otherwise an INVALID_ARGUMENT
     /// error is returned:
     ///
-    /// * Max entries count: 200 by default; 100 for
-    /// [Type.VARIANT][google.cloud.retail.v2alpha.Product.Type.VARIANT].
+    /// * Max entries count: 200.
     /// * The key must be a UTF-8 encoded string with a length limit of 128
     ///   characters.
-    /// * Max indexable entries count: 200 by default; 40 for
-    /// [Type.VARIANT][google.cloud.retail.v2alpha.Product.Type.VARIANT].
-    /// * Max searchable entries count: 30.
     /// * For indexable attribute, the key must match the pattern:
     ///   [a-zA-Z0-9][a-zA-Z0-9_]*. For example, key0LikeThis or KEY_1_LIKE_THIS.
     #[prost(map = "string, message", tag = "12")]
@@ -730,7 +729,7 @@ pub struct Product {
     pub sizes: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     /// The material of the product. For example, "leather", "wooden".
     ///
-    /// A maximum of 5 values are allowed. Each value must be a UTF-8 encoded
+    /// A maximum of 20 values are allowed. Each value must be a UTF-8 encoded
     /// string with a length limit of 128 characters. Otherwise, an
     /// INVALID_ARGUMENT error is returned.
     ///
@@ -742,7 +741,7 @@ pub struct Product {
     /// The pattern or graphic print of the product. For example, "striped", "polka
     /// dot", "paisley".
     ///
-    /// A maximum of 5 values are allowed per
+    /// A maximum of 20 values are allowed per
     /// [Product][google.cloud.retail.v2alpha.Product]. Each value must be a UTF-8
     /// encoded string with a length limit of 128 characters. Otherwise, an
     /// INVALID_ARGUMENT error is returned.
@@ -831,8 +830,12 @@ pub struct Product {
     /// * [name][google.cloud.retail.v2alpha.Product.name]
     /// * [color_info][google.cloud.retail.v2alpha.Product.color_info]
     ///
-    /// Maximum number of paths is 20. Otherwise, an INVALID_ARGUMENT error is
+    /// Maximum number of paths is 30. Otherwise, an INVALID_ARGUMENT error is
     /// returned.
+    ///
+    /// Note: Returning more fields in
+    /// [SearchResponse][google.cloud.retail.v2alpha.SearchResponse] may increase
+    /// response payload size and serving latency.
     #[prost(message, optional, tag = "30")]
     pub retrievable_fields: ::core::option::Option<::prost_types::FieldMask>,
     /// Output only. Product variants grouped together on primary product which
@@ -1175,9 +1178,21 @@ pub struct UserEvent {
 pub struct ProductDetail {
     /// Required. [Product][google.cloud.retail.v2alpha.Product] information.
     ///
-    /// Only [Product.id][google.cloud.retail.v2alpha.Product.id] field is used
-    /// when ingesting an event, all other product fields are ignored as we will
-    /// look them up from the catalog.
+    /// Required field(s):
+    ///
+    /// * [Product.id][google.cloud.retail.v2alpha.Product.id]
+    ///
+    /// Optional override field(s):
+    ///
+    /// * [Product.price_info][google.cloud.retail.v2alpha.Product.price_info]
+    ///
+    /// If any supported optional fields are provided, we will treat them as a full
+    /// override when looking up product information from the catalog. Thus, it is
+    /// important to ensure that the overriding fields are accurate and
+    /// complete.
+    ///
+    /// All other product fields are ignored and instead populated via catalog
+    /// lookup after event ingestion.
     #[prost(message, optional, tag = "1")]
     pub product: ::core::option::Option<Product>,
     /// Quantity of the product associated with the user event.
@@ -1428,13 +1443,13 @@ pub mod import_products_request {
         /// Can only be while using
         /// [BigQuerySource][google.cloud.retail.v2alpha.BigQuerySource].
         ///
-        /// Add the IAM permission “BigQuery Data Viewer” for
+        /// Add the IAM permission "BigQuery Data Viewer" for
         /// cloud-retail-customer-data-access@system.gserviceaccount.com before
         /// using this feature otherwise an error is thrown.
         ///
         /// This feature is only available for users who have Retail Search enabled.
-        /// Contact Retail Support (retail-search-support@google.com) if you are
-        /// interested in using Retail Search.
+        /// Please submit a form [here](https://cloud.google.com/contact) to contact
+        /// cloud sales if you are interested in using Retail Search.
         Full = 2,
     }
 }
@@ -1547,7 +1562,7 @@ pub mod completion_data_input_config {
     pub enum Source {
         /// Required. BigQuery input source.
         ///
-        /// Add the IAM permission “BigQuery Data Viewer” for
+        /// Add the IAM permission "BigQuery Data Viewer" for
         /// cloud-retail-customer-data-access@system.gserviceaccount.com before
         /// using this feature otherwise an error is thrown.
         #[prost(message, tag = "1")]
@@ -1709,7 +1724,7 @@ pub struct MerchantCenterLink {
     pub branch_id: ::prost::alloc::string::String,
     /// String representing the destination to import for, all if left empty.
     /// List of possible values can be found here.
-    /// [https://support.google.com/merchants/answer/7501026?hl=en]
+    /// [https://support.google.com/merchants/answer/7501026]
     /// List of allowed string values:
     /// "shopping-ads", "buy-on-google-listings", "display-ads", "local-inventory
     /// -ads", "free-listings", "free-local-listings"
@@ -1890,7 +1905,7 @@ pub mod catalog_service_client {
             interceptor: F,
         ) -> CatalogServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -1985,8 +2000,8 @@ pub mod catalog_service_client {
         #[doc = "   {newBranch}."]
         #[doc = ""]
         #[doc = " This feature is only available for users who have Retail Search enabled."]
-        #[doc = " Contact Retail Support (retail-search-support@google.com) if you are"]
-        #[doc = " interested in using Retail Search."]
+        #[doc = " Please submit a form [here](https://cloud.google.com/contact) to contact"]
+        #[doc = " cloud sales if you are interested in using Retail Search."]
         pub async fn set_default_branch(
             &mut self,
             request: impl tonic::IntoRequest<super::SetDefaultBranchRequest>,
@@ -2008,8 +2023,8 @@ pub mod catalog_service_client {
         #[doc = " method under a specified parent catalog."]
         #[doc = ""]
         #[doc = " This feature is only available for users who have Retail Search enabled."]
-        #[doc = " Contact Retail Support (retail-search-support@google.com) if you are"]
-        #[doc = " interested in using Retail Search."]
+        #[doc = " Please submit a form [here](https://cloud.google.com/contact) to contact"]
+        #[doc = " cloud sales if you are interested in using Retail Search."]
         pub async fn get_default_branch(
             &mut self,
             request: impl tonic::IntoRequest<super::GetDefaultBranchRequest>,
@@ -2077,22 +2092,26 @@ pub struct CompleteQueryRequest {
     #[prost(string, tag = "4")]
     pub device_type: ::prost::alloc::string::String,
     /// Determines which dataset to use for fetching completion. "user-data" will
-    /// use the imported dataset through [ImportCompletionData][]. "cloud-retail"
-    /// will use the dataset generated by cloud retail based on user events. If
-    /// leave empty, it will use the "user-data".
+    /// use the imported dataset through
+    /// [CompletionService.ImportCompletionData][google.cloud.retail.v2alpha.CompletionService.ImportCompletionData].
+    /// "cloud-retail" will use the dataset generated by cloud retail based on user
+    /// events. If leave empty, it will use the "user-data".
     ///
     /// Current supported values:
     ///
     /// * user-data
     ///
     /// * cloud-retail
-    ///   This option is not automatically enabled. Before using cloud-retail,
-    ///   contact retail-search-support@google.com first.
+    ///   This option requires additional allowlisting. Before using cloud-retail,
+    ///   contact Cloud Retail support team first.
     #[prost(string, tag = "6")]
     pub dataset: ::prost::alloc::string::String,
-    /// Completion max suggestions.
+    /// Completion max suggestions. If left unset or set to 0, then will fallback
+    /// to the configured value
+    /// [CompletionConfig.max_suggestions][google.cloud.retail.v2alpha.CompletionConfig.max_suggestions].
     ///
-    /// The maximum allowed max suggestions is 20. The default value is 20.
+    /// The maximum allowed max suggestions is 20. If it is set higher, it will be
+    /// capped by 20.
     #[prost(int32, tag = "5")]
     pub max_suggestions: i32,
 }
@@ -2109,9 +2128,9 @@ pub struct CompleteQueryResponse {
     /// performance.
     #[prost(string, tag = "2")]
     pub attribution_token: ::prost::alloc::string::String,
-    /// Matched recent searches of this user. This field is a restricted feature.
-    /// Contact Retail Support (retail-search-support@google.com) if you are
-    /// interested in enabling it.
+    /// Matched recent searches of this user. The maximum number of recent searches
+    /// is 10. This field is a restricted feature. Contact Retail Search support
+    /// team if you are interested in enabling it.
     ///
     /// This feature is only available when
     /// [CompleteQueryRequest.visitor_id][google.cloud.retail.v2alpha.CompleteQueryRequest.visitor_id]
@@ -2158,8 +2177,8 @@ pub mod completion_service_client {
     #[doc = " Auto-completion service for retail."]
     #[doc = ""]
     #[doc = " This feature is only available for users who have Retail Search enabled."]
-    #[doc = " Contact Retail Support (retail-search-support@google.com) if you are"]
-    #[doc = " interested in using Retail Search."]
+    #[doc = " Please submit a form [here](https://cloud.google.com/contact) to contact"]
+    #[doc = " cloud sales if you are interested in using Retail Search."]
     #[derive(Debug, Clone)]
     pub struct CompletionServiceClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -2180,7 +2199,7 @@ pub mod completion_service_client {
             interceptor: F,
         ) -> CompletionServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -2208,8 +2227,8 @@ pub mod completion_service_client {
         #[doc = " Completes the specified prefix with keyword suggestions."]
         #[doc = ""]
         #[doc = " This feature is only available for users who have Retail Search enabled."]
-        #[doc = " Contact Retail Support (retail-search-support@google.com) if you are"]
-        #[doc = " interested in using Retail Search."]
+        #[doc = " Please submit a form [here](https://cloud.google.com/contact) to contact"]
+        #[doc = " cloud sales if you are interested in using Retail Search."]
         pub async fn complete_query(
             &mut self,
             request: impl tonic::IntoRequest<super::CompleteQueryRequest>,
@@ -2231,8 +2250,8 @@ pub mod completion_service_client {
         #[doc = " Request processing may be synchronous. Partial updating is not supported."]
         #[doc = ""]
         #[doc = " This feature is only available for users who have Retail Search enabled."]
-        #[doc = " Contact Retail Support (retail-search-support@google.com) if you are"]
-        #[doc = " interested in using Retail Search."]
+        #[doc = " Please submit a form [here](https://cloud.google.com/contact) to contact"]
+        #[doc = " cloud sales if you are interested in using Retail Search."]
         pub async fn import_completion_data(
             &mut self,
             request: impl tonic::IntoRequest<super::ImportCompletionDataRequest>,
@@ -2488,7 +2507,7 @@ pub mod prediction_service_client {
             interceptor: F,
         ) -> PredictionServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -3052,7 +3071,7 @@ pub mod product_service_client {
             interceptor: F,
         ) -> ProductServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -3228,8 +3247,8 @@ pub mod product_service_client {
         #[doc = " [RemoveFulfillmentPlaces][google.cloud.retail.v2alpha.ProductService.RemoveFulfillmentPlaces]."]
         #[doc = ""]
         #[doc = " This feature is only available for users who have Retail Search enabled."]
-        #[doc = " Contact Retail Support (retail-search-support@google.com) if you are"]
-        #[doc = " interested in using Retail Search."]
+        #[doc = " Please submit a form [here](https://cloud.google.com/contact) to contact"]
+        #[doc = " cloud sales if you are interested in using Retail Search."]
         pub async fn set_inventory(
             &mut self,
             request: impl tonic::IntoRequest<super::SetInventoryRequest>,
@@ -3262,8 +3281,8 @@ pub mod product_service_client {
         #[doc = " [ListProducts][google.cloud.retail.v2alpha.ProductService.ListProducts]."]
         #[doc = ""]
         #[doc = " This feature is only available for users who have Retail Search enabled."]
-        #[doc = " Contact Retail Support (retail-search-support@google.com) if you are"]
-        #[doc = " interested in using Retail Search."]
+        #[doc = " Please submit a form [here](https://cloud.google.com/contact) to contact"]
+        #[doc = " cloud sales if you are interested in using Retail Search."]
         pub async fn add_fulfillment_places(
             &mut self,
             request: impl tonic::IntoRequest<super::AddFulfillmentPlacesRequest>,
@@ -3296,8 +3315,8 @@ pub mod product_service_client {
         #[doc = " [ListProducts][google.cloud.retail.v2alpha.ProductService.ListProducts]."]
         #[doc = ""]
         #[doc = " This feature is only available for users who have Retail Search enabled."]
-        #[doc = " Contact Retail Support (retail-search-support@google.com) if you are"]
-        #[doc = " interested in using Retail Search."]
+        #[doc = " Please submit a form [here](https://cloud.google.com/contact) to contact"]
+        #[doc = " cloud sales if you are interested in using Retail Search."]
         pub async fn remove_fulfillment_places(
             &mut self,
             request: impl tonic::IntoRequest<super::RemoveFulfillmentPlacesRequest>,
@@ -3387,8 +3406,7 @@ pub struct SearchRequest {
     pub offset: i32,
     /// The filter syntax consists of an expression language for constructing a
     /// predicate from one or more fields of the products being filtered. Filter
-    /// expression is case-sensitive. See more details at this [user
-    /// guide](/retail/private/docs/filter-and-order#filter).
+    /// expression is case-sensitive.
     ///
     /// If this field is unrecognizable, an INVALID_ARGUMENT is returned.
     #[prost(string, tag = "10")]
@@ -3407,9 +3425,7 @@ pub struct SearchRequest {
     pub canonical_filter: ::prost::alloc::string::String,
     /// The order in which products are returned. Products can be ordered by
     /// a field in an [Product][google.cloud.retail.v2alpha.Product] object. Leave
-    /// it unset if ordered by relevance. OrderBy expression is case-sensitive. See
-    /// more details at this [user
-    /// guide](/retail/private/docs/filter-and-order#order).
+    /// it unset if ordered by relevance. OrderBy expression is case-sensitive.
     ///
     /// If this field is unrecognizable, an INVALID_ARGUMENT is returned.
     #[prost(string, tag = "11")]
@@ -3423,18 +3439,15 @@ pub struct SearchRequest {
     /// The specification for dynamically generated facets. Notice that only
     /// textual facets can be dynamically generated.
     ///
-    /// This feature requires additional allowlisting. Contact Retail Support
-    /// (retail-search-support@google.com) if you are interested in using dynamic
-    /// facet feature.
+    /// This feature requires additional allowlisting. Contact Retail Search
+    /// support team if you are interested in using dynamic facet feature.
     #[prost(message, optional, tag = "21")]
     pub dynamic_facet_spec: ::core::option::Option<search_request::DynamicFacetSpec>,
-    /// Boost specification to boost certain products. See more details at this
-    /// [user guide](/retail/private/docs/boosting).
+    /// Boost specification to boost certain products.
     #[prost(message, optional, tag = "13")]
     pub boost_spec: ::core::option::Option<search_request::BoostSpec>,
     /// The query expansion specification that specifies the conditions under which
-    /// query expansion will occur. See more details at this [user
-    /// guide](/retail/private/docs/result-size#query_expansion).
+    /// query expansion will occur..
     #[prost(message, optional, tag = "14")]
     pub query_expansion_spec: ::core::option::Option<search_request::QueryExpansionSpec>,
     /// The relevance threshold of the search results.
@@ -3442,8 +3455,7 @@ pub struct SearchRequest {
     /// Defaults to
     /// [RelevanceThreshold.HIGH][google.cloud.retail.v2alpha.SearchRequest.RelevanceThreshold.HIGH],
     /// which means only the most relevant results are shown, and the least number
-    /// of results are returned. See more details at this [user
-    /// guide](/retail/private/docs/result-size#relevance_thresholding).
+    /// of results are returned.
     #[prost(enumeration = "search_request::RelevanceThreshold", tag = "15")]
     pub relevance_threshold: i32,
     /// The keys to fetch and rollup the matching
@@ -3457,10 +3469,9 @@ pub struct SearchRequest {
     /// [Product][google.cloud.retail.v2alpha.Product]s attributes will lead to
     /// extra query latency. Maximum number of keys is 10.
     ///
-    /// For
-    /// [Product.fulfillment_info][google.cloud.retail.v2alpha.Product.fulfillment_info],
-    /// a fulfillment type and a fulfillment ID must be provided in the format of
-    /// "fulfillmentType.filfillmentId". E.g., in "pickupInStore.store123",
+    /// For [FulfillmentInfo][google.cloud.retail.v2alpha.FulfillmentInfo], a
+    /// fulfillment type and a fulfillment ID must be provided in the format of
+    /// "fulfillmentType.fulfillmentId". E.g., in "pickupInStore.store123",
     /// "pickupInStore" is fulfillment type and "store123" is the store ID.
     ///
     /// Supported keys are:
@@ -3471,24 +3482,51 @@ pub struct SearchRequest {
     /// * discount
     /// * attributes.key, where key is any key in the
     ///   [Product.attributes][google.cloud.retail.v2alpha.Product.attributes] map.
-    /// * pickupInStore.id, where id is any [FulfillmentInfo.ids][] for type
-    ///   [FulfillmentInfo.Type.PICKUP_IN_STORE][].
-    /// * shipToStore.id, where id is any [FulfillmentInfo.ids][] for type
-    ///   [FulfillmentInfo.Type.SHIP_TO_STORE][].
-    /// * sameDayDelivery.id, where id is any [FulfillmentInfo.ids][] for type
-    ///   [FulfillmentInfo.Type.SAME_DAY_DELIVERY][].
-    /// * nextDayDelivery.id, where id is any [FulfillmentInfo.ids][] for type
-    ///   [FulfillmentInfo.Type.NEXT_DAY_DELIVERY][].
-    /// * customFulfillment1.id, where id is any [FulfillmentInfo.ids][] for type
-    ///   [FulfillmentInfo.Type.CUSTOM_TYPE_1][].
-    /// * customFulfillment2.id, where id is any [FulfillmentInfo.ids][] for type
-    ///   [FulfillmentInfo.Type.CUSTOM_TYPE_2][].
-    /// * customFulfillment3.id, where id is any [FulfillmentInfo.ids][] for type
-    ///   [FulfillmentInfo.Type.CUSTOM_TYPE_3][].
-    /// * customFulfillment4.id, where id is any [FulfillmentInfo.ids][] for type
-    ///   [FulfillmentInfo.Type.CUSTOM_TYPE_4][].
-    /// * customFulfillment5.id, where id is any [FulfillmentInfo.ids][] for type
-    ///   [FulfillmentInfo.Type.CUSTOM_TYPE_5][].
+    /// * pickupInStore.id, where id is any
+    /// [FulfillmentInfo.place_ids][google.cloud.retail.v2alpha.FulfillmentInfo.place_ids]
+    /// for
+    /// [FulfillmentInfo.type][google.cloud.retail.v2alpha.FulfillmentInfo.type]
+    ///   "pickup-in-store".
+    /// * shipToStore.id, where id is any
+    /// [FulfillmentInfo.place_ids][google.cloud.retail.v2alpha.FulfillmentInfo.place_ids]
+    /// for
+    /// [FulfillmentInfo.type][google.cloud.retail.v2alpha.FulfillmentInfo.type]
+    ///   "ship-to-store".
+    /// * sameDayDelivery.id, where id is any
+    /// [FulfillmentInfo.place_ids][google.cloud.retail.v2alpha.FulfillmentInfo.place_ids]
+    /// for
+    /// [FulfillmentInfo.type][google.cloud.retail.v2alpha.FulfillmentInfo.type]
+    ///   "same-day-delivery".
+    /// * nextDayDelivery.id, where id is any
+    /// [FulfillmentInfo.place_ids][google.cloud.retail.v2alpha.FulfillmentInfo.place_ids]
+    /// for
+    /// [FulfillmentInfo.type][google.cloud.retail.v2alpha.FulfillmentInfo.type]
+    ///   "next-day-delivery".
+    /// * customFulfillment1.id, where id is any
+    /// [FulfillmentInfo.place_ids][google.cloud.retail.v2alpha.FulfillmentInfo.place_ids]
+    /// for
+    /// [FulfillmentInfo.type][google.cloud.retail.v2alpha.FulfillmentInfo.type]
+    ///   "custom-type-1".
+    /// * customFulfillment2.id, where id is any
+    /// [FulfillmentInfo.place_ids][google.cloud.retail.v2alpha.FulfillmentInfo.place_ids]
+    /// for
+    /// [FulfillmentInfo.type][google.cloud.retail.v2alpha.FulfillmentInfo.type]
+    ///   "custom-type-2".
+    /// * customFulfillment3.id, where id is any
+    /// [FulfillmentInfo.place_ids][google.cloud.retail.v2alpha.FulfillmentInfo.place_ids]
+    /// for
+    /// [FulfillmentInfo.type][google.cloud.retail.v2alpha.FulfillmentInfo.type]
+    ///   "custom-type-3".
+    /// * customFulfillment4.id, where id is any
+    /// [FulfillmentInfo.place_ids][google.cloud.retail.v2alpha.FulfillmentInfo.place_ids]
+    /// for
+    /// [FulfillmentInfo.type][google.cloud.retail.v2alpha.FulfillmentInfo.type]
+    ///   "custom-type-4".
+    /// * customFulfillment5.id, where id is any
+    /// [FulfillmentInfo.place_ids][google.cloud.retail.v2alpha.FulfillmentInfo.place_ids]
+    /// for
+    /// [FulfillmentInfo.type][google.cloud.retail.v2alpha.FulfillmentInfo.type]
+    ///   "custom-type-5".
     ///
     /// If this field is set to an invalid value other than these, an
     /// INVALID_ARGUMENT error is returned.
@@ -3588,173 +3626,35 @@ pub mod search_request {
             /// [FacetKey.query][google.cloud.retail.v2alpha.SearchRequest.FacetSpec.FacetKey.query]
             /// is not specified:
             ///
-            /// * textual_field =<br>
-            ///     <font color='grey'>
-            ///     *# The
-            ///     [Product.brands][google.cloud.retail.v2alpha.Product.brands].<br>*
-            ///     </font>
-            ///     "brands";
-            ///     <br>
-            ///     <font color='categories'>
-            ///     *# The
-            ///     [Product.categories][google.cloud.retail.v2alpha.Product.categories].<br>*
-            ///     </font>
-            ///     "categories";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The
-            ///     [Audience.genders][google.cloud.retail.v2alpha.Audience.genders].<br>*
-            ///     </font>
-            ///     | "genders";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The
-            ///     [Audience.age_groups][google.cloud.retail.v2alpha.Audience.age_groups].<br>*
-            ///     </font>
-            ///     | "ageGroups";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The
-            ///     [Product.availability][google.cloud.retail.v2alpha.Product.availability].
-            ///     Value is one of<br>*
-            ///     *# "IN_STOCK", "OUT_OF_STOCK", PREORDER", "BACKORDER".<br>*
-            ///     </font>
-            ///     | "availability";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The
-            ///     [ColorInfo.color_families][google.cloud.retail.v2alpha.ColorInfo.color_families].<br>*
-            ///     </font>
-            ///     | "colorFamilies";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The
-            ///     [ColorInfo.colors][google.cloud.retail.v2alpha.ColorInfo.colors].<br>*
-            ///     </font>
-            ///     | "colors";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The
-            ///     [Product.sizes][google.cloud.retail.v2alpha.Product.sizes].<br>*
-            ///     </font>
-            ///     | "sizes";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The
-            ///     [Product.materials][google.cloud.retail.v2alpha.Product.materials].<br>*
-            ///     </font>
-            ///     | "materials";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The
-            ///     [Product.patterns][google.cloud.retail.v2alpha.Product.patterns].<br>*
-            ///     </font>
-            ///     | "patterns";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The
-            ///     [Product.conditions][google.cloud.retail.v2alpha.Product.conditions].<br>*
-            ///     </font>
-            ///     | "conditions";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The textual custom attribute in
-            ///     [Product][google.cloud.retail.v2alpha.Product] object. Key can<br>*
-            ///     *# be any key in the
-            ///     [Product.attributes][google.cloud.retail.v2alpha.Product.attributes]
-            ///     map<br>*
-            ///     *# if the attribute values are textual.<br>*
-            ///     *# map.<br>*
-            ///     </font>
-            ///     | "attributes.key";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The [FulfillmentInfo.ids][] for type
-            ///     *# [FulfillmentInfo.Type.PICKUP_IN_STORE][].<br>*
-            ///     </font>
-            ///     | "pickupInStore";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The [FulfillmentInfo.ids][] for type
-            ///     *# [FulfillmentInfo.Type.SHIP_TO_STORE][].<br>*
-            ///     </font>
-            ///     | "shipToStore";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The [FulfillmentInfo.ids][] for type
-            ///     *# [FulfillmentInfo.Type.SAME_DAY_DELIVERY][].<br>*
-            ///     </font>
-            ///     | "sameDayDelivery";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The [FulfillmentInfo.ids][] for type
-            ///     *# [FulfillmentInfo.Type.NEXT_DAY_DELIVERY][].<br>*
-            ///     </font>
-            ///     | "nextDayDelivery";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The [FulfillmentInfo.ids][] for type
-            ///     *# [FulfillmentInfo.Type.CUSTOM_TYPE_1][].<br>*
-            ///     </font>
-            ///     | "customFulfillment1";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The [FulfillmentInfo.ids][] for type
-            ///     *# [FulfillmentInfo.Type.CUSTOM_TYPE_2][].<br>*
-            ///     </font>
-            ///     | "customFulfillment2";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The [FulfillmentInfo.ids][] for type
-            ///     *# [FulfillmentInfo.Type.CUSTOM_TYPE_3][].<br>*
-            ///     </font>
-            ///     | "customFulfillment3";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The [FulfillmentInfo.ids][] for type
-            ///     *# [FulfillmentInfo.Type.CUSTOM_TYPE_4][].<br>*
-            ///     </font>
-            ///     | "customFulfillment4";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The [FulfillmentInfo.ids][] for type
-            ///     *# [FulfillmentInfo.Type.CUSTOM_TYPE_5][].<br>*
-            ///     </font>
-            ///     | "customFulfillment5";
+            /// * textual_field =
+            ///     * "brands"
+            ///     * "categories"
+            ///     * "genders"
+            ///     * "ageGroups"
+            ///     * "availability"
+            ///     * "colorFamilies"
+            ///     * "colors"
+            ///     * "sizes"
+            ///     * "materials"
+            ///     * "patterns"
+            ///     * "conditions"
+            ///     * "attributes.key"
+            ///     * "pickupInStore"
+            ///     * "shipToStore"
+            ///     * "sameDayDelivery"
+            ///     * "nextDayDelivery"
+            ///     * "customFulfillment1"
+            ///     * "customFulfillment2"
+            ///     * "customFulfillment3"
+            ///     * "customFulfillment4"
+            ///     * "customFulfillment5"
             ///
-            /// * numerical_field =<br>
-            ///     <font color='grey'>
-            ///     *# The
-            ///     [PriceInfo.price][google.cloud.retail.v2alpha.PriceInfo.price].<br>*
-            ///     </font>
-            ///     "price";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The discount. Computed by (original_price-price)/price <br>*
-            ///     </font>
-            ///     "discount";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The
-            ///     [Rating.average_rating][google.cloud.retail.v2alpha.Rating.average_rating].<br>*
-            ///     </font>
-            ///     "rating";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The
-            ///     [Rating.rating_count][google.cloud.retail.v2alpha.Rating.rating_count].<br>*
-            ///     </font>
-            ///     "ratingCount";
-            ///     <br>
-            ///     <font color='grey'>
-            ///     *# The numerical custom attribute in
-            ///     [Product][google.cloud.retail.v2alpha.Product] object. Key can<br>*
-            ///     *# be any key in the
-            ///     [Product.attributes][google.cloud.retail.v2alpha.Product.attributes]
-            ///     map<br>*
-            ///     *# if the attribute values are numerical.<br>*
-            ///     </font>
-            ///     | "attributes.key";
+            /// * numerical_field =
+            ///     * "price"
+            ///     * "discount"
+            ///     * "rating"
+            ///     * "ratingCount"
+            ///     * "attributes.key"
             #[prost(string, tag = "1")]
             pub key: ::prost::alloc::string::String,
             /// Set only if values should be bucketized into intervals. Must be set
@@ -3818,7 +3718,8 @@ pub mod search_request {
             /// order](https://en.wikipedia.org/wiki/Natural_sort_order); numerical
             /// intervals are sorted in the order given by
             /// [FacetSpec.FacetKey.intervals][google.cloud.retail.v2alpha.SearchRequest.FacetSpec.FacetKey.intervals];
-            /// [FulfillmentInfo.ids][] are sorted in the order given by
+            /// [FulfillmentInfo.place_ids][google.cloud.retail.v2alpha.FulfillmentInfo.place_ids]
+            /// are sorted in the order given by
             /// [FacetSpec.FacetKey.restricted_values][google.cloud.retail.v2alpha.SearchRequest.FacetSpec.FacetKey.restricted_values].
             #[prost(string, tag = "4")]
             pub order_by: ::prost::alloc::string::String,
@@ -3897,10 +3798,9 @@ pub mod search_request {
             ///
             /// * To boost products with product ID "product_1" or "product_2", and
             /// color
-            ///   "Red" or "Blue":<br>
-            ///   *(id: ANY("product_1", "product_2"))<br>*
-            ///   *AND<br>*
-            ///   *(colorFamilies: ANY("Red", "Blue"))<br>*
+            ///   "Red" or "Blue":
+            ///     * (id: ANY("product_1", "product_2")) AND (colorFamilies:
+            ///     ANY("Red","Blue"))
             #[prost(string, tag = "1")]
             pub condition: ::prost::alloc::string::String,
             /// Strength of the condition boost, which should be in [-1, 1]. Negative
@@ -3932,6 +3832,11 @@ pub mod search_request {
         /// [Condition.DISABLED][google.cloud.retail.v2alpha.SearchRequest.QueryExpansionSpec.Condition.DISABLED].
         #[prost(enumeration = "query_expansion_spec::Condition", tag = "1")]
         pub condition: i32,
+        /// Whether to pin unexpanded results. If this field is set to true,
+        /// unexpanded products are always at the top of the search results, followed
+        /// by the expanded results.
+        #[prost(bool, tag = "2")]
+        pub pin_unexpanded_results: bool,
     }
     /// Nested message and enum types in `QueryExpansionSpec`.
     pub mod query_expansion_spec {
@@ -4074,21 +3979,22 @@ pub mod search_response {
         /// string or double values with type
         /// [google.protobuf.ListValue][google.protobuf.ListValue]. For example, if
         /// there are two variants with colors "red" and "blue", the rollup values
-        /// are { key: "colorFamilies"
-        ///   value {
-        ///     list_value {
-        ///       values { string_value: "red" }
-        ///       values { string_value: "blue" }
-        ///      }
-        ///   }
-        /// }
+        /// are
         ///
-        /// For
-        /// [Product.fulfillment_info][google.cloud.retail.v2alpha.Product.fulfillment_info],
-        /// the rollup values is a double value with type
-        /// [google.protobuf.Value][google.protobuf.Value]. For example, {key:
-        /// "pickupInStore.store1" value { number_value: 10 }} means a there are 10
-        /// variants in this product are available in the store "store1".
+        ///     { key: "colorFamilies"
+        ///       value {
+        ///         list_value {
+        ///           values { string_value: "red" }
+        ///           values { string_value: "blue" }
+        ///          }
+        ///       }
+        ///     }
+        ///
+        /// For [FulfillmentInfo][google.cloud.retail.v2alpha.FulfillmentInfo], the
+        /// rollup values is a double value with type
+        /// [google.protobuf.Value][google.protobuf.Value]. For example,
+        /// `{key: "pickupInStore.store1" value { number_value: 10 }}` means a there
+        /// are 10 variants in this product are available in the store "store1".
         #[prost(map = "string, message", tag = "5")]
         pub variant_rollup_values:
             ::std::collections::HashMap<::prost::alloc::string::String, ::prost_types::Value>,
@@ -4140,6 +4046,11 @@ pub mod search_response {
         /// Bool describing whether query expansion has occurred.
         #[prost(bool, tag = "1")]
         pub expanded_query: bool,
+        /// Number of pinned results. This field will only be set when expansion
+        /// happens and [SearchRequest.query_expansion_spec.pin_unexpanded_results][]
+        /// is set to true.
+        #[prost(int64, tag = "2")]
+        pub pinned_result_count: i64,
     }
 }
 #[doc = r" Generated client implementations."]
@@ -4149,8 +4060,8 @@ pub mod search_service_client {
     #[doc = " Service for search."]
     #[doc = ""]
     #[doc = " This feature is only available for users who have Retail Search enabled."]
-    #[doc = " Contact Retail Support (retail-search-support@google.com) if you are"]
-    #[doc = " interested in using Retail Search."]
+    #[doc = " Please submit a form [here](https://cloud.google.com/contact) to contact"]
+    #[doc = " cloud sales if you are interested in using Retail Search."]
     #[derive(Debug, Clone)]
     pub struct SearchServiceClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -4171,7 +4082,7 @@ pub mod search_service_client {
             interceptor: F,
         ) -> SearchServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -4199,8 +4110,8 @@ pub mod search_service_client {
         #[doc = " Performs a search."]
         #[doc = ""]
         #[doc = " This feature is only available for users who have Retail Search enabled."]
-        #[doc = " Contact Retail Support (retail-search-support@google.com) if you are"]
-        #[doc = " interested in using Retail Search."]
+        #[doc = " Please submit a form [here](https://cloud.google.com/contact) to contact"]
+        #[doc = " cloud sales if you are interested in using Retail Search."]
         pub async fn search(
             &mut self,
             request: impl tonic::IntoRequest<super::SearchRequest>,
@@ -4326,7 +4237,7 @@ pub mod user_event_service_client {
             interceptor: F,
         ) -> UserEventServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<

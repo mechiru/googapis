@@ -17,11 +17,18 @@ pub struct Reservation {
     /// `google.rpc.Code.RESOURCE_EXHAUSTED`.
     #[prost(int64, tag = "2")]
     pub slot_capacity: i64,
-    /// If false, any query using this reservation will use idle slots from other
-    /// reservations within the same admin project. If true, a query using this
-    /// reservation will execute with the slot capacity specified above at most.
+    /// If false, any query or pipeline job using this reservation will use idle
+    /// slots from other reservations within the same admin project. If true, a
+    /// query or pipeline job using this reservation will execute with the slot
+    /// capacity specified in the slot_capacity field at most.
     #[prost(bool, tag = "4")]
     pub ignore_idle_slots: bool,
+    /// Output only. Creation time of the reservation.
+    #[prost(message, optional, tag = "8")]
+    pub creation_time: ::core::option::Option<::prost_types::Timestamp>,
+    /// Output only. Last update time of the reservation.
+    #[prost(message, optional, tag = "9")]
+    pub update_time: ::core::option::Option<::prost_types::Timestamp>,
 }
 /// Capacity commitment is a way to purchase compute capacity for BigQuery jobs
 /// (in the form of slots) with some committed period of usage. Annual
@@ -48,6 +55,10 @@ pub struct CapacityCommitment {
     /// Output only. State of the commitment.
     #[prost(enumeration = "capacity_commitment::State", tag = "4")]
     pub state: i32,
+    /// Output only. The start of the current commitment period. It is applicable only for
+    /// ACTIVE capacity commitments.
+    #[prost(message, optional, tag = "9")]
+    pub commitment_start_time: ::core::option::Option<::prost_types::Timestamp>,
     /// Output only. The end of the current commitment period. It is applicable only for ACTIVE
     /// capacity commitments.
     #[prost(message, optional, tag = "5")]
@@ -186,6 +197,13 @@ pub struct CreateCapacityCommitmentRequest {
     /// capacity commitment.
     #[prost(bool, tag = "4")]
     pub enforce_single_admin_project_per_org: bool,
+    /// The optional capacity commitment ID. Capacity commitment name will be
+    /// generated automatically if this field is empty.
+    /// This field must only contain lower case alphanumeric characters or dash.
+    /// Max length is 64 characters.
+    /// NOTE: this ID won't be kept if the capacity commitment is split or merged.
+    #[prost(string, tag = "5")]
+    pub capacity_commitment_id: ::prost::alloc::string::String,
 }
 /// The request for [ReservationService.ListCapacityCommitments][google.cloud.bigquery.reservation.v1.ReservationService.ListCapacityCommitments].
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -227,6 +245,11 @@ pub struct DeleteCapacityCommitmentRequest {
     ///    `projects/myproject/locations/US/capacityCommitments/123`
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
+    /// Can be used to force delete commitments even if assignments exist. Deleting
+    /// commitments with assignments may cause queries to fail if they no longer
+    /// have access to slots.
+    #[prost(bool, tag = "3")]
+    pub force: bool,
 }
 /// The request for [ReservationService.UpdateCapacityCommitment][google.cloud.bigquery.reservation.v1.ReservationService.UpdateCapacityCommitment].
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -306,6 +329,9 @@ pub mod assignment {
         Pipeline = 1,
         /// Query jobs from the project will use the reservation.
         Query = 2,
+        /// BigQuery ML jobs that use services external to BigQuery for model
+        /// training. These jobs will not utilize idle slots from other reservations.
+        MlExternal = 3,
     }
     /// Assignment will remain in PENDING state if no active capacity commitment is
     /// present. It will become ACTIVE when some capacity commitment becomes
@@ -334,6 +360,12 @@ pub struct CreateAssignmentRequest {
     /// Assignment resource to create.
     #[prost(message, optional, tag = "2")]
     pub assignment: ::core::option::Option<Assignment>,
+    /// The optional assignment ID. Assignment name will be generated automatically
+    /// if this field is empty.
+    /// This field must only contain lower case alphanumeric characters or dash.
+    /// Max length is 64 characters.
+    #[prost(string, tag = "4")]
+    pub assignment_id: ::prost::alloc::string::String,
 }
 /// The request for [ReservationService.ListAssignments][google.cloud.bigquery.reservation.v1.ReservationService.ListAssignments].
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -402,9 +434,47 @@ pub struct SearchAssignmentsRequest {
     #[prost(string, tag = "4")]
     pub page_token: ::prost::alloc::string::String,
 }
+/// The request for
+/// [ReservationService.SearchAllAssignments][google.cloud.bigquery.reservation.v1.ReservationService.SearchAllAssignments].
+/// Note: "bigquery.reservationAssignments.search" permission is required on the
+/// related assignee.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SearchAllAssignmentsRequest {
+    /// Required. The resource name with location (project name could be the wildcard '-'),
+    /// e.g.:
+    ///   `projects/-/locations/US`.
+    #[prost(string, tag = "1")]
+    pub parent: ::prost::alloc::string::String,
+    /// Please specify resource name as assignee in the query.
+    ///
+    /// Examples:
+    ///
+    /// * `assignee=projects/myproject`
+    /// * `assignee=folders/123`
+    /// * `assignee=organizations/456`
+    #[prost(string, tag = "2")]
+    pub query: ::prost::alloc::string::String,
+    /// The maximum number of items to return per page.
+    #[prost(int32, tag = "3")]
+    pub page_size: i32,
+    /// The next_page_token value returned from a previous List request, if any.
+    #[prost(string, tag = "4")]
+    pub page_token: ::prost::alloc::string::String,
+}
 /// The response for [ReservationService.SearchAssignments][google.cloud.bigquery.reservation.v1.ReservationService.SearchAssignments].
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SearchAssignmentsResponse {
+    /// List of assignments visible to the user.
+    #[prost(message, repeated, tag = "1")]
+    pub assignments: ::prost::alloc::vec::Vec<Assignment>,
+    /// Token to retrieve the next page of results, or empty if there are no
+    /// more results in the list.
+    #[prost(string, tag = "2")]
+    pub next_page_token: ::prost::alloc::string::String,
+}
+/// The response for [ReservationService.SearchAllAssignments][google.cloud.bigquery.reservation.v1.ReservationService.SearchAllAssignments].
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SearchAllAssignmentsResponse {
     /// List of assignments visible to the user.
     #[prost(message, repeated, tag = "1")]
     pub assignments: ::prost::alloc::vec::Vec<Assignment>,
@@ -439,7 +509,7 @@ pub struct MoveAssignmentRequest {
 pub struct BiReservation {
     /// The resource name of the singleton BI reservation.
     /// Reservation names have the form
-    /// `projects/{project_id}/locations/{location_id}/bireservation`.
+    /// `projects/{project_id}/locations/{location_id}/biReservation`.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
     /// Output only. The last update timestamp of a reservation.
@@ -453,7 +523,7 @@ pub struct BiReservation {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetBiReservationRequest {
     /// Required. Name of the requested reservation, for example:
-    /// `projects/{project_id}/locations/{location_id}/bireservation`
+    /// `projects/{project_id}/locations/{location_id}/biReservation`
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
 }
@@ -506,7 +576,7 @@ pub mod reservation_service_client {
             interceptor: F,
         ) -> ReservationServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -784,6 +854,11 @@ pub mod reservation_service_client {
         #[doc = "   `project2`) could all be created and mapped to the same or different"]
         #[doc = "   reservations."]
         #[doc = ""]
+        #[doc = " \"None\" assignments represent an absence of the assignment. Projects"]
+        #[doc = " assigned to None use on-demand pricing. To create a \"None\" assignment, use"]
+        #[doc = " \"none\" as a reservation_id in the parent. Example parent:"]
+        #[doc = " `projects/myproject/locations/US/reservations/none`."]
+        #[doc = ""]
         #[doc = " Returns `google.rpc.Code.PERMISSION_DENIED` if user does not have"]
         #[doc = " 'bigquery.admin' permissions on the project using the reservation"]
         #[doc = " and the project that owns this reservation."]
@@ -874,7 +949,7 @@ pub mod reservation_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        #[doc = " Looks up assignments for a specified resource for a particular region."]
+        #[doc = " Deprecated: Looks up assignments for a specified resource for a particular region."]
         #[doc = " If the request is about a project:"]
         #[doc = ""]
         #[doc = " 1. Assignments created on the project will be returned if they exist."]
@@ -910,6 +985,42 @@ pub mod reservation_service_client {
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
                 "/google.cloud.bigquery.reservation.v1.ReservationService/SearchAssignments",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        #[doc = " Looks up assignments for a specified resource for a particular region."]
+        #[doc = " If the request is about a project:"]
+        #[doc = ""]
+        #[doc = " 1. Assignments created on the project will be returned if they exist."]
+        #[doc = " 2. Otherwise assignments created on the closest ancestor will be"]
+        #[doc = "    returned."]
+        #[doc = " 3. Assignments for different JobTypes will all be returned."]
+        #[doc = ""]
+        #[doc = " The same logic applies if the request is about a folder."]
+        #[doc = ""]
+        #[doc = " If the request is about an organization, then assignments created on the"]
+        #[doc = " organization will be returned (organization doesn't have ancestors)."]
+        #[doc = ""]
+        #[doc = " Comparing to ListAssignments, there are some behavior"]
+        #[doc = " differences:"]
+        #[doc = ""]
+        #[doc = " 1. permission on the assignee will be verified in this API."]
+        #[doc = " 2. Hierarchy lookup (project->folder->organization) happens in this API."]
+        #[doc = " 3. Parent here is `projects/*/locations/*`, instead of"]
+        #[doc = "    `projects/*/locations/*reservations/*`."]
+        pub async fn search_all_assignments(
+            &mut self,
+            request: impl tonic::IntoRequest<super::SearchAllAssignmentsRequest>,
+        ) -> Result<tonic::Response<super::SearchAllAssignmentsResponse>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/google.cloud.bigquery.reservation.v1.ReservationService/SearchAllAssignments",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
