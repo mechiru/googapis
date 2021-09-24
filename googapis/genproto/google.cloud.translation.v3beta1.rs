@@ -60,14 +60,13 @@ pub struct TranslateTextRequest {
     ///
     /// - General (built-in) models:
     ///   `projects/{project-number-or-id}/locations/{location-id}/models/general/nmt`,
-    ///   `projects/{project-number-or-id}/locations/{location-id}/models/general/base`
     ///
     ///
     /// For global (non-regionalized) requests, use `location-id` `global`.
     /// For example,
     /// `projects/{project-number-or-id}/locations/global/models/general/nmt`.
     ///
-    /// If missing, the system decides which google base model to use.
+    /// If not provided, the default Google model (NMT) will be used
     #[prost(string, tag = "6")]
     pub model: ::prost::alloc::string::String,
     /// Optional. Glossary to be applied. The glossary must be
@@ -106,6 +105,8 @@ pub struct TranslateTextResponse {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Translation {
     /// Text translated into the target language.
+    /// If an error occurs during translation, this field might be excluded from
+    /// the response.
     #[prost(string, tag = "1")]
     pub translated_text: ::prost::alloc::string::String,
     /// Only present when `model` is present in the request.
@@ -140,7 +141,7 @@ pub struct DetectLanguageRequest {
     /// For global calls, use `projects/{project-number-or-id}/locations/global` or
     /// `projects/{project-number-or-id}`.
     ///
-    /// Only models within the same region, which have the same location-id, can be used.
+    /// Only models within the same region (has same location-id) can be used.
     /// Otherwise an INVALID_ARGUMENT (400) error is returned.
     #[prost(string, tag = "5")]
     pub parent: ::prost::alloc::string::String,
@@ -235,11 +236,10 @@ pub struct GetSupportedLanguagesRequest {
     ///
     /// - General (built-in) models:
     ///   `projects/{project-number-or-id}/locations/{location-id}/models/general/nmt`,
-    ///   `projects/{project-number-or-id}/locations/{location-id}/models/general/base`
     ///
     ///
     /// Returns languages supported by the specified model.
-    /// If missing, we get supported languages of Google general base (PBMT) model.
+    /// If missing, we get supported languages of Google general NMT model.
     #[prost(string, tag = "2")]
     pub model: ::prost::alloc::string::String,
 }
@@ -368,13 +368,13 @@ pub mod output_config {
         /// content to output.
         ///
         /// Once a row is present in index.csv, the input/output matching never
-        /// changes. Callers should also expect the contents in the input_file are
+        /// changes. Callers should also expect all the content in input_file are
         /// processed and ready to be consumed (that is, no partial output file is
         /// written).
         ///
-        /// Since index.csv will be updated during the process, please make
+        /// Since index.csv will be keeping updated during the process, please make
         /// sure there is no custom retention policy applied on the output bucket
-        /// that may prevent file updating.
+        /// that may avoid file updating.
         /// (https://cloud.google.com/storage/docs/bucket-lock?hl=en#retention-policy)
         ///
         /// The format of translations_file (for target language code 'trg') is:
@@ -547,8 +547,7 @@ pub struct TranslateDocumentRequest {
     ///
     /// Format: `projects/{project-number-or-id}/locations/{location-id}`.
     ///
-    /// For global calls, use `projects/{project-number-or-id}/locations/global` or
-    /// `projects/{project-number-or-id}`.
+    /// For global calls, use `projects/{project-number-or-id}/locations/global`.
     ///
     /// Non-global location is required for requests using AutoML models or custom
     /// glossaries.
@@ -588,7 +587,6 @@ pub struct TranslateDocumentRequest {
     ///
     /// - General (built-in) models:
     ///   `projects/{project-number-or-id}/locations/{location-id}/models/general/nmt`,
-    ///   `projects/{project-number-or-id}/locations/{location-id}/models/general/base`
     ///
     ///
     /// If not provided, the default Google model (NMT) will be used for
@@ -678,7 +676,7 @@ pub struct BatchTranslateTextRequest {
     #[prost(string, repeated, tag = "3")]
     pub target_language_codes: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     /// Optional. The models to use for translation. Map's key is target language
-    /// code. Map's value is the model name. Value can be a built-in general model,
+    /// code. Map's value is model name. Value can be a built-in general model,
     /// or an AutoML Translation model.
     ///
     /// The value format depends on model type:
@@ -688,7 +686,6 @@ pub struct BatchTranslateTextRequest {
     ///
     /// - General (built-in) models:
     ///   `projects/{project-number-or-id}/locations/{location-id}/models/general/nmt`,
-    ///   `projects/{project-number-or-id}/locations/{location-id}/models/general/base`
     ///
     ///
     /// If the map is empty or a specific model is
@@ -1095,7 +1092,6 @@ pub struct BatchTranslateDocumentRequest {
     ///
     /// - General (built-in) models:
     ///   `projects/{project-number-or-id}/locations/{location-id}/models/general/nmt`,
-    ///   `projects/{project-number-or-id}/locations/{location-id}/models/general/base`
     ///
     ///
     /// If the map is empty or a specific model is not requested for a language
@@ -1107,6 +1103,19 @@ pub struct BatchTranslateDocumentRequest {
     #[prost(map = "string, message", tag = "7")]
     pub glossaries:
         ::std::collections::HashMap<::prost::alloc::string::String, TranslateTextGlossaryConfig>,
+    /// Optional. File format conversion map to be applied to all input files.
+    /// Map's key is the original mime_type. Map's value is the target mime_type of
+    /// translated documents.
+    ///
+    /// Supported file format conversion includes:
+    /// - `application/pdf` to
+    ///   `application/vnd.openxmlformats-officedocument.wordprocessingml.document`
+    ///
+    /// If nothing specified, output files will be in the same format as the
+    /// original file.
+    #[prost(map = "string, string", tag = "8")]
+    pub format_conversions:
+        ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 /// Input configuration for BatchTranslateDocument request.
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1135,10 +1144,10 @@ pub mod batch_document_input_config {
         /// - `xlsx`,
         /// application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
         ///
-        /// The max file size supported for `.docx`, `.pptx` and `.xlsx` is 100MB.
-        /// The max file size supported for `.pdf` is 1GB and the max page limit is
+        /// The max file size to support for `.docx`, `.pptx` and `.xlsx` is 100MB.
+        /// The max file size to support for `.pdf` is 1GB and the max page limit is
         /// 1000 pages.
-        /// The max file size supported for all input documents is 1GB.
+        /// The max file size to support for all input documents is 1GB.
         #[prost(message, tag = "1")]
         GcsSource(super::GcsSource),
     }
@@ -1212,16 +1221,16 @@ pub mod batch_document_output_config {
 /// translated successfully.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct BatchTranslateDocumentResponse {
-    /// Total number of pages to translate in all documents. Documents without a
+    /// Total number of pages to translate in all documents. Documents without
     /// clear page definition (such as XLSX) are not counted.
     #[prost(int64, tag = "1")]
     pub total_pages: i64,
     /// Number of successfully translated pages in all documents. Documents without
-    /// a clear page definition (such as XLSX) are not counted.
+    /// clear page definition (such as XLSX) are not counted.
     #[prost(int64, tag = "2")]
     pub translated_pages: i64,
     /// Number of pages that failed to process in all documents. Documents without
-    /// a clear page definition (such as XLSX) are not counted.
+    /// clear page definition (such as XLSX) are not counted.
     #[prost(int64, tag = "3")]
     pub failed_pages: i64,
     /// Number of billable pages in documents with clear page definition (such as
@@ -1341,7 +1350,7 @@ pub mod translation_service_client {
             interceptor: F,
         ) -> TranslationServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<

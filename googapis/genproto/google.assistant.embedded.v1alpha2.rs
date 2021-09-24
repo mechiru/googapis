@@ -463,7 +463,7 @@ pub mod embedded_assistant_client {
             interceptor: F,
         ) -> EmbeddedAssistantClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<

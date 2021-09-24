@@ -20,6 +20,26 @@ pub struct LongRunningRecognizeRequest {
     /// Required. The audio data to be recognized.
     #[prost(message, optional, tag = "2")]
     pub audio: ::core::option::Option<RecognitionAudio>,
+    /// Optional. Specifies an optional destination for the recognition results.
+    #[prost(message, optional, tag = "4")]
+    pub output_config: ::core::option::Option<TranscriptOutputConfig>,
+}
+/// Specifies an optional destination for the recognition results.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TranscriptOutputConfig {
+    #[prost(oneof = "transcript_output_config::OutputType", tags = "1")]
+    pub output_type: ::core::option::Option<transcript_output_config::OutputType>,
+}
+/// Nested message and enum types in `TranscriptOutputConfig`.
+pub mod transcript_output_config {
+    #[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum OutputType {
+        /// Specifies a Cloud Storage URI for the recognition results. Must be
+        /// specified in the format: `gs://bucket_name/object_name`, and the bucket
+        /// must already exist.
+        #[prost(string, tag = "1")]
+        GcsUri(::prost::alloc::string::String),
+    }
 }
 /// The top-level message sent by the client for the `StreamingRecognize` method.
 /// Multiple `StreamingRecognizeRequest` messages are sent. The first message
@@ -73,6 +93,16 @@ pub struct StreamingRecognitionConfig {
     /// `END_OF_SINGLE_UTTERANCE` event and cease recognition. It will return no
     /// more than one `StreamingRecognitionResult` with the `is_final` flag set to
     /// `true`.
+    ///
+    /// The `single_utterance` field can only be used with specified models,
+    /// otherwise an error is thrown. The `model` field in [`RecognitionConfig`][]
+    /// must be set to:
+    ///
+    /// * `command_and_search`
+    /// * `phone_call` AND additional field `useEnhanced`=`true`
+    /// * The `model` field is left undefined. In this case the API auto-selects
+    ///   a model based on any other parameters that you set in
+    ///   `RecognitionConfig`.
     #[prost(bool, tag = "2")]
     pub single_utterance: bool,
     /// If `true`, interim results (tentative hypotheses) may be
@@ -145,7 +175,7 @@ pub struct RecognitionConfig {
     /// A means to provide context to assist the speech recognition. For more
     /// information, see
     /// [speech
-    /// adaptation](https://cloud.google.com/speech-to-text/docs/context-strength).
+    /// adaptation](https://cloud.google.com/speech-to-text/docs/adaptation).
     #[prost(message, repeated, tag = "6")]
     pub speech_contexts: ::prost::alloc::vec::Vec<SpeechContext>,
     /// If `true`, the top result includes a list of words and
@@ -158,9 +188,6 @@ pub struct RecognitionConfig {
     /// This feature is only available in select languages. Setting this for
     /// requests in other languages has no effect at all.
     /// The default 'false' value does not add punctuation to result hypotheses.
-    /// Note: This is currently offered as an experimental service, complimentary
-    /// to all users. In the future this may be exclusively available as a
-    /// premium feature.
     #[prost(bool, tag = "11")]
     pub enable_automatic_punctuation: bool,
     /// Config to enable speaker diarization and set additional
@@ -196,7 +223,7 @@ pub struct RecognitionConfig {
     ///   </tr>
     ///   <tr>
     ///     <td><code>video</code></td>
-    ///     <td>Best for audio that originated from from video or includes multiple
+    ///     <td>Best for audio that originated from video or includes multiple
     ///         speakers. Ideally the audio is recorded at a 16khz or greater
     ///         sampling rate. This is a premium model that costs more than the
     ///         standard rate.</td>
@@ -233,7 +260,7 @@ pub mod recognition_config {
     /// a lossless encoding (`FLAC` or `LINEAR16`). The accuracy of the speech
     /// recognition can be reduced if lossy codecs are used to capture or transmit
     /// audio, particularly if background noise is present. Lossy codecs include
-    /// `MULAW`, `AMR`, `AMR_WB`, `OGG_OPUS`, `SPEEX_WITH_HEADER_BYTE`, and `MP3`.
+    /// `MULAW`, `AMR`, `AMR_WB`, `OGG_OPUS`, `SPEEX_WITH_HEADER_BYTE`, `MP3`.
     ///
     /// The `FLAC` and `WAV` audio file formats include a header that describes the
     /// included audio content. You can request recognition for `WAV` files that
@@ -303,7 +330,7 @@ pub struct SpeakerDiarizationConfig {
     /// number of speakers. If not set, the default value is 6.
     #[prost(int32, tag = "3")]
     pub max_speaker_count: i32,
-    /// Unused.
+    /// Output only. Unused.
     #[deprecated]
     #[prost(int32, tag = "5")]
     pub speaker_tag: i32,
@@ -485,6 +512,9 @@ pub struct RecognizeResponse {
     /// sequential portions of audio.
     #[prost(message, repeated, tag = "2")]
     pub results: ::prost::alloc::vec::Vec<SpeechRecognitionResult>,
+    /// When available, billed audio seconds for the corresponding request.
+    #[prost(message, optional, tag = "3")]
+    pub total_billed_time: ::core::option::Option<::prost_types::Duration>,
 }
 /// The only message returned to the client by the `LongRunningRecognize` method.
 /// It contains the result as zero or more sequential `SpeechRecognitionResult`
@@ -497,6 +527,9 @@ pub struct LongRunningRecognizeResponse {
     /// sequential portions of audio.
     #[prost(message, repeated, tag = "2")]
     pub results: ::prost::alloc::vec::Vec<SpeechRecognitionResult>,
+    /// When available, billed audio seconds for the corresponding request.
+    #[prost(message, optional, tag = "3")]
+    pub total_billed_time: ::core::option::Option<::prost_types::Duration>,
 }
 /// Describes the progress of a long-running `LongRunningRecognize` call. It is
 /// included in the `metadata` field of the `Operation` returned by the
@@ -513,6 +546,10 @@ pub struct LongRunningRecognizeMetadata {
     /// Time of the most recent processing update.
     #[prost(message, optional, tag = "3")]
     pub last_update_time: ::core::option::Option<::prost_types::Timestamp>,
+    /// Output only. The URI of the audio file being transcribed. Empty if the audio was sent
+    /// as byte content.
+    #[prost(string, tag = "4")]
+    pub uri: ::prost::alloc::string::String,
 }
 /// `StreamingRecognizeResponse` is the only message returned to the client by
 /// `StreamingRecognize`. A series of zero or more `StreamingRecognizeResponse`
@@ -520,8 +557,8 @@ pub struct LongRunningRecognizeMetadata {
 /// audio, and `single_utterance` is set to false, then no messages are streamed
 /// back to the client.
 ///
-/// Here's an example of a series of ten `StreamingRecognizeResponse`s that might
-/// be returned while processing audio:
+/// Here's an example of a series of `StreamingRecognizeResponse`s that might be
+/// returned while processing audio:
 ///
 /// 1. results { alternatives { transcript: "tube" } stability: 0.01 }
 ///
@@ -581,6 +618,10 @@ pub struct StreamingRecognizeResponse {
         tag = "4"
     )]
     pub speech_event_type: i32,
+    /// When available, billed audio seconds for the stream.
+    /// Set only if this is the last response in the stream.
+    #[prost(message, optional, tag = "5")]
+    pub total_billed_time: ::core::option::Option<::prost_types::Duration>,
 }
 /// Nested message and enum types in `StreamingRecognizeResponse`.
 pub mod streaming_recognize_response {
@@ -697,7 +738,7 @@ pub struct WordInfo {
     /// The word corresponding to this set of information.
     #[prost(string, tag = "3")]
     pub word: ::prost::alloc::string::String,
-    /// A distinct integer value is assigned for every speaker within
+    /// Output only. A distinct integer value is assigned for every speaker within
     /// the audio. This field specifies which one of those speakers was detected to
     /// have spoken this word. Value ranges from '1' to diarization_speaker_count.
     /// speaker_tag is set if enable_speaker_diarization = 'true' and only in the
@@ -730,7 +771,7 @@ pub mod speech_client {
             interceptor: F,
         ) -> SpeechClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<

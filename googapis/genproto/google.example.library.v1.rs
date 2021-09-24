@@ -168,7 +168,7 @@ pub struct MoveBookRequest {
 pub mod library_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    #[doc = " This API represents a simple digital library.  It lets you manage Shelf"]
+    #[doc = " This API represents a simple digital library. It lets you manage Shelf"]
     #[doc = " resources and Book resources in the library. It defines the following"]
     #[doc = " resource model:"]
     #[doc = ""]
@@ -197,7 +197,7 @@ pub mod library_service_client {
             interceptor: F,
         ) -> LibraryServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<

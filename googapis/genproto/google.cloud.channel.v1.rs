@@ -216,7 +216,8 @@ pub struct Customer {
     /// Secondary contact email. You need to provide an alternate email to create
     /// different domains if a primary contact email already exists. Users will
     /// receive a notification with credentials when you create an admin.google.com
-    /// account. Secondary emails are also recovery email addresses.
+    /// account. Secondary emails are also recovery email addresses. Alternate
+    /// emails are optional when you create Team customers.
     #[prost(string, tag = "5")]
     pub alternate_email: ::prost::alloc::string::String,
     /// Required. The customer's primary domain. Must match the primary contact
@@ -250,10 +251,10 @@ pub struct Customer {
 /// Contact information for a customer account.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ContactInfo {
-    /// The customer account contact's first name.
+    /// The customer account contact's first name. Optional for Team customers.
     #[prost(string, tag = "1")]
     pub first_name: ::prost::alloc::string::String,
-    /// The customer account contact's last name.
+    /// The customer account contact's last name. Optional for Team customers.
     #[prost(string, tag = "2")]
     pub last_name: ::prost::alloc::string::String,
     /// Output only. The customer account contact's display name, formatted as a
@@ -262,7 +263,7 @@ pub struct ContactInfo {
     pub display_name: ::prost::alloc::string::String,
     /// The customer account's contact email. Required for entitlements that create
     /// admin.google.com accounts, and serves as the customer's username for those
-    /// accounts.
+    /// accounts. Use this email to invite Team customers.
     #[prost(string, tag = "5")]
     pub email: ::prost::alloc::string::String,
     /// Optional. The customer account contact's job title.
@@ -981,6 +982,58 @@ pub struct DeleteCustomerRequest {
     /// Required. The resource name of the customer to delete.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
+}
+/// Request message for [CloudChannelService.ImportCustomer][google.cloud.channel.v1.CloudChannelService.ImportCustomer]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ImportCustomerRequest {
+    /// Required. The resource name of the reseller's account.
+    /// Parent takes the format: accounts/{account_id} or
+    /// accounts/{account_id}/channelPartnerLinks/{channel_partner_id}
+    #[prost(string, tag = "1")]
+    pub parent: ::prost::alloc::string::String,
+    /// Optional. The super admin of the resold customer generates this token to
+    /// authorize a reseller to access their Cloud Identity and purchase
+    /// entitlements on their behalf. You can omit this token after authorization.
+    /// See https://support.google.com/a/answer/7643790 for more details.
+    #[prost(string, tag = "4")]
+    pub auth_token: ::prost::alloc::string::String,
+    /// Required. Choose to overwrite an existing customer if found.
+    /// This must be set to true if there is an existing customer with a
+    /// conflicting region code or domain.
+    #[prost(bool, tag = "5")]
+    pub overwrite_if_exists: bool,
+    /// Optional. Cloud Identity ID of a channel partner who will be the direct reseller for
+    /// the customer's order. This field is required for 2-tier transfer scenarios
+    /// and can be provided via the request Parent binding as well.
+    #[prost(string, tag = "6")]
+    pub channel_partner_id: ::prost::alloc::string::String,
+    /// Optional. Specifies the customer that will receive imported Cloud Identity
+    /// information.
+    /// Format: accounts/{account_id}/customers/{customer_id}
+    #[prost(string, tag = "7")]
+    pub customer: ::prost::alloc::string::String,
+    /// Specifies the identity of the transfer customer.
+    /// A customer's cloud_identity_id or domain is required to look up the
+    /// customer's Cloud Identity. For Team customers, only the cloud_identity_id
+    /// option is valid.
+    #[prost(oneof = "import_customer_request::CustomerIdentity", tags = "2, 3")]
+    pub customer_identity: ::core::option::Option<import_customer_request::CustomerIdentity>,
+}
+/// Nested message and enum types in `ImportCustomerRequest`.
+pub mod import_customer_request {
+    /// Specifies the identity of the transfer customer.
+    /// A customer's cloud_identity_id or domain is required to look up the
+    /// customer's Cloud Identity. For Team customers, only the cloud_identity_id
+    /// option is valid.
+    #[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum CustomerIdentity {
+        /// Required. Customer domain.
+        #[prost(string, tag = "2")]
+        Domain(::prost::alloc::string::String),
+        /// Required. Customer's Cloud Identity ID
+        #[prost(string, tag = "3")]
+        CloudIdentityId(::prost::alloc::string::String),
+    }
 }
 /// Request message for [CloudChannelService.ProvisionCloudIdentity][google.cloud.channel.v1.CloudChannelService.ProvisionCloudIdentity]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1923,7 +1976,7 @@ pub mod cloud_channel_service_client {
             interceptor: F,
         ) -> CloudChannelServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -2114,6 +2167,39 @@ pub mod cloud_channel_service_client {
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
                 "/google.cloud.channel.v1.CloudChannelService/DeleteCustomer",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        #[doc = " Imports a [Customer][google.cloud.channel.v1.Customer] from the Cloud Identity associated with the provided"]
+        #[doc = " Cloud Identity ID or domain before a TransferEntitlements call. If a"]
+        #[doc = " linked Customer already exists and overwrite_if_exists is true, it will"]
+        #[doc = " update that Customer's data."]
+        #[doc = ""]
+        #[doc = " Possible error codes:"]
+        #[doc = ""]
+        #[doc = " * PERMISSION_DENIED: The reseller account making the request is different"]
+        #[doc = " from the reseller account in the API request."]
+        #[doc = " * NOT_FOUND: Cloud Identity doesn't exist or was deleted."]
+        #[doc = " * INVALID_ARGUMENT: Required parameters are missing, or the auth_token is"]
+        #[doc = " expired or invalid."]
+        #[doc = " * ALREADY_EXISTS: A customer already exists and has conflicting critical"]
+        #[doc = " fields. Requires an overwrite."]
+        #[doc = ""]
+        #[doc = " Return value:"]
+        #[doc = " The [Customer][google.cloud.channel.v1.Customer]."]
+        pub async fn import_customer(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ImportCustomerRequest>,
+        ) -> Result<tonic::Response<super::Customer>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/google.cloud.channel.v1.CloudChannelService/ImportCustomer",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }

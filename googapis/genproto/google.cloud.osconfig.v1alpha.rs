@@ -256,10 +256,10 @@ pub struct Inventory {
     /// Output only. Base level operating system information for the VM.
     #[prost(message, optional, tag = "1")]
     pub os_info: ::core::option::Option<inventory::OsInfo>,
-    /// Output only. Inventory items related to the VM keyed by an opaque unique identifier for
-    /// each inventory item. The identifier is unique to each distinct and
-    /// addressable inventory item and will change, when there is a new package
-    /// version.
+    /// Output only. Inventory items related to the VM keyed by an opaque unique
+    /// identifier for each inventory item. The identifier is unique to each
+    /// distinct and addressable inventory item and will change, when there is a
+    /// new package version.
     #[prost(map = "string, message", tag = "2")]
     pub items: ::std::collections::HashMap<::prost::alloc::string::String, inventory::Item>,
     /// Output only. Timestamp of the last reported inventory for the VM.
@@ -363,7 +363,10 @@ pub mod inventory {
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct SoftwarePackage {
         /// Information about the different types of software packages.
-        #[prost(oneof = "software_package::Details", tags = "1, 2, 3, 4, 5, 6, 7, 8")]
+        #[prost(
+            oneof = "software_package::Details",
+            tags = "1, 2, 3, 4, 5, 6, 7, 8, 9"
+        )]
         pub details: ::core::option::Option<software_package::Details>,
     }
     /// Nested message and enum types in `SoftwarePackage`.
@@ -410,6 +413,9 @@ pub mod inventory {
             /// Details of a COS package.
             #[prost(message, tag = "8")]
             CosPackage(super::VersionedPackage),
+            /// Details of Windows Application.
+            #[prost(message, tag = "9")]
+            WindowsApplication(super::WindowsApplication),
         }
     }
     /// Information related to the a standard versioned package.  This includes
@@ -511,6 +517,32 @@ pub mod inventory {
         /// Date that the QFE update was installed.  Mapped from installed_on field.
         #[prost(message, optional, tag = "5")]
         pub install_time: ::core::option::Option<::prost_types::Timestamp>,
+    }
+    /// Contains information about a Windows application as retrieved from the
+    /// Windows Registry. For more information about these fields, see
+    ///
+    /// [Windows Installer Properties for the Uninstall
+    /// Registry](https://docs.microsoft.com/en-us/windows/win32/msi/uninstall-registry-key){:
+    /// class="external" }
+    #[derive(Clone, PartialEq, ::prost::Message)]
+    pub struct WindowsApplication {
+        /// The name of the application or product.
+        #[prost(string, tag = "1")]
+        pub display_name: ::prost::alloc::string::String,
+        /// The version of the product or application in string format.
+        #[prost(string, tag = "2")]
+        pub display_version: ::prost::alloc::string::String,
+        /// The name of the manufacturer for the product or application.
+        #[prost(string, tag = "3")]
+        pub publisher: ::prost::alloc::string::String,
+        /// The last time this product received service. The value of this property
+        /// is replaced each time a patch is applied or removed from the product or
+        /// the command-line option is used to repair the product.
+        #[prost(message, optional, tag = "4")]
+        pub install_date: ::core::option::Option<super::super::super::super::r#type::Date>,
+        /// The internet address for technical support.
+        #[prost(string, tag = "5")]
+        pub help_link: ::prost::alloc::string::String,
     }
 }
 /// A request message for getting inventory data for the specified VM.
@@ -1834,7 +1866,7 @@ pub mod os_config_zonal_service_client {
             interceptor: F,
         ) -> OsConfigZonalServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<

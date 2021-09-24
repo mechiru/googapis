@@ -115,6 +115,7 @@ pub struct ValidateSchemaRequest {
     pub schema: ::core::option::Option<Schema>,
 }
 /// Response for the `ValidateSchema` method.
+/// Empty for now.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ValidateSchemaResponse {}
 /// Request for the `ValidateMessage` method.
@@ -148,6 +149,7 @@ pub mod validate_message_request {
     }
 }
 /// Response for the `ValidateMessage` method.
+/// Empty for now.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ValidateMessageResponse {}
 /// View of Schema object fields to be returned by GetSchema and ListSchemas.
@@ -199,7 +201,7 @@ pub mod schema_service_client {
             interceptor: F,
         ) -> SchemaServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -384,6 +386,16 @@ pub struct Topic {
     /// server; it is ignored if it is set in any requests.
     #[prost(bool, tag = "7")]
     pub satisfies_pzs: bool,
+    /// Indicates the minimum duration to retain a message after it is published to
+    /// the topic. If this field is set, messages published to the topic in the
+    /// last `message_retention_duration` are always available to subscribers. For
+    /// instance, it allows any attached subscription to [seek to a
+    /// timestamp](https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time)
+    /// that is up to `message_retention_duration` in the past. If this field is
+    /// not set, message retention is controlled by settings on individual
+    /// subscriptions. Cannot be more than 7 days or less than 10 minutes.
+    #[prost(message, optional, tag = "8")]
+    pub message_retention_duration: ::core::option::Option<::prost_types::Duration>,
 }
 /// A message that is published by publishers and consumed by subscribers. The
 /// message must contain either a non-empty data field or at least one attribute.
@@ -616,8 +628,9 @@ pub struct Subscription {
     /// Indicates whether to retain acknowledged messages. If true, then
     /// messages are not expunged from the subscription's backlog, even if they are
     /// acknowledged, until they fall out of the `message_retention_duration`
-    /// window. This must be true if you would like to [Seek to a timestamp]
-    /// (https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time).
+    /// window. This must be true if you would like to [`Seek` to a timestamp]
+    /// (https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time) in
+    /// the past to replay previously-acknowledged messages.
     #[prost(bool, tag = "7")]
     pub retain_acked_messages: bool,
     /// How long to retain unacknowledged messages in the subscription's backlog,
@@ -680,6 +693,14 @@ pub struct Subscription {
     /// the endpoint will not be made.
     #[prost(bool, tag = "15")]
     pub detached: bool,
+    /// Output only. Indicates the minimum duration for which a message is retained
+    /// after it is published to the subscription's topic. If this field is set,
+    /// messages published to the subscription's topic in the last
+    /// `topic_message_retention_duration` are always available to subscribers. See
+    /// the `message_retention_duration` field in `Topic`. This field is set only
+    /// in responses from the server; it is ignored if it is set in any requests.
+    #[prost(message, optional, tag = "17")]
+    pub topic_message_retention_duration: ::core::option::Option<::prost_types::Duration>,
 }
 /// A policy that specifies how Cloud Pub/Sub retries message delivery.
 ///
@@ -1263,7 +1284,7 @@ pub mod publisher_client {
             interceptor: F,
         ) -> PublisherClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -1476,7 +1497,7 @@ pub mod subscriber_client {
             interceptor: F,
         ) -> SubscriberClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<

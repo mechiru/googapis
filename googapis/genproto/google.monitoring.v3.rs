@@ -29,7 +29,7 @@ pub mod typed_value {
         DistributionValue(super::super::super::api::Distribution),
     }
 }
-/// A closed time interval. It extends from the start time to the end time, and includes both: `[startTime, endTime]`. Valid time intervals depend on the [`MetricKind`](/monitoring/api/ref_v3/rest/v3/projects.metricDescriptors#MetricKind) of the metric value. The end time must not be earlier than the start time. When writing data points, the start time must not be more than 25 hours in the past and the end time must not be more than five minutes in the future.
+/// A closed time interval. It extends from the start time to the end time, and includes both: `[startTime, endTime]`. Valid time intervals depend on the [`MetricKind`](https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.metricDescriptors#MetricKind) of the metric value. The end time must not be earlier than the start time. When writing data points, the start time must not be more than 25 hours in the past and the end time must not be more than five minutes in the future.
 ///
 /// * For `GAUGE` metrics, the `startTime` value is technically optional; if
 ///   no value is specified, the start time defaults to the value of the
@@ -410,29 +410,6 @@ pub enum ComparisonType {
     /// True if the left argument is not equal to the right argument.
     ComparisonNe = 6,
 }
-/// The tier of service for a Workspace. Please see the
-/// [service tiers
-/// documentation](https://cloud.google.com/monitoring/workspaces/tiers) for more
-/// details.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-#[repr(i32)]
-pub enum ServiceTier {
-    /// An invalid sentinel value, used to indicate that a tier has not
-    /// been provided explicitly.
-    Unspecified = 0,
-    /// The Stackdriver Basic tier, a free tier of service that provides basic
-    /// features, a moderate allotment of logs, and access to built-in metrics.
-    /// A number of features are not available in this tier. For more details,
-    /// see [the service tiers
-    /// documentation](https://cloud.google.com/monitoring/workspaces/tiers).
-    Basic = 1,
-    /// The Stackdriver Premium tier, a higher, more expensive tier of service
-    /// that provides access to all Stackdriver features, lets you use Stackdriver
-    /// with AWS accounts, and has a larger allotments for logs and metrics. For
-    /// more details, see [the service tiers
-    /// documentation](https://cloud.google.com/monitoring/workspaces/tiers).
-    Premium = 2,
-}
 /// Describes a change made to a configuration.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MutationRecord {
@@ -455,7 +432,7 @@ pub struct AlertPolicy {
     ///     projects/[PROJECT_ID_OR_NUMBER]/alertPolicies/[ALERT_POLICY_ID]
     ///
     /// `[ALERT_POLICY_ID]` is assigned by Stackdriver Monitoring when the policy
-    /// is created.  When calling the
+    /// is created. When calling the
     /// [alertPolicies.create][google.monitoring.v3.AlertPolicyService.CreateAlertPolicy]
     /// method, do not include the `name` field in the alerting policy passed as
     /// part of the request.
@@ -529,6 +506,9 @@ pub struct AlertPolicy {
     /// provided in a call to create or update, this field will be ignored.
     #[prost(message, optional, tag = "11")]
     pub mutation_record: ::core::option::Option<MutationRecord>,
+    /// Control over how this alert policy's notification channels are notified.
+    #[prost(message, optional, tag = "21")]
+    pub alert_strategy: ::core::option::Option<alert_policy::AlertStrategy>,
 }
 /// Nested message and enum types in `AlertPolicy`.
 pub mod alert_policy {
@@ -586,7 +566,7 @@ pub mod alert_policy {
         #[prost(string, tag = "6")]
         pub display_name: ::prost::alloc::string::String,
         /// Only one of the following condition types will be specified.
-        #[prost(oneof = "condition::Condition", tags = "1, 2, 19")]
+        #[prost(oneof = "condition::Condition", tags = "1, 2, 20, 19")]
         pub condition: ::core::option::Option<condition::Condition>,
     }
     /// Nested message and enum types in `Condition`.
@@ -746,6 +726,34 @@ pub mod alert_policy {
             #[prost(message, optional, tag = "3")]
             pub trigger: ::core::option::Option<Trigger>,
         }
+        /// A condition type that checks whether a log message in the [scoping
+        /// project](https://cloud.google.com/monitoring/api/v3#project_name)
+        /// satisfies the given filter. Logs from other projects in the metrics
+        /// scope are not evaluated.
+        #[derive(Clone, PartialEq, ::prost::Message)]
+        pub struct LogMatch {
+            /// Required. A logs-based filter. See [Advanced Logs
+            /// Queries](/logging/docs/view/advanced-queries) for how this filter
+            /// should be constructed.
+            #[prost(string, tag = "1")]
+            pub filter: ::prost::alloc::string::String,
+            /// Optional. A map from a label key to an extractor expression, which is
+            /// used to extract the value for this label key. Each entry in this map is
+            /// a specification for how data should be extracted from log entries that
+            /// match `filter`. Each combination of extracted values is treated as a
+            /// separate rule for the purposes of triggering notifications. Label keys
+            /// and corresponding values can be used in notifications generated by this
+            /// condition.
+            ///
+            /// Please see [the documentation on logs-based metric
+            /// `valueExtractor`s](/logging/docs/reference/v2/rest/v2/projects.metrics#LogMetric.FIELDS.value_extractor)
+            /// for syntax and examples.
+            #[prost(map = "string, string", tag = "2")]
+            pub label_extractors: ::std::collections::HashMap<
+                ::prost::alloc::string::String,
+                ::prost::alloc::string::String,
+            >,
+        }
         /// A condition type that allows alert policies to be defined using
         /// [Monitoring Query Language](https://cloud.google.com/monitoring/mql).
         #[derive(Clone, PartialEq, ::prost::Message)]
@@ -785,10 +793,35 @@ pub mod alert_policy {
             /// receive new data points.
             #[prost(message, tag = "2")]
             ConditionAbsent(MetricAbsence),
+            /// A condition that checks for log messages matching given constraints. If
+            /// set, no other conditions can be present.
+            #[prost(message, tag = "20")]
+            ConditionMatchedLog(LogMatch),
             /// A condition that uses the Monitoring Query Language to define
             /// alerts.
             #[prost(message, tag = "19")]
             ConditionMonitoringQueryLanguage(MonitoringQueryLanguageCondition),
+        }
+    }
+    /// Control over how the notification channels in `notification_channels`
+    /// are notified when this alert fires.
+    #[derive(Clone, PartialEq, ::prost::Message)]
+    pub struct AlertStrategy {
+        /// Required for alert policies with a `LogMatch` condition.
+        ///
+        /// This limit is not implemented for alert policies that are not log-based.
+        #[prost(message, optional, tag = "1")]
+        pub notification_rate_limit: ::core::option::Option<alert_strategy::NotificationRateLimit>,
+    }
+    /// Nested message and enum types in `AlertStrategy`.
+    pub mod alert_strategy {
+        /// Control over the rate of notifications sent to this alert policy's
+        /// notification channels.
+        #[derive(Clone, PartialEq, ::prost::Message)]
+        pub struct NotificationRateLimit {
+            /// Not more than one notification per `period`.
+            #[prost(message, optional, tag = "1")]
+            pub period: ::core::option::Option<::prost_types::Duration>,
         }
     }
     /// Operators for combining conditions.
@@ -814,7 +847,8 @@ pub mod alert_policy {
 /// The protocol for the `CreateAlertPolicy` request.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateAlertPolicyRequest {
-    /// Required. The project in which to create the alerting policy. The format is:
+    /// Required. The [project](https://cloud.google.com/monitoring/api/v3#project_name) in
+    /// which to create the alerting policy. The format is:
     ///
     ///     projects/[PROJECT_ID_OR_NUMBER]
     ///
@@ -845,7 +879,8 @@ pub struct GetAlertPolicyRequest {
 /// The protocol for the `ListAlertPolicies` request.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListAlertPoliciesRequest {
-    /// Required. The project whose alert policies are to be listed. The format is:
+    /// Required. The [project](https://cloud.google.com/monitoring/api/v3#project_name)
+    /// whose alert policies are to be listed. The format is:
     ///
     ///     projects/[PROJECT_ID_OR_NUMBER]
     ///
@@ -973,7 +1008,7 @@ pub mod alert_policy_service_client {
             interceptor: F,
         ) -> AlertPolicyServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -1170,7 +1205,8 @@ pub struct Group {
 /// The `ListGroup` request.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListGroupsRequest {
-    /// Required. The project whose groups are to be listed. The format is:
+    /// Required. The [project](https://cloud.google.com/monitoring/api/v3#project_name)
+    /// whose groups are to be listed. The format is:
     ///
     ///     projects/[PROJECT_ID_OR_NUMBER]
     #[prost(string, tag = "7")]
@@ -1249,7 +1285,8 @@ pub struct GetGroupRequest {
 /// The `CreateGroup` request.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateGroupRequest {
-    /// Required. The project in which to create the group. The format is:
+    /// Required. The [project](https://cloud.google.com/monitoring/api/v3#project_name) in
+    /// which to create the group. The format is:
     ///
     ///     projects/[PROJECT_ID_OR_NUMBER]
     #[prost(string, tag = "4")]
@@ -1372,7 +1409,7 @@ pub mod group_service_client {
             interceptor: F,
         ) -> GroupServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -1530,7 +1567,9 @@ pub struct TimeSeries {
     #[prost(message, optional, tag = "1")]
     pub metric: ::core::option::Option<super::super::api::Metric>,
     /// The associated monitored resource.  Custom metrics can use only certain
-    /// monitored resource types in their time series data.
+    /// monitored resource types in their time series data. For more information,
+    /// see [Monitored resources for custom
+    /// metrics](https://cloud.google.com/monitoring/custom-metrics/creating-metrics#custom-metric-resources).
     #[prost(message, optional, tag = "2")]
     pub resource: ::core::option::Option<super::super::api::MonitoredResource>,
     /// Output only. The associated monitored resource metadata. When reading a
@@ -1749,7 +1788,8 @@ pub mod text_locator {
 /// The `ListMonitoredResourceDescriptors` request.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListMonitoredResourceDescriptorsRequest {
-    /// Required. The project on which to execute the request. The format is:
+    /// Required. The [project](https://cloud.google.com/monitoring/api/v3#project_name) on
+    /// which to execute the request. The format is:
     ///
     ///     projects/[PROJECT_ID_OR_NUMBER]
     #[prost(string, tag = "5")]
@@ -1800,7 +1840,8 @@ pub struct GetMonitoredResourceDescriptorRequest {
 /// The `ListMetricDescriptors` request.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListMetricDescriptorsRequest {
-    /// Required. The project on which to execute the request. The format is:
+    /// Required. The [project](https://cloud.google.com/monitoring/api/v3#project_name) on
+    /// which to execute the request. The format is:
     ///
     ///     projects/[PROJECT_ID_OR_NUMBER]
     #[prost(string, tag = "5")]
@@ -1852,8 +1893,9 @@ pub struct GetMetricDescriptorRequest {
 /// The `CreateMetricDescriptor` request.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateMetricDescriptorRequest {
-    /// Required. The project on which to execute the request. The format is:
-    ///
+    /// Required. The [project](https://cloud.google.com/monitoring/api/v3#project_name) on
+    /// which to execute the request. The format is:
+    /// 4
     ///     projects/[PROJECT_ID_OR_NUMBER]
     #[prost(string, tag = "3")]
     pub name: ::prost::alloc::string::String,
@@ -1877,8 +1919,8 @@ pub struct DeleteMetricDescriptorRequest {
 /// The `ListTimeSeries` request.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListTimeSeriesRequest {
-    /// Required. The project, organization or folder on which to execute the request. The
-    /// format is:
+    /// Required. The [project](https://cloud.google.com/monitoring/api/v3#project_name),
+    /// organization or folder on which to execute the request. The format is:
     ///
     ///     projects/[PROJECT_ID_OR_NUMBER]
     ///     organizations/[ORGANIZATION_ID]
@@ -1971,7 +2013,8 @@ pub struct ListTimeSeriesResponse {
 /// The `CreateTimeSeries` request.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateTimeSeriesRequest {
-    /// Required. The project on which to execute the request. The format is:
+    /// Required. The [project](https://cloud.google.com/monitoring/api/v3#project_name) on
+    /// which to execute the request. The format is:
     ///
     ///     projects/[PROJECT_ID_OR_NUMBER]
     #[prost(string, tag = "3")]
@@ -2027,7 +2070,8 @@ pub mod create_time_series_summary {
 /// The `QueryTimeSeries` request.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct QueryTimeSeriesRequest {
-    /// Required. The project on which to execute the request. The format is:
+    /// Required. The [project](https://cloud.google.com/monitoring/api/v3#project_name) on
+    /// which to execute the request. The format is:
     ///
     ///     projects/[PROJECT_ID_OR_NUMBER]
     #[prost(string, tag = "1")]
@@ -2103,7 +2147,7 @@ pub mod metric_service_client {
             interceptor: F,
         ) -> MetricServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -2312,11 +2356,6 @@ pub struct NotificationChannelDescriptor {
     /// description for how that field should be populated.
     #[prost(message, repeated, tag = "4")]
     pub labels: ::prost::alloc::vec::Vec<super::super::api::LabelDescriptor>,
-    /// The tiers that support this notification channel; the project service tier
-    /// must be one of the supported_tiers.
-    #[deprecated]
-    #[prost(enumeration = "ServiceTier", repeated, packed = "false", tag = "5")]
-    pub supported_tiers: ::prost::alloc::vec::Vec<i32>,
     /// The product launch stage for channels of this type.
     #[prost(enumeration = "super::super::api::LaunchStage", tag = "7")]
     pub launch_stage: i32,
@@ -2439,8 +2478,10 @@ pub struct ListNotificationChannelDescriptorsRequest {
     ///
     ///     projects/[PROJECT_ID_OR_NUMBER]
     ///
-    /// Note that this names the parent container in which to look for the
-    /// descriptors; to retrieve a single descriptor by name, use the
+    /// Note that this
+    /// [names](https://cloud.google.com/monitoring/api/v3#project_name) the parent
+    /// container in which to look for the descriptors; to retrieve a single
+    /// descriptor by name, use the
     /// [GetNotificationChannelDescriptor][google.monitoring.v3.NotificationChannelService.GetNotificationChannelDescriptor]
     /// operation, instead.
     #[prost(string, tag = "4")]
@@ -2482,7 +2523,8 @@ pub struct GetNotificationChannelDescriptorRequest {
 /// The `CreateNotificationChannel` request.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateNotificationChannelRequest {
-    /// Required. The project on which to execute the request. The format is:
+    /// Required. The [project](https://cloud.google.com/monitoring/api/v3#project_name) on
+    /// which to execute the request. The format is:
     ///
     ///     projects/[PROJECT_ID_OR_NUMBER]
     ///
@@ -2499,7 +2541,8 @@ pub struct CreateNotificationChannelRequest {
 /// The `ListNotificationChannels` request.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListNotificationChannelsRequest {
-    /// Required. The project on which to execute the request. The format is:
+    /// Required. The [project](https://cloud.google.com/monitoring/api/v3#project_name) on
+    /// which to execute the request. The format is:
     ///
     ///     projects/[PROJECT_ID_OR_NUMBER]
     ///
@@ -2675,7 +2718,7 @@ pub mod notification_channel_service_client {
             interceptor: F,
         ) -> NotificationChannelServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -2929,7 +2972,7 @@ pub mod query_service_client {
             interceptor: F,
         ) -> QueryServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -2991,6 +3034,15 @@ pub struct Service {
     /// Configuration for how to query telemetry on a Service.
     #[prost(message, optional, tag = "13")]
     pub telemetry: ::core::option::Option<service::Telemetry>,
+    /// Labels which have been used to annotate the service. Label keys must start
+    /// with a letter. Label keys and values may contain lowercase letters,
+    /// numbers, underscores, and dashes. Label keys and values have a maximum
+    /// length of 63 characters, and must be less than 128 bytes in size. Up to 64
+    /// label entries may be stored. For labels which do not have a semantic value,
+    /// the empty string may be supplied for the label value.
+    #[prost(map = "string, string", tag = "14")]
+    pub user_labels:
+        ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
     /// REQUIRED. Service-identifying atoms specifying the underlying service.
     #[prost(oneof = "service::Identifier", tags = "6, 7, 8, 9, 10, 11")]
     pub identifier: ::core::option::Option<service::Identifier>,
@@ -3140,6 +3192,15 @@ pub struct ServiceLevelObjective {
     /// met. `0 < goal <= 0.999`.
     #[prost(double, tag = "4")]
     pub goal: f64,
+    /// Labels which have been used to annotate the service-level objective. Label
+    /// keys must start with a letter. Label keys and values may contain lowercase
+    /// letters, numbers, underscores, and dashes. Label keys and values have a
+    /// maximum length of 63 characters, and must be less than 128 bytes in size.
+    /// Up to 64 label entries may be stored. For labels which do not have a
+    /// semantic value, the empty string may be supplied for the label value.
+    #[prost(map = "string, string", tag = "12")]
+    pub user_labels:
+        ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
     /// The time period over which the objective will be evaluated.
     #[prost(oneof = "service_level_objective::Period", tags = "5, 6")]
     pub period: ::core::option::Option<service_level_objective::Period>,
@@ -3276,9 +3337,7 @@ pub mod basic_sli {
         Latency(LatencyCriteria),
     }
 }
-/// Range of numerical values, inclusive of `min` and exclusive of `max`. If the
-/// open range "< range.max" is desired, set `range.min = -infinity`. If the open
-/// range ">= range.min" is desired, set `range.max = infinity`.
+/// Range of numerical values within `min` and `max`.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Range {
     /// Range minimum.
@@ -3344,8 +3403,8 @@ pub struct TimeSeriesRatio {
 /// A `DistributionCut` defines a `TimeSeries` and thresholds used for measuring
 /// good service and total service. The `TimeSeries` must have `ValueType =
 /// DISTRIBUTION` and `MetricKind = DELTA` or `MetricKind = CUMULATIVE`. The
-/// computed `good_service` will be the count of values x in the `Distribution`
-/// such that `range.min <= x < range.max`.
+/// computed `good_service` will be the estimated count of values in the
+/// `Distribution` that fall within the specified `min` and `max`.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DistributionCut {
     /// A [monitoring filter](https://cloud.google.com/monitoring/api/v3/filters)
@@ -3400,7 +3459,7 @@ pub mod windows_based_sli {
         }
     }
     /// A `MetricRange` is used when each window is good when the value x of a
-    /// single `TimeSeries` satisfies `range.min <= x < range.max`. The provided
+    /// single `TimeSeries` satisfies `range.min <= x <= range.max`. The provided
     /// `TimeSeries` must have `ValueType = INT64` or `ValueType = DOUBLE` and
     /// `MetricKind = GAUGE`.
     #[derive(Clone, PartialEq, ::prost::Message)]
@@ -3438,7 +3497,8 @@ pub mod windows_based_sli {
 /// The `CreateService` request.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateServiceRequest {
-    /// Required. Resource name of the parent workspace. The format is:
+    /// Required. Resource [name](https://cloud.google.com/monitoring/api/v3#project_name) of
+    /// the parent workspace. The format is:
     ///
     ///     projects/[PROJECT_ID_OR_NUMBER]
     #[prost(string, tag = "1")]
@@ -3464,7 +3524,8 @@ pub struct GetServiceRequest {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListServicesRequest {
     /// Required. Resource name of the parent containing the listed services, either a
-    /// project or a Monitoring Workspace. The formats are:
+    /// [project](https://cloud.google.com/monitoring/api/v3#project_name) or a
+    /// Monitoring Workspace. The formats are:
     ///
     ///     projects/[PROJECT_ID_OR_NUMBER]
     ///     workspaces/[HOST_PROJECT_ID_OR_NUMBER]
@@ -3656,7 +3717,7 @@ pub mod service_monitoring_service_client {
             interceptor: F,
         ) -> ServiceMonitoringServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -3854,8 +3915,8 @@ pub mod service_monitoring_service_client {
         }
     }
 }
-/// The context of a span, attached to
-/// [Exemplars][google.api.Distribution.Exemplars]
+/// The context of a span. This is attached to an
+/// [Exemplar][google.api.Distribution.Exemplar]
 /// in [Distribution][google.api.Distribution] values during aggregation.
 ///
 /// It contains the name of a span with format:
@@ -4176,10 +4237,12 @@ pub mod uptime_check_config {
             NotContainsString = 2,
             /// Selects regular-expression matching. The match succeeds of the output
             /// matches the regular expression specified in the `content` string.
+            /// Regex matching is only supported for HTTP/HTTPS checks.
             MatchesRegex = 3,
             /// Selects negation of regular-expression matching. The match succeeds if
             /// the output does _NOT_ match the regular expression specified in the
-            /// `content` string.
+            /// `content` string. Regex matching is only supported for HTTP/HTTPS
+            /// checks.
             NotMatchesRegex = 4,
         }
     }
@@ -4189,12 +4252,13 @@ pub mod uptime_check_config {
         /// The [monitored
         /// resource](https://cloud.google.com/monitoring/api/resources) associated
         /// with the configuration.
-        /// The following monitored resource types are supported for Uptime checks:
+        /// The following monitored resource types are valid for this field:
         ///   `uptime_url`,
         ///   `gce_instance`,
         ///   `gae_app`,
         ///   `aws_ec2_instance`,
         ///   `aws_elb_load_balancer`
+        ///   `k8s_service`
         #[prost(message, tag = "3")]
         MonitoredResource(super::super::super::api::MonitoredResource),
         /// The group resource associated with the configuration.
@@ -4269,7 +4333,8 @@ pub enum GroupResourceType {
 /// The protocol for the `ListUptimeCheckConfigs` request.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListUptimeCheckConfigsRequest {
-    /// Required. The project whose Uptime check configurations are listed. The format is:
+    /// Required. The [project](https://cloud.google.com/monitoring/api/v3#project_name)
+    /// whose Uptime check configurations are listed. The format is:
     ///
     ///     projects/[PROJECT_ID_OR_NUMBER]
     #[prost(string, tag = "1")]
@@ -4316,7 +4381,8 @@ pub struct GetUptimeCheckConfigRequest {
 /// The protocol for the `CreateUptimeCheckConfig` request.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateUptimeCheckConfigRequest {
-    /// Required. The project in which to create the Uptime check. The format is:
+    /// Required. The [project](https://cloud.google.com/monitoring/api/v3#project_name) in
+    /// which to create the Uptime check. The format is:
     ///
     ///     projects/[PROJECT_ID_OR_NUMBER]
     #[prost(string, tag = "1")]
@@ -4422,7 +4488,7 @@ pub mod uptime_check_service_client {
             interceptor: F,
         ) -> UptimeCheckServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<

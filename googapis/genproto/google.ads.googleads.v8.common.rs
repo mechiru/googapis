@@ -432,8 +432,8 @@ pub struct DisplayCallToAction {
     /// white.
     #[prost(string, optional, tag = "6")]
     pub text_color: ::core::option::Option<::prost::alloc::string::String>,
-    /// Identifies the url collection in the ad.url_collections field. If not set
-    /// the url defaults to final_url.
+    /// Identifies the URL collection in the `ad.url_collections` field. If not
+    /// set, the URL defaults to `final_url`.
     #[prost(string, optional, tag = "7")]
     pub url_collection_id: ::core::option::Option<::prost::alloc::string::String>,
 }
@@ -652,11 +652,11 @@ pub struct ResponsiveSearchAdInfo {
     /// will be selected from this list.
     #[prost(message, repeated, tag = "2")]
     pub descriptions: ::prost::alloc::vec::Vec<AdTextAsset>,
-    /// First part of text that may appear appended to the url displayed in the ad.
+    /// First part of text that can be appended to the URL in the ad.
     #[prost(string, optional, tag = "5")]
     pub path1: ::core::option::Option<::prost::alloc::string::String>,
-    /// Second part of text that may appear appended to the url displayed in the
-    /// ad. This field can only be set when path1 is also set.
+    /// Second part of text that can be appended to the URL in the ad. This field
+    /// can only be set when `path1` is also set.
     #[prost(string, optional, tag = "6")]
     pub path2: ::core::option::Option<::prost::alloc::string::String>,
 }
@@ -679,17 +679,17 @@ pub struct LegacyResponsiveDisplayAdInfo {
     /// Advertiser's consent to allow flexible color. When true, the ad may be
     /// served with different color if necessary. When false, the ad will be served
     /// with the specified colors or a neutral color.
-    /// The default value is true.
-    /// Must be true if main_color and accent_color are not set.
+    /// The default value is `true`.
+    /// Must be true if `main_color` and `accent_color` are not set.
     #[prost(bool, optional, tag = "20")]
     pub allow_flexible_color: ::core::option::Option<bool>,
     /// The accent color of the ad in hexadecimal, e.g. #ffffff for white.
-    /// If one of main_color and accent_color is set, the other is required as
+    /// If one of `main_color` and `accent_color` is set, the other is required as
     /// well.
     #[prost(string, optional, tag = "21")]
     pub accent_color: ::core::option::Option<::prost::alloc::string::String>,
     /// The main color of the ad in hexadecimal, e.g. #ffffff for white.
-    /// If one of main_color and accent_color is set, the other is required as
+    /// If one of `main_color` and `accent_color` is set, the other is required as
     /// well.
     #[prost(string, optional, tag = "22")]
     pub main_color: ::core::option::Option<::prost::alloc::string::String>,
@@ -770,7 +770,7 @@ pub struct AppEngagementAdInfo {
 /// A legacy app install ad that only can be used by a few select customers.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct LegacyAppInstallAdInfo {
-    /// The id of the mobile app.
+    /// The ID of the mobile app.
     #[prost(string, optional, tag = "6")]
     pub app_id: ::core::option::Option<::prost::alloc::string::String>,
     /// The app store the mobile app is available in.
@@ -794,24 +794,24 @@ pub struct LegacyAppInstallAdInfo {
 pub struct ResponsiveDisplayAdInfo {
     /// Marketing images to be used in the ad. Valid image types are GIF,
     /// JPEG, and PNG. The minimum size is 600x314 and the aspect ratio must
-    /// be 1.91:1 (+-1%). At least one marketing_image is required. Combined with
-    /// square_marketing_images the maximum is 15.
+    /// be 1.91:1 (+-1%). At least one `marketing_image` is required. Combined
+    /// with `square_marketing_images`, the maximum is 15.
     #[prost(message, repeated, tag = "1")]
     pub marketing_images: ::prost::alloc::vec::Vec<AdImageAsset>,
     /// Square marketing images to be used in the ad. Valid image types are GIF,
     /// JPEG, and PNG. The minimum size is 300x300 and the aspect ratio must
-    /// be 1:1 (+-1%). At least one square marketing_image is required. Combined
-    /// with marketing_images the maximum is 15.
+    /// be 1:1 (+-1%). At least one square `marketing_image` is required. Combined
+    /// with `marketing_images`, the maximum is 15.
     #[prost(message, repeated, tag = "2")]
     pub square_marketing_images: ::prost::alloc::vec::Vec<AdImageAsset>,
     /// Logo images to be used in the ad. Valid image types are GIF,
     /// JPEG, and PNG. The minimum size is 512x128 and the aspect ratio must
-    /// be 4:1 (+-1%). Combined with square_logo_images the maximum is 5.
+    /// be 4:1 (+-1%). Combined with `square_logo_images`, the maximum is 5.
     #[prost(message, repeated, tag = "3")]
     pub logo_images: ::prost::alloc::vec::Vec<AdImageAsset>,
     /// Square logo images to be used in the ad. Valid image types are GIF,
     /// JPEG, and PNG. The minimum size is 128x128 and the aspect ratio must
-    /// be 1:1 (+-1%). Combined with square_logo_images the maximum is 5.
+    /// be 1:1 (+-1%). Combined with `square_logo_images`, the maximum is 5.
     #[prost(message, repeated, tag = "4")]
     pub square_logo_images: ::prost::alloc::vec::Vec<AdImageAsset>,
     /// Short format headlines for the ad. The maximum length is 30 characters.
@@ -832,20 +832,20 @@ pub struct ResponsiveDisplayAdInfo {
     #[prost(string, optional, tag = "17")]
     pub business_name: ::core::option::Option<::prost::alloc::string::String>,
     /// The main color of the ad in hexadecimal, e.g. #ffffff for white.
-    /// If one of main_color and accent_color is set, the other is required as
+    /// If one of `main_color` and `accent_color` is set, the other is required as
     /// well.
     #[prost(string, optional, tag = "18")]
     pub main_color: ::core::option::Option<::prost::alloc::string::String>,
     /// The accent color of the ad in hexadecimal, e.g. #ffffff for white.
-    /// If one of main_color and accent_color is set, the other is required as
+    /// If one of `main_color` and `accent_color` is set, the other is required as
     /// well.
     #[prost(string, optional, tag = "19")]
     pub accent_color: ::core::option::Option<::prost::alloc::string::String>,
     /// Advertiser's consent to allow flexible color. When true, the ad may be
     /// served with different color if necessary. When false, the ad will be served
     /// with the specified colors or a neutral color.
-    /// The default value is true.
-    /// Must be true if main_color and accent_color are not set.
+    /// The default value is `true`.
+    /// Must be true if `main_color` and `accent_color` are not set.
     #[prost(bool, optional, tag = "20")]
     pub allow_flexible_color: ::core::option::Option<bool>,
     /// The call-to-action text for the ad. Maximum display width is 30.
@@ -900,17 +900,16 @@ pub struct LocalAdInfo {
     /// are optional and at most 20 can be specified.
     #[prost(message, repeated, tag = "6")]
     pub videos: ::prost::alloc::vec::Vec<AdVideoAsset>,
-    /// First part of optional text that may appear appended to the url displayed
-    /// in the ad.
+    /// First part of optional text that can be appended to the URL in the ad.
     #[prost(string, optional, tag = "9")]
     pub path1: ::core::option::Option<::prost::alloc::string::String>,
-    /// Second part of optional text that may appear appended to the url displayed
-    /// in the ad. This field can only be set when path1 is also set.
+    /// Second part of optional text that can be appended to the URL in the ad.
+    /// This field can only be set when `path1` is also set.
     #[prost(string, optional, tag = "10")]
     pub path2: ::core::option::Option<::prost::alloc::string::String>,
 }
 /// A generic type of display ad. The exact ad format is controlled by the
-/// display_upload_product_type field, which determines what kinds of data
+/// `display_upload_product_type` field, which determines what kinds of data
 /// need to be included with the ad.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DisplayUploadAdInfo {
@@ -930,7 +929,7 @@ pub mod display_upload_ad_info {
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum MediaAsset {
         /// A media bundle asset to be used in the ad. For information about the
-        /// media bundle for HTML5_UPLOAD_AD see
+        /// media bundle for HTML5_UPLOAD_AD, see
         /// https://support.google.com/google-ads/answer/1722096
         /// Media bundles that are part of dynamic product types use a special format
         /// that needs to be created through the Google Web Designer. See
@@ -1001,7 +1000,7 @@ pub struct CallAdInfo {
     pub phone_number_verification_url: ::prost::alloc::string::String,
     /// The conversion action to attribute a call conversion to. If not set a
     /// default conversion action is used. This field only has effect if
-    /// call_tracked is set to true. Otherwise this field is ignored.
+    /// `call_tracked` is set to `true`. Otherwise this field is ignored.
     #[prost(string, tag = "9")]
     pub conversion_action: ::prost::alloc::string::String,
     /// The call conversion behavior of this call ad. It can use its own call
@@ -1011,12 +1010,11 @@ pub struct CallAdInfo {
         tag = "10"
     )]
     pub conversion_reporting_state: i32,
-    /// First part of text that may appear appended to the url displayed to in
-    /// the ad. Optional.
+    /// First part of text that can be appended to the URL in the ad. Optional.
     #[prost(string, tag = "13")]
     pub path1: ::prost::alloc::string::String,
-    /// Second part of text that may appear appended to the url displayed to in
-    /// the ad. This field can only be set when path1 is set. Optional.
+    /// Second part of text that can be appended to the URL in the ad. This field
+    /// can only be set when `path1` is also set. Optional.
     #[prost(string, tag = "14")]
     pub path2: ::prost::alloc::string::String,
 }
@@ -2181,10 +2179,12 @@ pub struct TargetCpa {
     pub target_cpa_micros: ::core::option::Option<i64>,
     /// Maximum bid limit that can be set by the bid strategy.
     /// The limit applies to all keywords managed by the strategy.
+    /// This should only be set for portfolio bid strategies.
     #[prost(int64, optional, tag = "5")]
     pub cpc_bid_ceiling_micros: ::core::option::Option<i64>,
     /// Minimum bid limit that can be set by the bid strategy.
     /// The limit applies to all keywords managed by the strategy.
+    /// This should only be set for portfolio bid strategies.
     #[prost(int64, optional, tag = "6")]
     pub cpc_bid_floor_micros: ::core::option::Option<i64>,
 }
@@ -2223,10 +2223,12 @@ pub struct TargetRoas {
     pub target_roas: ::core::option::Option<f64>,
     /// Maximum bid limit that can be set by the bid strategy.
     /// The limit applies to all keywords managed by the strategy.
+    /// This should only be set for portfolio bid strategies.
     #[prost(int64, optional, tag = "5")]
     pub cpc_bid_ceiling_micros: ::core::option::Option<i64>,
     /// Minimum bid limit that can be set by the bid strategy.
     /// The limit applies to all keywords managed by the strategy.
+    /// This should only be set for portfolio bid strategies.
     #[prost(int64, optional, tag = "6")]
     pub cpc_bid_floor_micros: ::core::option::Option<i64>,
 }
@@ -3745,10 +3747,12 @@ pub struct OfflineUserAddressInfo {
     /// case only and no punctuation).
     #[prost(string, optional, tag = "8")]
     pub hashed_last_name: ::core::option::Option<::prost::alloc::string::String>,
-    /// City of the address. Only accepted for Store Sales Direct data.
+    /// City of the address. Only accepted for Store Sales and
+    /// ConversionAdjustmentUploadService.
     #[prost(string, optional, tag = "9")]
     pub city: ::core::option::Option<::prost::alloc::string::String>,
-    /// State code of the address. Only accepted for Store Sales Direct data.
+    /// State code of the address. Only accepted for Store Sales and
+    /// ConversionAdjustmentUploadService.
     #[prost(string, optional, tag = "10")]
     pub state: ::core::option::Option<::prost::alloc::string::String>,
     /// 2-letter country code in ISO-3166-1 alpha-2 of the user's address.
@@ -3757,41 +3761,66 @@ pub struct OfflineUserAddressInfo {
     /// Postal code of the user's address.
     #[prost(string, optional, tag = "12")]
     pub postal_code: ::core::option::Option<::prost::alloc::string::String>,
+    /// The street address of the user hashed using SHA-256 hash function after
+    /// normalization (lower case only). Only accepted for
+    /// ConversionAdjustmentUploadService.
+    #[prost(string, optional, tag = "13")]
+    pub hashed_street_address: ::core::option::Option<::prost::alloc::string::String>,
 }
-/// Hashed user identifying information.
+/// User identifying information.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UserIdentifier {
-    /// Source of the user identifier when the upload is from Store Sales third
-    /// party partners.
+    /// Source of the user identifier when the upload is from Store Sales,
+    /// ConversionUploadService, or ConversionAdjustmentUploadService. For
+    /// ConversionUploadService and ConversionAdjustmentUploadService, the source
+    /// of the user identifier must be specified as FIRST_PARTY, otherwise an error
+    /// will be returned.
     #[prost(
         enumeration = "super::enums::user_identifier_source_enum::UserIdentifierSource",
         tag = "6"
     )]
     pub user_identifier_source: i32,
-    /// Exactly one must be specified.
+    /// Exactly one must be specified. For OfflineUserDataJobService, Customer
+    /// Match accepts hashed_email, hashed_phone_number, mobile_id,
+    /// third_party_user_id, and address_info; Store Sales accepts hashed_email,
+    /// hashed_phone_number, third_party_user_id, and address_info.
+    /// ConversionUploadService accepts hashed_email and hashed_phone_number.
+    /// ConversionAdjustmentUploadService accepts hashed_email,
+    /// hashed_phone_number, and address_info.
     #[prost(oneof = "user_identifier::Identifier", tags = "7, 8, 9, 10, 5")]
     pub identifier: ::core::option::Option<user_identifier::Identifier>,
 }
 /// Nested message and enum types in `UserIdentifier`.
 pub mod user_identifier {
-    /// Exactly one must be specified.
+    /// Exactly one must be specified. For OfflineUserDataJobService, Customer
+    /// Match accepts hashed_email, hashed_phone_number, mobile_id,
+    /// third_party_user_id, and address_info; Store Sales accepts hashed_email,
+    /// hashed_phone_number, third_party_user_id, and address_info.
+    /// ConversionUploadService accepts hashed_email and hashed_phone_number.
+    /// ConversionAdjustmentUploadService accepts hashed_email,
+    /// hashed_phone_number, and address_info.
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Identifier {
         /// Hashed email address using SHA-256 hash function after normalization.
+        /// Accepted for Customer Match, Store Sales, ConversionUploadService, and
+        /// ConversionAdjustmentUploadService.
         #[prost(string, tag = "7")]
         HashedEmail(::prost::alloc::string::String),
         /// Hashed phone number using SHA-256 hash function after normalization
-        /// (E164 standard).
+        /// (E164 standard). Accepted for Customer Match, Store Sales,
+        /// ConversionUploadService, and ConversionAdjustmentUploadService.
         #[prost(string, tag = "8")]
         HashedPhoneNumber(::prost::alloc::string::String),
-        /// Mobile device ID (advertising ID/IDFA).
+        /// Mobile device ID (advertising ID/IDFA). Accepted only for Customer Match.
         #[prost(string, tag = "9")]
         MobileId(::prost::alloc::string::String),
         /// Advertiser-assigned user ID for Customer Match upload, or
-        /// third-party-assigned user ID for SSD.
+        /// third-party-assigned user ID for Store Sales. Accepted only for Customer
+        /// Match and Store Sales.
         #[prost(string, tag = "10")]
         ThirdPartyUserId(::prost::alloc::string::String),
-        /// Address information.
+        /// Address information. Accepted only for Customer Match, Store Sales, and
+        /// ConversionAdjustmentUploadService.
         #[prost(message, tag = "5")]
         AddressInfo(super::OfflineUserAddressInfo),
     }
@@ -3807,6 +3836,7 @@ pub struct TransactionAttribute {
     #[prost(string, optional, tag = "8")]
     pub transaction_date_time: ::core::option::Option<::prost::alloc::string::String>,
     /// Transaction amount in micros. Required.
+    /// Transaction amount in micros needs to be greater than 1000.
     /// If item Attributes are provided, it represents the total value of the
     /// items, after multiplying the unit price per item by the quantity provided
     /// in the ItemAttributes.
@@ -4301,6 +4331,18 @@ pub struct Segments {
     /// Position of the ad.
     #[prost(enumeration = "super::enums::slot_enum::Slot", tag = "23")]
     pub slot: i32,
+    /// Primary dimension of applied conversion value rules.
+    /// NO_RULE_APPLIED shows the total recorded value of conversions that
+    /// do not have a value rule applied.
+    /// ORIGINAL shows the original value of conversions to which a value rule
+    /// has been applied.
+    /// GEO_LOCATION, DEVICE, AUDIENCE show the net adjustment after value
+    /// rules were applied.
+    #[prost(
+        enumeration = "super::enums::conversion_value_rule_primary_dimension_enum::ConversionValueRulePrimaryDimension",
+        tag = "138"
+    )]
+    pub conversion_value_rule_primary_dimension: i32,
     /// Resource name of the ad group criterion that represents webpage criterion.
     #[prost(string, optional, tag = "129")]
     pub webpage: ::core::option::Option<::prost::alloc::string::String>,

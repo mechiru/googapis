@@ -103,6 +103,10 @@ pub struct Asset {
     /// for more information.
     #[prost(message, optional, tag = "12")]
     pub os_inventory: ::core::option::Option<super::super::osconfig::v1::Inventory>,
+    /// The related assets of the asset of one relationship type.
+    /// One asset only represents one type of relationship.
+    #[prost(message, optional, tag = "13")]
+    pub related_assets: ::core::option::Option<RelatedAssets>,
     /// The ancestry path of an asset in Google Cloud [resource
     /// hierarchy](https://cloud.google.com/resource-manager/docs/cloud-platform-resource-hierarchy),
     /// represented as a list of relative resource names. An ancestry path starts
@@ -190,6 +194,68 @@ pub struct Resource {
     /// For more information, see https://cloud.google.com/about/locations/.
     #[prost(string, tag = "8")]
     pub location: ::prost::alloc::string::String,
+}
+/// The detailed related assets with the `relationship_type`.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct RelatedAssets {
+    /// The detailed relationship attributes.
+    #[prost(message, optional, tag = "1")]
+    pub relationship_attributes: ::core::option::Option<RelationshipAttributes>,
+    /// The peer resources of the relationship.
+    #[prost(message, repeated, tag = "2")]
+    pub assets: ::prost::alloc::vec::Vec<RelatedAsset>,
+}
+/// The relationship attributes which include  `type`, `source_resource_type`,
+/// `target_resource_type` and `action`.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct RelationshipAttributes {
+    /// The unique identifier of the relationship type. Example:
+    /// `INSTANCE_TO_INSTANCEGROUP`
+    #[prost(string, tag = "4")]
+    pub r#type: ::prost::alloc::string::String,
+    /// The source asset type. Example: `compute.googleapis.com/Instance`
+    #[prost(string, tag = "1")]
+    pub source_resource_type: ::prost::alloc::string::String,
+    /// The target asset type. Example: `compute.googleapis.com/Disk`
+    #[prost(string, tag = "2")]
+    pub target_resource_type: ::prost::alloc::string::String,
+    /// The detail of the relationship, e.g. `contains`, `attaches`
+    #[prost(string, tag = "3")]
+    pub action: ::prost::alloc::string::String,
+}
+/// An asset identify in Google Cloud which contains its name, type and
+/// ancestors. An asset can be any resource in the Google Cloud [resource
+/// hierarchy](https://cloud.google.com/resource-manager/docs/cloud-platform-resource-hierarchy),
+/// a resource outside the Google Cloud resource hierarchy (such as Google
+/// Kubernetes Engine clusters and objects), or a policy (e.g. Cloud IAM policy).
+/// See [Supported asset
+/// types](https://cloud.google.com/asset-inventory/docs/supported-asset-types)
+/// for more information.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct RelatedAsset {
+    /// The full name of the asset. Example:
+    /// `//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1`
+    ///
+    /// See [Resource
+    /// names](https://cloud.google.com/apis/design/resource_names#full_resource_name)
+    /// for more information.
+    #[prost(string, tag = "1")]
+    pub asset: ::prost::alloc::string::String,
+    /// The type of the asset. Example: `compute.googleapis.com/Disk`
+    ///
+    /// See [Supported asset
+    /// types](https://cloud.google.com/asset-inventory/docs/supported-asset-types)
+    /// for more information.
+    #[prost(string, tag = "2")]
+    pub asset_type: ::prost::alloc::string::String,
+    /// The ancestors of an asset in Google Cloud [resource
+    /// hierarchy](https://cloud.google.com/resource-manager/docs/cloud-platform-resource-hierarchy),
+    /// represented as a list of relative resource names. An ancestry path starts
+    /// with the closest ancestor in the hierarchy and ends at root.
+    ///
+    /// Example: `["projects/123456789", "folders/5432", "organizations/1234"]`
+    #[prost(string, repeated, tag = "3")]
+    pub ancestors: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 /// A result of Resource Search, containing information of a cloud resource.
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -410,6 +476,15 @@ pub struct ResourceSearchResult {
     /// as to allow users to search on them.
     #[prost(message, repeated, tag = "20")]
     pub attached_resources: ::prost::alloc::vec::Vec<AttachedResource>,
+    /// A map of related resources of this resource, keyed by the
+    /// relationship type. A relationship type is in the format of
+    /// {SourceType}_{ACTION}_{DestType}. Example: `DISK_TO_INSTANCE`,
+    /// `DISK_TO_NETWORK`, `INSTANCE_TO_INSTANCEGROUP`.
+    /// See [supported relationship
+    /// types](https://cloud.google.com/asset-inventory/docs/supported-asset-types#supported_relationship_types).
+    #[prost(map = "string, message", tag = "21")]
+    pub relationships:
+        ::std::collections::HashMap<::prost::alloc::string::String, RelatedResources>,
     /// The type of this resource's immediate parent, if there is one.
     ///
     /// To search against the `parent_asset_type`:
@@ -466,6 +541,24 @@ pub struct AttachedResource {
     /// representations during version migration.
     #[prost(message, repeated, tag = "3")]
     pub versioned_resources: ::prost::alloc::vec::Vec<VersionedResource>,
+}
+/// The related resources of the primary resource.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct RelatedResources {
+    /// The detailed related resources of the primary resource.
+    #[prost(message, repeated, tag = "1")]
+    pub related_resources: ::prost::alloc::vec::Vec<RelatedResource>,
+}
+/// The detailed related resource.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct RelatedResource {
+    /// The type of the asset. Example: `compute.googleapis.com/Instance`
+    #[prost(string, tag = "1")]
+    pub asset_type: ::prost::alloc::string::String,
+    /// The full resource name of the related resource. Example:
+    /// `//compute.googleapis.com/projects/my_proj_123/zones/instance/instance123`
+    #[prost(string, tag = "2")]
+    pub full_resource_name: ::prost::alloc::string::String,
 }
 /// A result of IAM Policy search, containing information of an IAM policy.
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -767,7 +860,7 @@ pub mod iam_policy_analysis_result {
 /// AnalyzeIamPolicyLongrunning rpc.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct AnalyzeIamPolicyLongrunningMetadata {
-    /// The time the operation was created.
+    /// Output only. The time the operation was created.
     #[prost(message, optional, tag = "1")]
     pub create_time: ::core::option::Option<::prost_types::Timestamp>,
 }
@@ -814,6 +907,23 @@ pub struct ExportAssetsRequest {
     /// Required. Output configuration indicating where the results will be output to.
     #[prost(message, optional, tag = "5")]
     pub output_config: ::core::option::Option<OutputConfig>,
+    /// A list of relationship types to export, for example:
+    /// `INSTANCE_TO_INSTANCEGROUP`. This field should only be specified if
+    /// content_type=RELATIONSHIP.
+    /// * If specified:
+    /// it snapshots specified relationships. It returns an error if
+    /// any of the [relationship_types] doesn't belong to the supported
+    /// relationship types of the [asset_types] or if any of the [asset_types]
+    /// doesn't belong to the source types of the [relationship_types].
+    /// * Otherwise:
+    /// it snapshots the supported relationships for all [asset_types] or returns
+    /// an error if any of the [asset_types] has no relationship support.
+    /// An unspecified asset types field means all supported asset_types.
+    /// See [Introduction to Cloud Asset
+    /// Inventory](https://cloud.google.com/asset-inventory/docs/overview) for all
+    /// supported asset types and relationship types.
+    #[prost(string, repeated, tag = "6")]
+    pub relationship_types: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 /// The export asset response. This message is returned by the
 /// [google.longrunning.Operations.GetOperation][google.longrunning.Operations.GetOperation] method in the returned
@@ -883,6 +993,23 @@ pub struct ListAssetsRequest {
     /// prior `ListAssets` call, and the API should return the next page of assets.
     #[prost(string, tag = "6")]
     pub page_token: ::prost::alloc::string::String,
+    /// A list of relationship types to output, for example:
+    /// `INSTANCE_TO_INSTANCEGROUP`. This field should only be specified if
+    /// content_type=RELATIONSHIP.
+    /// * If specified:
+    /// it snapshots specified relationships. It returns an error if
+    /// any of the [relationship_types] doesn't belong to the supported
+    /// relationship types of the [asset_types] or if any of the [asset_types]
+    /// doesn't belong to the source types of the [relationship_types].
+    /// * Otherwise:
+    /// it snapshots the supported relationships for all [asset_types] or returns
+    /// an error if any of the [asset_types] has no relationship support.
+    /// An unspecified asset types field means all supported asset_types.
+    /// See [Introduction to Cloud Asset
+    /// Inventory](https://cloud.google.com/asset-inventory/docs/overview)
+    /// for all supported asset types and relationship types.
+    #[prost(string, repeated, tag = "7")]
+    pub relationship_types: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 /// ListAssets response.
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -928,6 +1055,24 @@ pub struct BatchGetAssetsHistoryRequest {
     /// window overlap with read_time_window.
     #[prost(message, optional, tag = "4")]
     pub read_time_window: ::core::option::Option<TimeWindow>,
+    /// Optional. A list of relationship types to output, for example:
+    /// `INSTANCE_TO_INSTANCEGROUP`. This field should only be specified if
+    /// content_type=RELATIONSHIP.
+    /// * If specified:
+    /// it outputs specified relationships' history on the [asset_names]. It
+    /// returns an error if any of the [relationship_types] doesn't belong to the
+    /// supported relationship types of the [asset_names] or if any of the
+    /// [asset_names]'s types doesn't belong to the source types of the
+    /// [relationship_types].
+    /// * Otherwise:
+    /// it outputs the supported relationships' history on the [asset_names] or
+    /// returns an error if any of the [asset_names]'s types has no relationship
+    /// support.
+    /// See [Introduction to Cloud Asset
+    /// Inventory](https://cloud.google.com/asset-inventory/docs/overview) for all
+    /// supported asset types and relationship types.
+    #[prost(string, repeated, tag = "5")]
+    pub relationship_types: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 /// Batch get assets history response.
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1274,6 +1419,24 @@ pub struct Feed {
     /// for detailed instructions.
     #[prost(message, optional, tag = "6")]
     pub condition: ::core::option::Option<super::super::super::r#type::Expr>,
+    /// A list of relationship types to output, for example:
+    /// `INSTANCE_TO_INSTANCEGROUP`. This field should only be specified if
+    /// content_type=RELATIONSHIP.
+    /// * If specified:
+    /// it outputs specified relationship updates on the [asset_names] or the
+    /// [asset_types]. It returns an error if any of the [relationship_types]
+    /// doesn't belong to the supported relationship types of the [asset_names] or
+    /// [asset_types], or any of the [asset_names] or the [asset_types] doesn't
+    /// belong to the source types of the [relationship_types].
+    /// * Otherwise:
+    /// it outputs the supported relationships of the types of [asset_names] and
+    /// [asset_types] or returns an error if any of the [asset_names] or the
+    /// [asset_types] has no replationship support.
+    /// See [Introduction to Cloud Asset
+    /// Inventory](https://cloud.google.com/asset-inventory/docs/overview)
+    /// for all supported asset types and relationship types.
+    #[prost(string, repeated, tag = "7")]
+    pub relationship_types: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 /// Search all resources request.
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1998,6 +2161,8 @@ pub enum ContentType {
     AccessPolicy = 5,
     /// The runtime OS Inventory information.
     OsInventory = 6,
+    /// The related resources.
+    Relationship = 7,
 }
 #[doc = r" Generated client implementations."]
 pub mod asset_service_client {
@@ -2024,7 +2189,7 @@ pub mod asset_service_client {
             interceptor: F,
         ) -> AssetServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<

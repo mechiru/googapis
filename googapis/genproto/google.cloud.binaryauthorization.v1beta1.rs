@@ -137,9 +137,9 @@ pub mod policy {
     pub enum GlobalPolicyEvaluationMode {
         /// Not specified: DISABLE is assumed.
         Unspecified = 0,
-        /// Enables global policy evaluation.
+        /// Enables system policy evaluation.
         Enable = 1,
-        /// Disables global policy evaluation.
+        /// Disables system policy evaluation.
         Disable = 2,
     }
 }
@@ -523,7 +523,7 @@ pub mod binauthz_management_service_v1_beta1_client {
             interceptor: F,
         ) -> BinauthzManagementServiceV1Beta1Client<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<

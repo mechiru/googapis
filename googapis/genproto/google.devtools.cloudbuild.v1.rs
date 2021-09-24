@@ -256,6 +256,11 @@ pub struct BuildStep {
     /// as the build progresses.
     #[prost(enumeration = "build::Status", tag = "12")]
     pub status: i32,
+    /// A shell script to be executed in the step.
+    ///
+    /// When script is provided, the user cannot specify the entrypoint or args.
+    #[prost(string, tag = "19")]
+    pub script: ::prost::alloc::string::String,
 }
 /// Volume describes a Docker container volume which is mounted into build steps
 /// in order to persist files across build step execution.
@@ -441,14 +446,19 @@ pub struct Build {
     /// Output only. Stores timing information for phases of the build. Valid keys
     /// are:
     ///
-    /// * BUILD: time to execute all build steps
+    /// * BUILD: time to execute all build steps.
     /// * PUSH: time to push all specified images.
     /// * FETCHSOURCE: time to fetch source.
+    /// * SETUPBUILD: time to set up build.
     ///
     /// If the build does not specify source or images,
     /// these keys will not be included.
     #[prost(map = "string, message", tag = "33")]
     pub timing: ::std::collections::HashMap<::prost::alloc::string::String, TimeSpan>,
+    /// Output only. Describes this build's approval configuration, status,
+    /// and result.
+    #[prost(message, optional, tag = "44")]
+    pub approval: ::core::option::Option<BuildApproval>,
     /// IAM service account whose credentials will be used at build runtime.
     /// Must be of the format `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     /// ACCOUNT can be email address or uniqueId of the service account.
@@ -537,6 +547,9 @@ pub mod build {
     pub enum Status {
         /// Status of the build is unknown.
         Unknown = 0,
+        /// Build has been created and is pending execution and queuing. It has not
+        /// been queued.
+        Pending = 10,
         /// Build or step is queued; work has not yet begun.
         Queued = 1,
         /// Build or step is being executed.
@@ -828,6 +841,97 @@ pub struct CancelBuildRequest {
     #[prost(string, tag = "2")]
     pub id: ::prost::alloc::string::String,
 }
+/// Request to approve or reject a pending build.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ApproveBuildRequest {
+    /// Required. Name of the target build.
+    /// For example: "projects/{$project_id}/builds/{$build_id}"
+    #[prost(string, tag = "1")]
+    pub name: ::prost::alloc::string::String,
+    /// Approval decision and metadata.
+    #[prost(message, optional, tag = "2")]
+    pub approval_result: ::core::option::Option<ApprovalResult>,
+}
+/// BuildApproval describes a build's approval configuration, state, and
+/// result.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct BuildApproval {
+    /// Output only. The state of this build's approval.
+    #[prost(enumeration = "build_approval::State", tag = "1")]
+    pub state: i32,
+    /// Output only. Configuration for manual approval of this build.
+    #[prost(message, optional, tag = "2")]
+    pub config: ::core::option::Option<ApprovalConfig>,
+    /// Output only. Result of manual approval for this Build.
+    #[prost(message, optional, tag = "3")]
+    pub result: ::core::option::Option<ApprovalResult>,
+}
+/// Nested message and enum types in `BuildApproval`.
+pub mod build_approval {
+    /// Specifies the current state of a build's approval.
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum State {
+        /// Default enum type. This should not be used.
+        Unspecified = 0,
+        /// Build approval is pending.
+        Pending = 1,
+        /// Build approval has been approved.
+        Approved = 2,
+        /// Build approval has been rejected.
+        Rejected = 3,
+        /// Build was cancelled while it was still pending approval.
+        Cancelled = 5,
+    }
+}
+/// ApprovalConfig describes configuration for manual approval of a build.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ApprovalConfig {
+    /// Whether or not approval is needed. If this is set on a build, it will
+    /// become pending when created, and will need to be explicitly approved
+    /// to start.
+    #[prost(bool, tag = "1")]
+    pub approval_required: bool,
+}
+/// ApprovalResult describes the decision and associated metadata of a manual
+/// approval of a build.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ApprovalResult {
+    /// Output only. Email of the user that called the ApproveBuild API to
+    /// approve or reject a build at the time that the API was called.
+    #[prost(string, tag = "2")]
+    pub approver_account: ::prost::alloc::string::String,
+    /// Output only. The time when the approval decision was made.
+    #[prost(message, optional, tag = "3")]
+    pub approval_time: ::core::option::Option<::prost_types::Timestamp>,
+    /// Required. The decision of this manual approval.
+    #[prost(enumeration = "approval_result::Decision", tag = "4")]
+    pub decision: i32,
+    /// Optional. An optional comment for this manual approval result.
+    #[prost(string, tag = "5")]
+    pub comment: ::prost::alloc::string::String,
+    /// Optional. An optional URL tied to this manual approval result. This field
+    /// is essentially the same as comment, except that it will be rendered by the
+    /// UI differently. An example use case is a link to an external job that
+    /// approved this Build.
+    #[prost(string, tag = "6")]
+    pub url: ::prost::alloc::string::String,
+}
+/// Nested message and enum types in `ApprovalResult`.
+pub mod approval_result {
+    /// Specifies whether or not this manual approval result is to approve
+    /// or reject a build.
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum Decision {
+        /// Default enum type. This should not be used.
+        Unspecified = 0,
+        /// Build is approved.
+        Approved = 1,
+        /// Build is rejected.
+        Rejected = 2,
+    }
+}
 /// Configuration for an automated build in response to source repository
 /// changes.
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -912,6 +1016,13 @@ pub struct BuildTrigger {
     /// Optional. A Common Expression Language string.
     #[prost(string, tag = "30")]
     pub filter: ::prost::alloc::string::String,
+    /// The service account used for all user-controlled operations including
+    /// UpdateBuildTrigger, RunBuildTrigger, CreateBuild, and CancelBuild.
+    /// If no service account is set, then the standard Cloud Build service account
+    /// ([PROJECT_NUM]@system.gserviceaccount.com) will be used instead.
+    /// Format: `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_ID_OR_EMAIL}`
+    #[prost(string, tag = "33")]
+    pub service_account: ::prost::alloc::string::String,
     /// Template describing the Build request to make when the trigger is matched.
     #[prost(oneof = "build_trigger::BuildTemplate", tags = "18, 4, 8")]
     pub build_template: ::core::option::Option<build_trigger::BuildTemplate>,
@@ -1721,7 +1832,7 @@ pub mod cloud_build_client {
             interceptor: F,
         ) -> CloudBuildClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -1870,6 +1981,31 @@ pub mod cloud_build_client {
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
                 "/google.devtools.cloudbuild.v1.CloudBuild/RetryBuild",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        #[doc = " Approves or rejects a pending build."]
+        #[doc = ""]
+        #[doc = " If approved, the returned LRO will be analogous to the LRO returned from"]
+        #[doc = " a CreateBuild call."]
+        #[doc = ""]
+        #[doc = " If rejected, the returned LRO will be immediately done."]
+        pub async fn approve_build(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ApproveBuildRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::super::longrunning::Operation>,
+            tonic::Status,
+        > {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/google.devtools.cloudbuild.v1.CloudBuild/ApproveBuild",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }

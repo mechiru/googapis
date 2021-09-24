@@ -701,7 +701,7 @@ pub mod big_query_read_client {
             interceptor: F,
         ) -> BigQueryReadClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -743,7 +743,7 @@ pub mod big_query_read_client {
         #[doc = " limits are enforced based on the number of pre-filtered rows, so some"]
         #[doc = " filters can lead to lopsided assignments."]
         #[doc = ""]
-        #[doc = " Read sessions automatically expire 24 hours after they are created and do"]
+        #[doc = " Read sessions automatically expire 6 hours after they are created and do"]
         #[doc = " not require manual clean-up by the caller."]
         pub async fn create_read_session(
             &mut self,
@@ -844,7 +844,7 @@ pub mod big_query_write_client {
             interceptor: F,
         ) -> BigQueryWriteClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<

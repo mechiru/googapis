@@ -104,7 +104,6 @@ pub struct Schedule {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SpecSource {
     /// The game server config resource. Uses the form:
-    ///
     /// `projects/{project}/locations/{location}/gameServerDeployments/{deployment_id}/configs/{config_id}`.
     #[prost(string, tag = "1")]
     pub game_server_config_name: ::prost::alloc::string::String,
@@ -117,12 +116,10 @@ pub struct SpecSource {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TargetDetails {
     /// The game server cluster name. Uses the form:
-    ///
     /// `projects/{project}/locations/{location}/realms/{realm}/gameServerClusters/{cluster}`.
     #[prost(string, tag = "1")]
     pub game_server_cluster_name: ::prost::alloc::string::String,
     /// The game server deployment name. Uses the form:
-    ///
     /// `projects/{project}/locations/{location}/gameServerDeployments/{deployment_id}`.
     #[prost(string, tag = "2")]
     pub game_server_deployment_name: ::prost::alloc::string::String,
@@ -246,11 +243,11 @@ pub mod deployed_fleet_details {
 /// Request message for GameServerClustersService.ListGameServerClusters.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListGameServerClustersRequest {
-    /// Required. The parent resource name. Uses the form:
+    /// Required. The parent resource name, in the following form:
     /// "projects/{project}/locations/{location}/realms/{realm}".
     #[prost(string, tag = "1")]
     pub parent: ::prost::alloc::string::String,
-    /// Optional. The maximum number of items to return.  If unspecified, the server
+    /// Optional. The maximum number of items to return. If unspecified, the server
     /// will pick an appropriate default. The server may return fewer items than
     /// requested. A caller should only rely on response's
     /// [next_page_token][google.cloud.gaming.v1.ListGameServerClustersResponse.next_page_token] to
@@ -267,6 +264,14 @@ pub struct ListGameServerClustersRequest {
     /// https://cloud.google.com/apis/design/design_patterns#sorting_order.
     #[prost(string, tag = "5")]
     pub order_by: ::prost::alloc::string::String,
+    /// Optional. View for the returned GameServerCluster objects. When `FULL` is
+    /// specified, the `cluster_state` field is also returned in the
+    /// GameServerCluster object, which includes the state of the referenced
+    /// Kubernetes cluster such as versions and provider info. The default/unset
+    /// value is GAME_SERVER_CLUSTER_VIEW_UNSPECIFIED, same as BASIC, which does
+    /// not return the `cluster_state` field.
+    #[prost(enumeration = "GameServerClusterView", tag = "6")]
+    pub view: i32,
 }
 /// Response message for GameServerClustersService.ListGameServerClusters.
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -285,16 +290,23 @@ pub struct ListGameServerClustersResponse {
 /// Request message for GameServerClustersService.GetGameServerCluster.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetGameServerClusterRequest {
-    /// Required. The name of the game server cluster to retrieve. Uses the form:
-    ///
+    /// Required. The name of the game server cluster to retrieve, in the following form:
     /// `projects/{project}/locations/{location}/realms/{realm-id}/gameServerClusters/{cluster}`.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
+    /// Optional. View for the returned GameServerCluster objects. When `FULL` is
+    /// specified, the `cluster_state` field is also returned in the
+    /// GameServerCluster object, which includes the state of the referenced
+    /// Kubernetes cluster such as versions and provider info. The default/unset
+    /// value is GAME_SERVER_CLUSTER_VIEW_UNSPECIFIED, same as BASIC, which does
+    /// not return the `cluster_state` field.
+    #[prost(enumeration = "GameServerClusterView", tag = "6")]
+    pub view: i32,
 }
 /// Request message for GameServerClustersService.CreateGameServerCluster.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateGameServerClusterRequest {
-    /// Required. The parent resource name. Uses the form:
+    /// Required. The parent resource name, in the following form:
     /// `projects/{project}/locations/{location}/realms/{realm-id}`.
     #[prost(string, tag = "1")]
     pub parent: ::prost::alloc::string::String,
@@ -308,7 +320,7 @@ pub struct CreateGameServerClusterRequest {
 /// Request message for GameServerClustersService.PreviewCreateGameServerCluster.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PreviewCreateGameServerClusterRequest {
-    /// Required. The parent resource name. Uses the form:
+    /// Required. The parent resource name, in the following form:
     /// `projects/{project}/locations/{location}/realms/{realm}`.
     #[prost(string, tag = "1")]
     pub parent: ::prost::alloc::string::String,
@@ -321,6 +333,11 @@ pub struct PreviewCreateGameServerClusterRequest {
     /// Optional. The target timestamp to compute the preview.
     #[prost(message, optional, tag = "4")]
     pub preview_time: ::core::option::Option<::prost_types::Timestamp>,
+    /// Optional. This field is deprecated, preview will always return
+    /// KubernetesClusterState.
+    #[deprecated]
+    #[prost(enumeration = "GameServerClusterView", tag = "6")]
+    pub view: i32,
 }
 /// Response message for
 /// GameServerClustersService.PreviewCreateGameServerCluster.
@@ -332,11 +349,15 @@ pub struct PreviewCreateGameServerClusterResponse {
     /// The target state.
     #[prost(message, optional, tag = "3")]
     pub target_state: ::core::option::Option<TargetState>,
+    /// Output only. The state of the Kubernetes cluster in preview, this will be available if
+    /// 'view' is set to `FULL` in the relevant List/Get/Preview request.
+    #[prost(message, optional, tag = "4")]
+    pub cluster_state: ::core::option::Option<KubernetesClusterState>,
 }
 /// Request message for GameServerClustersService.DeleteGameServerCluster.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeleteGameServerClusterRequest {
-    /// Required. The name of the game server cluster to delete. Uses the form:
+    /// Required. The name of the game server cluster to delete, in the following form:
     /// `projects/{project}/locations/{location}/gameServerClusters/{cluster}`.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
@@ -344,7 +365,7 @@ pub struct DeleteGameServerClusterRequest {
 /// Request message for GameServerClustersService.PreviewDeleteGameServerCluster.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PreviewDeleteGameServerClusterRequest {
-    /// Required. The name of the game server cluster to delete. Uses the form:
+    /// Required. The name of the game server cluster to delete, in the following form:
     /// `projects/{project}/locations/{location}/gameServerClusters/{cluster}`.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
@@ -372,10 +393,7 @@ pub struct UpdateGameServerClusterRequest {
     pub game_server_cluster: ::core::option::Option<GameServerCluster>,
     /// Required. Mask of fields to update. At least one path must be supplied in
     /// this field. For the `FieldMask` definition, see
-    ///
-    /// https:
-    /// //developers.google.com/protocol-buffers
-    /// // /docs/reference/google.protobuf#fieldmask
+    /// https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     #[prost(message, optional, tag = "2")]
     pub update_mask: ::core::option::Option<::prost_types::FieldMask>,
 }
@@ -388,10 +406,7 @@ pub struct PreviewUpdateGameServerClusterRequest {
     pub game_server_cluster: ::core::option::Option<GameServerCluster>,
     /// Required. Mask of fields to update. At least one path must be supplied in
     /// this field. For the `FieldMask` definition, see
-    ///
-    /// https:
-    /// //developers.google.com/protocol-buffers
-    /// // /docs/reference/google.protobuf#fieldmask
+    /// https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     #[prost(message, optional, tag = "2")]
     pub update_mask: ::core::option::Option<::prost_types::FieldMask>,
     /// Optional. The target timestamp to compute the preview.
@@ -451,11 +466,9 @@ pub struct GkeClusterReference {
 /// A game server cluster resource.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GameServerCluster {
-    /// Required. The resource name of the game server cluster. Uses the form:
-    ///
+    /// Required. The resource name of the game server cluster, in the following form:
     /// `projects/{project}/locations/{location}/realms/{realm}/gameServerClusters/{cluster}`.
     /// For example,
-    ///
     /// `projects/my-project/locations/{location}/realms/zanzibar/gameServerClusters/my-onprem-cluster`.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
@@ -480,6 +493,83 @@ pub struct GameServerCluster {
     /// Human readable description of the cluster.
     #[prost(string, tag = "7")]
     pub description: ::prost::alloc::string::String,
+    /// Output only. The state of the Kubernetes cluster, this will be available if
+    /// 'view' is set to `FULL` in the relevant List/Get/Preview request.
+    #[prost(message, optional, tag = "11")]
+    pub cluster_state: ::core::option::Option<KubernetesClusterState>,
+}
+/// The state of the Kubernetes cluster.
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct KubernetesClusterState {
+    /// Output only. The version of Agones currently installed in the registered Kubernetes
+    /// cluster.
+    #[prost(string, tag = "1")]
+    pub agones_version_installed: ::prost::alloc::string::String,
+    /// Output only. The version of Kubernetes that is currently used in the registered
+    /// Kubernetes cluster (as detected by the Cloud Game Servers service).
+    #[prost(string, tag = "2")]
+    pub kubernetes_version_installed: ::prost::alloc::string::String,
+    /// Output only. The state for the installed versions of Agones/Kubernetes.
+    #[prost(enumeration = "kubernetes_cluster_state::InstallationState", tag = "3")]
+    pub installation_state: i32,
+    /// Output only. The detailed error message for the installed versions of Agones/Kubernetes.
+    #[prost(string, tag = "4")]
+    pub version_installed_error_message: ::prost::alloc::string::String,
+    /// Output only. The cloud provider type reported by the first node's providerID in the list
+    /// of nodes on the Kubernetes endpoint. On Kubernetes platforms that support
+    /// zero-node clusters (like GKE-on-GCP), the provider type will be empty.
+    #[prost(string, tag = "5")]
+    pub provider: ::prost::alloc::string::String,
+    /// Output only. The version of Agones that is targeted to be installed in the cluster.
+    #[prost(string, tag = "6")]
+    pub agones_version_targeted: ::prost::alloc::string::String,
+}
+/// Nested message and enum types in `KubernetesClusterState`.
+pub mod kubernetes_cluster_state {
+    /// The state of the installed versions of Agones/Kubernetes. See also
+    /// https://cloud.google.com/game-servers/docs/versions-and-upgrades.
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum InstallationState {
+        /// The default value. This value is used if the state is omitted.
+        Unspecified = 0,
+        /// The combination of Agones and Kubernetes versions is supported by Google
+        /// Cloud Game Servers.
+        AgonesKubernetesVersionSupported = 1,
+        /// The installed version of Agones is not supported by Google Cloud Game
+        /// Servers.
+        AgonesVersionUnsupported = 2,
+        /// The installed version of Agones is supported by Google Cloud Game
+        /// Servers, but the installed version of Kubernetes is not recommended or
+        /// supported by the version of Agones.
+        AgonesKubernetesVersionUnsupported = 3,
+        /// The installed version of Agones is not recognized because the Agones
+        /// controller's image name does not have a version string reported as
+        /// {major}.{minor}(.{patch}).
+        AgonesVersionUnrecognized = 4,
+        /// The server version of Kubernetes cluster is not recognized because the
+        /// API server didn't return parsable version info on path/version.
+        KubernetesVersionUnrecognized = 5,
+        /// Failed to read or verify the version of Agones or Kubernetes. See
+        /// version_installed_error_message for details.
+        VersionVerificationFailed = 6,
+        /// Agones is not installed.
+        AgonesNotInstalled = 7,
+    }
+}
+/// A view for GameServerCluster objects.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum GameServerClusterView {
+    /// The default / unset value.
+    /// The API will default to the BASIC view.
+    Unspecified = 0,
+    /// Include basic information of a GameServerCluster resource and omit
+    /// `cluster_state`. This is the default value (for ListGameServerClusters,
+    /// GetGameServerCluster and PreviewCreateGameServerCluster).
+    Basic = 1,
+    /// Include everything.
+    Full = 2,
 }
 #[doc = r" Generated client implementations."]
 pub mod game_server_clusters_service_client {
@@ -507,7 +597,7 @@ pub mod game_server_clusters_service_client {
             interceptor: F,
         ) -> GameServerClustersServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -686,8 +776,7 @@ pub mod game_server_clusters_service_client {
 /// Request message for GameServerConfigsService.ListGameServerConfigs.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListGameServerConfigsRequest {
-    /// Required. The parent resource name. Uses the form:
-    ///
+    /// Required. The parent resource name, in the following form:
     /// `projects/{project}/locations/{location}/gameServerDeployments/{deployment}/configs/*`.
     #[prost(string, tag = "1")]
     pub parent: ::prost::alloc::string::String,
@@ -726,8 +815,7 @@ pub struct ListGameServerConfigsResponse {
 /// Request message for GameServerConfigsService.GetGameServerConfig.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetGameServerConfigRequest {
-    /// Required. The name of the game server config to retrieve. Uses the form:
-    ///
+    /// Required. The name of the game server config to retrieve, in the following form:
     /// `projects/{project}/locations/{location}/gameServerDeployments/{deployment}/configs/{config}`.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
@@ -735,8 +823,7 @@ pub struct GetGameServerConfigRequest {
 /// Request message for GameServerConfigsService.CreateGameServerConfig.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateGameServerConfigRequest {
-    /// Required. The parent resource name. Uses the form:
-    ///
+    /// Required. The parent resource name, in the following form:
     /// `projects/{project}/locations/{location}/gameServerDeployments/{deployment}/`.
     #[prost(string, tag = "1")]
     pub parent: ::prost::alloc::string::String,
@@ -750,8 +837,7 @@ pub struct CreateGameServerConfigRequest {
 /// Request message for GameServerConfigsService.DeleteGameServerConfig.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeleteGameServerConfigRequest {
-    /// Required. The name of the game server config to delete. Uses the form:
-    ///
+    /// Required. The name of the game server config to delete, in the following form:
     /// `projects/{project}/locations/{location}/gameServerDeployments/{deployment}/configs/{config}`.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
@@ -789,11 +875,9 @@ pub struct FleetConfig {
 /// A game server config resource.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GameServerConfig {
-    /// The resource name of the game server config. Uses the form:
-    ///
+    /// The resource name of the game server config, in the following form:
     /// `projects/{project}/locations/{location}/gameServerDeployments/{deployment}/configs/{config}`.
     /// For example,
-    ///
     /// `projects/my-project/locations/global/gameServerDeployments/my-game/configs/my-config`.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
@@ -844,7 +928,7 @@ pub mod game_server_configs_service_client {
             interceptor: F,
         ) -> GameServerConfigsServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -952,7 +1036,7 @@ pub mod game_server_configs_service_client {
 /// Request message for GameServerDeploymentsService.ListGameServerDeployments.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListGameServerDeploymentsRequest {
-    /// Required. The parent resource name. Uses the form:
+    /// Required. The parent resource name, in the following form:
     /// `projects/{project}/locations/{location}`.
     #[prost(string, tag = "1")]
     pub parent: ::prost::alloc::string::String,
@@ -992,8 +1076,7 @@ pub struct ListGameServerDeploymentsResponse {
 /// Request message for GameServerDeploymentsService.GetGameServerDeployment.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetGameServerDeploymentRequest {
-    /// Required. The name of the game server delpoyment to retrieve. Uses the form:
-    ///
+    /// Required. The name of the game server delpoyment to retrieve, in the following form:
     /// `projects/{project}/locations/{location}/gameServerDeployments/{deployment}`.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
@@ -1002,8 +1085,7 @@ pub struct GetGameServerDeploymentRequest {
 /// GameServerDeploymentsService.GetGameServerDeploymentRollout.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetGameServerDeploymentRolloutRequest {
-    /// Required. The name of the game server delpoyment to retrieve. Uses the form:
-    ///
+    /// Required. The name of the game server delpoyment to retrieve, in the following form:
     /// `projects/{project}/locations/{location}/gameServerDeployments/{deployment}/rollout`.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
@@ -1011,7 +1093,7 @@ pub struct GetGameServerDeploymentRolloutRequest {
 /// Request message for GameServerDeploymentsService.CreateGameServerDeployment.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateGameServerDeploymentRequest {
-    /// Required. The parent resource name. Uses the form:
+    /// Required. The parent resource name, in the following form:
     /// `projects/{project}/locations/{location}`.
     #[prost(string, tag = "1")]
     pub parent: ::prost::alloc::string::String,
@@ -1025,8 +1107,7 @@ pub struct CreateGameServerDeploymentRequest {
 /// Request message for GameServerDeploymentsService.DeleteGameServerDeployment.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeleteGameServerDeploymentRequest {
-    /// Required. The name of the game server delpoyment to delete. Uses the form:
-    ///
+    /// Required. The name of the game server delpoyment to delete, in the following form:
     /// `projects/{project}/locations/{location}/gameServerDeployments/{deployment}`.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
@@ -1041,10 +1122,7 @@ pub struct UpdateGameServerDeploymentRequest {
     pub game_server_deployment: ::core::option::Option<GameServerDeployment>,
     /// Required. Mask of fields to update. At least one path must be supplied in
     /// this field. For the `FieldMask` definition, see
-    ///
-    /// https:
-    /// //developers.google.com/protocol-buffers
-    /// // /docs/reference/google.protobuf#fieldmask
+    /// https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     #[prost(message, optional, tag = "2")]
     pub update_mask: ::core::option::Option<::prost_types::FieldMask>,
 }
@@ -1058,18 +1136,14 @@ pub struct UpdateGameServerDeploymentRolloutRequest {
     pub rollout: ::core::option::Option<GameServerDeploymentRollout>,
     /// Required. Mask of fields to update. At least one path must be supplied in
     /// this field. For the `FieldMask` definition, see
-    ///
-    /// https:
-    /// //developers.google.com/protocol-buffers
-    /// // /docs/reference/google.protobuf#fieldmask
+    /// https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     #[prost(message, optional, tag = "2")]
     pub update_mask: ::core::option::Option<::prost_types::FieldMask>,
 }
 /// Request message for GameServerDeploymentsService.FetchDeploymentState.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct FetchDeploymentStateRequest {
-    /// Required. The name of the game server delpoyment. Uses the form:
-    ///
+    /// Required. The name of the game server delpoyment, in the following form:
     /// `projects/{project}/locations/{location}/gameServerDeployments/{deployment}`.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
@@ -1102,8 +1176,7 @@ pub mod fetch_deployment_state_response {
 /// A game server deployment resource.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GameServerDeployment {
-    /// The resource name of the game server deployment. Uses the form:
-    ///
+    /// The resource name of the game server deployment, in the following form:
     /// `projects/{project}/locations/{location}/gameServerDeployments/{deployment}`.
     /// For example,
     /// `projects/my-project/locations/global/gameServerDeployments/my-deployment`.
@@ -1158,11 +1231,10 @@ pub mod game_server_config_override {
 /// state.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GameServerDeploymentRollout {
-    /// The resource name of the game server deployment rollout. Uses the form:
-    ///
+    /// The resource name of the game server deployment rollout, in the following
+    /// form:
     /// `projects/{project}/locations/{location}/gameServerDeployments/{deployment}/rollout`.
     /// For example,
-    ///
     /// `projects/my-project/locations/global/gameServerDeployments/my-deployment/rollout`.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
@@ -1174,7 +1246,6 @@ pub struct GameServerDeploymentRollout {
     pub update_time: ::core::option::Option<::prost_types::Timestamp>,
     /// The default game server config is applied to all realms unless overridden
     /// in the rollout. For example,
-    ///
     /// `projects/my-project/locations/global/gameServerDeployments/my-game/configs/my-config`.
     #[prost(string, tag = "4")]
     pub default_game_server_config: ::prost::alloc::string::String,
@@ -1196,10 +1267,7 @@ pub struct PreviewGameServerDeploymentRolloutRequest {
     pub rollout: ::core::option::Option<GameServerDeploymentRollout>,
     /// Optional. Mask of fields to update. At least one path must be supplied in
     /// this field. For the `FieldMask` definition, see
-    ///
-    /// https:
-    /// //developers.google.com/protocol-buffers
-    /// // /docs/reference/google.protobuf#fieldmask
+    /// https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     #[prost(message, optional, tag = "2")]
     pub update_mask: ::core::option::Option<::prost_types::FieldMask>,
     /// Optional. The target timestamp to compute the preview. Defaults to the immediately
@@ -1247,7 +1315,7 @@ pub mod game_server_deployments_service_client {
             interceptor: F,
         ) -> GameServerDeploymentsServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -1446,7 +1514,7 @@ pub mod game_server_deployments_service_client {
 /// Request message for RealmsService.ListRealms.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ListRealmsRequest {
-    /// Required. The parent resource name. Uses the form:
+    /// Required. The parent resource name, in the following form:
     /// `projects/{project}/locations/{location}`.
     #[prost(string, tag = "1")]
     pub parent: ::prost::alloc::string::String,
@@ -1486,7 +1554,7 @@ pub struct ListRealmsResponse {
 /// Request message for RealmsService.GetRealm.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetRealmRequest {
-    /// Required. The name of the realm to retrieve. Uses the form:
+    /// Required. The name of the realm to retrieve, in the following form:
     /// `projects/{project}/locations/{location}/realms/{realm}`.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
@@ -1494,7 +1562,7 @@ pub struct GetRealmRequest {
 /// Request message for RealmsService.CreateRealm.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateRealmRequest {
-    /// Required. The parent resource name. Uses the form:
+    /// Required. The parent resource name, in the following form:
     /// `projects/{project}/locations/{location}`.
     #[prost(string, tag = "1")]
     pub parent: ::prost::alloc::string::String,
@@ -1508,7 +1576,7 @@ pub struct CreateRealmRequest {
 /// Request message for RealmsService.DeleteRealm.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeleteRealmRequest {
-    /// Required. The name of the realm to delete. Uses the form:
+    /// Required. The name of the realm to delete, in the following form:
     /// `projects/{project}/locations/{location}/realms/{realm}`.
     #[prost(string, tag = "1")]
     pub name: ::prost::alloc::string::String,
@@ -1522,10 +1590,7 @@ pub struct UpdateRealmRequest {
     pub realm: ::core::option::Option<Realm>,
     /// Required. The update mask applies to the resource. For the `FieldMask`
     /// definition, see
-    ///
-    /// https:
-    /// //developers.google.com/protocol-buffers
-    /// // /docs/reference/google.protobuf#fieldmask
+    /// https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     #[prost(message, optional, tag = "2")]
     pub update_mask: ::core::option::Option<::prost_types::FieldMask>,
 }
@@ -1538,10 +1603,7 @@ pub struct PreviewRealmUpdateRequest {
     pub realm: ::core::option::Option<Realm>,
     /// Required. The update mask applies to the resource. For the `FieldMask`
     /// definition, see
-    ///
-    /// https:
-    /// //developers.google.com/protocol-buffers
-    /// // /docs/reference/google.protobuf#fieldmask
+    /// https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     #[prost(message, optional, tag = "2")]
     pub update_mask: ::core::option::Option<::prost_types::FieldMask>,
     /// Optional. The target timestamp to compute the preview.
@@ -1561,7 +1623,7 @@ pub struct PreviewRealmUpdateResponse {
 /// A realm resource.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Realm {
-    /// The resource name of the realm. Uses the form:
+    /// The resource name of the realm, in the following form:
     /// `projects/{project}/locations/{location}/realms/{realm}`. For
     /// example, `projects/my-project/locations/{location}/realms/my-realm`.
     #[prost(string, tag = "1")]
@@ -1614,7 +1676,7 @@ pub mod realms_service_client {
             interceptor: F,
         ) -> RealmsServiceClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<

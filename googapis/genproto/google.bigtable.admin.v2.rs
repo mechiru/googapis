@@ -205,7 +205,12 @@ pub mod app_profile {
     /// equidistant. Choosing this option sacrifices read-your-writes consistency
     /// to improve availability.
     #[derive(Clone, PartialEq, ::prost::Message)]
-    pub struct MultiClusterRoutingUseAny {}
+    pub struct MultiClusterRoutingUseAny {
+        /// The set of clusters to route to. The order is ignored; clusters will be
+        /// tried in order of distance. If left empty, all clusters are eligible.
+        #[prost(string, repeated, tag = "1")]
+        pub cluster_ids: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    }
     /// Unconditionally routes all read/write requests to a specific cluster.
     /// This option preserves read-your-writes consistency but does not improve
     /// availability.
@@ -555,7 +560,7 @@ pub mod bigtable_instance_admin_client {
             interceptor: F,
         ) -> BigtableInstanceAdminClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -1966,7 +1971,7 @@ pub mod bigtable_table_admin_client {
             interceptor: F,
         ) -> BigtableTableAdminClient<InterceptedService<T, F>>
         where
-            F: FnMut(tonic::Request<()>) -> Result<tonic::Request<()>, tonic::Status>,
+            F: tonic::service::Interceptor,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
