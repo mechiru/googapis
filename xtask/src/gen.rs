@@ -340,8 +340,7 @@ fn deps_resolver(protos: &[Proto]) -> HashMap<Package, HashSet<Package>> {
     map
 }
 
-#[allow(dead_code)]
-pub fn feature_gates(protos: &[Proto]) -> String {
+pub fn feature_gates(protos: &[Proto], broken_features: &[String]) -> String {
     let pkgs = protos
         .iter()
         .map(|p| p.package.feature_name())
@@ -349,7 +348,26 @@ pub fn feature_gates(protos: &[Proto]) -> String {
     let mut pkgs = pkgs.into_iter().collect::<Vec<_>>();
     pkgs.sort();
     pkgs.into_iter()
-        .map(|f| format!("{} = []", f))
+        .map(|f| {
+            let is_broken = broken_features.contains(&f);
+            format!("{}{} = []", is_broken.then(|| "# ").unwrap_or_default(), f)
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+pub fn feature_names(protos: &[Proto], broken_features: &[String]) -> String {
+    let pkgs = protos
+        .iter()
+        .map(|p| p.package.feature_name())
+        .collect::<HashSet<_>>();
+    let mut pkgs = pkgs.into_iter().collect::<Vec<_>>();
+    pkgs.sort();
+    pkgs.into_iter()
+        .map(|f| {
+            let is_broken = broken_features.contains(&f);
+            format!("  {}{}", is_broken.then(|| "# ").unwrap_or_default(), f)
+        })
         .collect::<Vec<_>>()
         .join("\n")
 }
