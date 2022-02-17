@@ -73,6 +73,7 @@ google-bigtable-admin-v2 = []
 google-bigtable-v2 = []
 google-bytestream = []
 google-chromeos-moblab-v1beta1 = []
+google-clients-auth = ["async-trait"]
 google-cloud = []
 google-cloud-accessapproval-v1 = []
 google-cloud-aiplatform-logging = []
@@ -331,8 +332,9 @@ google-firebase-fcm-connection-v1alpha1 = []
 google-firestore-admin-v1 = []
 google-firestore-admin-v1beta1 = []
 google-firestore-admin-v1beta2 = []
-# google-firestore-bundle = []
+# google-firestore-bundle = []# google-firestore-bundle = []
 google-firestore-v1 = []
+google-firestore-v1-client = ["google-firestore-v1", "google-clients-auth"]
 google-firestore-v1beta1 = []
 google-gapic-metadata = []
 google-genomics-v1 = []
@@ -393,3 +395,4 @@ maps-fleetengine-v1 = []
 tonic = "0.6.1"
 prost = "0.9.0"
 prost-types = "0.9.0"
+async-trait = { version = "^0.1", optional = true }

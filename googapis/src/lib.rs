@@ -89,3 +89,4 @@ macro_rules! include_proto {
 }
 
 include!("googapis.rs");
+include!("clients.rs");
